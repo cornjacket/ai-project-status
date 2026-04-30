@@ -1,0 +1,18 @@
+# Tracked repos. Each entry:
+#   name: short id (used as the directory name under tracked/)
+#   remote: git URL to clone/pull
+#   branch: optional, default "main"
+#   enabled: optional, default true. If false, the repo is skipped entirely.
+#   report_inactivity: optional, default true. If false, no inactivity line is
+#     written to summary.md when the repo has no new work.
+#
+# Example:
+#   repos:
+#     - name: ai-foo
+#       remote: git@github.com:cornjacket/ai-foo.git
+#     - name: ai-bar
+#       remote: git@github.com:cornjacket/ai-bar.git
+#       branch: develop
+#       report_inactivity: false
+
+repos: []
