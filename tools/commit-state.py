@@ -2,25 +2,12 @@
 """Advance state.json to current HEADs and commit summary.md + state.json."""
 from datetime import date
 
-from _lib import REPO_ROOT, enabled_repos, git, head_commit, load_state, repo_dir, save_state
+from _lib import REPO_ROOT, advance_state, git
 
 
 def main():
-    state = load_state()
     today = date.today().isoformat()
-    for r in enabled_repos():
-        name = r["name"]
-        if not repo_dir(name).exists():
-            continue
-        head = head_commit(name)
-        prev = state.get(name, {})
-        had_activity = prev.get("last_commit") != head
-        state[name] = {
-            "last_commit": head,
-            "last_synced": today,
-            "last_activity_date": today if had_activity else prev.get("last_activity_date"),
-        }
-    save_state(state)
+    advance_state(today=today)
 
     status = git(["status", "--porcelain", "summary.md", "state.json"], cwd=REPO_ROOT).stdout
     if not status.strip():

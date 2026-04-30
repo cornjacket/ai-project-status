@@ -71,6 +71,29 @@ def days_between(iso_a, iso_b):
     return (date.fromisoformat(iso_b) - date.fromisoformat(iso_a)).days
 
 
+def advance_state(today=None):
+    """Bump last_commit/last_synced for every enabled+synced repo; bump
+    last_activity_date only when the head moved. Persists and returns the
+    new state."""
+    from datetime import date as _date
+    today = today or _date.today().isoformat()
+    state = load_state()
+    for r in enabled_repos():
+        name = r["name"]
+        if not repo_dir(name).exists():
+            continue
+        head = head_commit(name)
+        prev = state.get(name, {})
+        had_activity = prev.get("last_commit") != head
+        state[name] = {
+            "last_commit": head,
+            "last_synced": today,
+            "last_activity_date": today if had_activity else prev.get("last_activity_date"),
+        }
+    save_state(state)
+    return state
+
+
 def gather_report(today=None):
     """Return one dict per enabled repo, in repos.yml order.
 

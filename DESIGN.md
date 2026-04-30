@@ -211,8 +211,12 @@ Roughly in order:
 9. Create `CLAUDE.md` documenting the run procedure and summarization rules (including the inactivity-line format).
 10. Create `prompts/per-repo.md` and `prompts/polish.md` prompt templates.
 11. Create `tools/run.py` orchestrator: parse `new-work.py` output, write inactivity lines deterministically, spawn `claude -p` per active repo, conditionally run polish pass, prepend to `summary.md`, call `commit-state.py`.
-12. Do a manual end-to-end run against one real tracked repo to validate.
-13. Set up the daily `/schedule` agent.
+12. Add automated tests for the deterministic layer. The two `claude -p` calls themselves are non-deterministic and out of scope; `--dry-run` covers pipeline shape without LLM cost.
+    1. `tests/test_lib.py` — unit tests for `gather_report()` against tmp git repos. Cover all four statuses (ACTIVE, INACTIVE, INACTIVE_SUPPRESSED, NOT_SYNCED), the empty-`state.json` case (first run uses `EMPTY_TREE`), and the `days_inactive` math.
+    2. `tests/test_run.py` — unit tests for `prepend_to_summary()` (marker present, marker absent + existing day section, empty file) and `render_inactive()` (with and without `last_activity_date`).
+    3. End-to-end `--dry-run` smoke test: build two tmp git repos with `log.md`, point a fixture `repos.yml`/`state.json` at them, run the orchestrator, assert a `## YYYY-MM-DD` section was prepended and `state.json` advanced.
+13. Do a manual end-to-end run against one real tracked repo to validate prose quality from the live `claude -p` calls.
+14. Set up the daily `/schedule` agent.
 
 ## Non-goals
 
