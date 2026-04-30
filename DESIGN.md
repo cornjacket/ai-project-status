@@ -81,11 +81,21 @@ The polish step is the only place where cross-repo context exists; per-repo summ
 
 ## Inputs and contract with tracked repos
 
-Every tracked repo MUST maintain a `log.md` in its root. Each entry in `log.md` is expected to be at daily or per-commit granularity and describe feature implementation work.
+Every tracked repo MUST maintain a `log.md` in its root. Entries are written at **task / question / concept** granularity (not per-prompt), one or two sentences each, ending with the short commit hash that delivered the work. The full convention is documented in [`ai-builder-lessons` lesson 038](https://github.com/cornjacket/ai-builder-lessons/blob/main/lessons/038-work-log-at-task-granularity.md).
 
 This repo treats `log.md` as the source of truth for *what* was done, and the repo's git history as the source of truth for *when* and *how much* (file counts, hashes).
 
+The contract is enforced inside the tracked repo by a numbered rule in its `CLAUDE.md`, injected by `setup-new-repo.sh` (see "Bootstrapping a tracked repo" below). Without an enforcing rule, `log.md` either drifts to per-prompt noise or stops being maintained.
+
 If a tracked repo does not have a `log.md`, it is flagged in `summary.md` and skipped until one exists.
+
+## Bootstrapping a tracked repo
+
+`setup-new-repo.sh <remote-url> [branch]` clones the target repo into a temp directory, ensures `log.md` and a `CLAUDE.md` work-log rule exist (idempotent — re-runs are no-ops), commits the bootstrap, pushes to the remote, and cleans up. Pass `--update` to refresh the rule block in place.
+
+The injected rule block lives between `<!-- ai-project-status:begin -->` and `<!-- ai-project-status:end -->` markers so it can be detected and refreshed without touching the rest of `CLAUDE.md`. The block content is in `templates/claude-rule.md`; the initial `log.md` is in `templates/log.md`.
+
+After bootstrapping, register the repo in `repos.yml` to start tracking it.
 
 ## Components
 
