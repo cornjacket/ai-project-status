@@ -79,6 +79,35 @@ python3 tools/run.py --skip-commit   # don't advance state.json or commit
 
 `--dry-run --skip-sync --skip-commit` exercises the full pipeline shape against your existing `tracked/` checkouts without spending any tokens or modifying state — handy for sanity-checking after editing prompts or templates.
 
+## Daily tracking (scheduled runs)
+
+`tools/run.py` is meant to be run once a day. Pick whichever of the two paths below fits your environment.
+
+### Option A — Claude Code `/schedule` (recommended)
+
+In an interactive Claude Code session inside this repo, run:
+
+```
+/schedule
+```
+
+and ask it to create a daily routine that runs `python3 tools/run.py` from the repo root. `/schedule` provisions a remote agent on a cron schedule with the `claude` CLI already in scope, so the per-repo summary and polish calls work without any extra setup. Use `/schedule list` to see active routines and `/schedule delete <id>` to remove one.
+
+This is the path described in [`DESIGN.md`](DESIGN.md) → "Scheduling".
+
+### Option B — local cron / systemd timer
+
+If you'd rather run on your own machine, the `claude` CLI must be installed and authenticated for the user that owns the cron job. A minimal crontab entry:
+
+```cron
+# Run ai-project-status every day at 09:00
+0 9 * * * cd /path/to/ai-project-status && /usr/bin/python3 tools/run.py >> run.log 2>&1
+```
+
+### What gets committed
+
+When the run produces a new day section, `tools/commit-state.py` makes a single atomic commit of `summary.md` + `state.json` to this repo. Push that commit with whatever you normally use (the scheduled run does **not** push automatically — keeping the push step manual avoids accidental force-pushes from a stale clone).
+
 ## Other tools
 
 - `python3 tools/diff.py <repo-name>` — print the new `log.md` lines and `git --stat` since the recorded `last_commit` for one repo. Debugging aid.
