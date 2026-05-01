@@ -15,4 +15,6 @@
 #       branch: develop
 #       report_inactivity: false
 
-repos: []
+repos:
+  - name: document-analyzer
+    remote: https://github.com/cornjacket/document-analyzer.git
