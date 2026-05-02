@@ -1,5 +1,6 @@
 """Shared helpers for ai-project-status tools."""
 import json
+import os
 import subprocess
 from pathlib import Path
 
@@ -10,6 +11,13 @@ REPOS_YML = REPO_ROOT / "repos.yml"
 STATE_JSON = REPO_ROOT / "state.json"
 TRACKED_DIR = REPO_ROOT / "tracked"
 SUMMARY_MD = REPO_ROOT / "summary.md"
+
+# When the daily run executes inside a Claude remote routine, the platform
+# pre-clones every declared `source` repo at /home/user/<name> via an
+# authenticated local proxy. Direct https://github.com clones from inside
+# that sandbox are intercepted by an Anthropic TLS-inspection proxy and
+# return 401 even for public repos, so we MUST reuse the pre-cloned trees.
+PREBUILT_SOURCE_ROOT = Path("/home/user")
 
 # Well-known SHA-1 of git's empty tree, used as a baseline diff target on first run.
 EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
@@ -50,6 +58,14 @@ def save_state(state):
 
 def repo_dir(name):
     return TRACKED_DIR / name
+
+
+def prebuilt_source_path(name):
+    """Path to the platform's pre-cloned checkout for `name`, or None."""
+    if not os.environ.get("CLAUDE_CODE_REMOTE"):
+        return None
+    p = PREBUILT_SOURCE_ROOT / name
+    return p if (p / ".git").is_dir() else None
 
 
 def git(args, cwd=None, check=True):
