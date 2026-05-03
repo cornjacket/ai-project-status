@@ -162,7 +162,7 @@ Activity summaries are *interpretive*, not copy-paste — they capture intent at
 
 Small, composable scripts so the orchestrator and individual `claude -p` calls each do exactly one thing:
 
-- `tools/sync.py` — clone or `git pull` every **enabled** repo in `repos.yml` into `tracked/`
+- `tools/sync.py` — clone or `git pull` every **enabled** repo in `repos.yml` into `tracked/`. When running inside a Claude `/schedule` routine sandbox (`CLAUDE_CODE_REMOTE=true`), each repo is symlinked from its platform-provided pre-clone at `/home/user/<name>` instead, since direct `https://github.com` clones are blocked by the Anthropic egress TLS-inspection proxy.
 - `tools/diff.py <repo>` — print the new `log.md` lines and `--stat` since the recorded `last_commit` for that repo (debugging aid)
 - `tools/new-work.py` — emit a single structured report covering every enabled repo. Active repos get diffs + `--stat` + commit list; inactive repos get `last_activity_date` and computed days-since-activity. The orchestrator parses this report and dispatches per-repo work.
 - `tools/run.py` — orchestrator and single entry point. Calls `sync.py`, parses `new-work.py` output, writes inactivity lines deterministically, spawns one `claude -p` per active repo, runs the cross-repo polish pass when ≥2 repos are active, prepends the result to `summary.md`, and calls `commit-state.py`.
@@ -205,6 +205,13 @@ If every enabled repo has no new work AND every such repo has `report_inactivity
 ## Scheduling
 
 A daily scheduled agent (via `/schedule`) runs the procedure above. Local execution is also supported — the only required state lives in `repos.yml` and `state.json`, both committed.
+
+The remote `/schedule` flow has two extra moving parts driven by sandbox limitations:
+
+1. **Pre-cloned sources.** The sandbox's egress proxy intercepts `https://github.com` and returns 401 even for public repos. Routines must declare every tracked repo (plus `ai-project-status` itself) in their `sources`; the platform pre-clones each at `/home/user/<name>` and `tools/sync.py` symlinks them into `tracked/`.
+2. **Side-branch + auto-merge.** The Claude GitHub App identity used by the routine cannot push to the default branch. So `tools/daily.sh` pushes the run's commit to `auto/status-YYYY-MM-DD` and `.github/workflows/auto-merge-status.yml` fast-forwards `main` to it (using the runner's standard `GITHUB_TOKEN`, which is not subject to the App restriction) and deletes the side branch. See `README.md` → "Why a side branch?" for the limitation rationale.
+
+Local cron execution skips both — direct `git clone` works, and `tools/run.py` + `git push` lands on `main` without the side-branch detour.
 
 ## Build tasks
 

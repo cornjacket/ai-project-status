@@ -16,7 +16,7 @@ pip install pyyaml
 
 ## Adding a tracked repo
 
-Two steps: bootstrap the target repo, then register it.
+Three steps: bootstrap the target repo, register it, and (if you use the `/schedule` daily flow) add it to the routine's `sources`.
 
 ### 1. Bootstrap the target
 
@@ -45,6 +45,12 @@ repos:
     branch: develop
     report_inactivity: false   # optional, default true
 ```
+
+### 3. Add it to the daily routine's `sources` (remote `/schedule` flow only)
+
+Direct `https://github.com` clones from inside the routine sandbox are blocked by an Anthropic egress TLS-inspection proxy. The platform pre-clones every declared `source` at `/home/user/<name>` via an authenticated local proxy, and `tools/sync.py` symlinks those into `tracked/`. So every entry in `repos.yml` must also be listed as a routine `source`, alongside `ai-project-status` itself.
+
+Open the routine at https://claude.ai/code/routines/trig_01BLz2BYyE95n44TCDKaFcnA and add `https://github.com/cornjacket/<repo>` to the sources list. Skip this step if you only run the pipeline locally (`tools/sync.py` will clone normally outside the sandbox).
 
 Per-repo flags:
 
@@ -85,7 +91,7 @@ python3 tools/run.py --skip-commit   # don't advance state.json or commit
 
 ### Option A — Claude Code `/schedule` (recommended)
 
-In an interactive Claude Code session, run `/schedule` and create a daily routine whose prompt is:
+The current daily routine is at https://claude.ai/code/routines/trig_01BLz2BYyE95n44TCDKaFcnA — fires daily at 09:13 UTC. To create a fresh routine, in an interactive Claude Code session run `/schedule` and supply the prompt:
 
 ```
 bash /home/user/ai-project-status/tools/daily.sh
