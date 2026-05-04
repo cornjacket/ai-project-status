@@ -4,6 +4,20 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-05-04
+
+### document-analyzer
+
+- Phase 11 wrapped up with the cross-strategy non-identity check (`31c3965`): after a question swap (the original canonical answer caused genuine naive/chunking convergence, a false positive the test's own comment had flagged), all 21 integration tests passed 21/21 under Tier 1.
+- Gemini Tier 1 upgrade removed the recurring 20 RPD daily-cap blocker that stalled multiple phases; `GeminiClient` now logs `x-gemini-service-tier` on first call to confirm propagation without waiting for a quota error.
+- Phase 12 built a full LLM-as-judge evaluation pipeline across 28 files / 2 889 insertions (`0d66a2a`..`5c72af5`): curated dataset (3 triples spanning short/medium/long docs), typed interfaces, triple loader, `LLMJudgeScorer` with retry-once-then-`score=null` sentinel, evaluator runner with parallel strategy fan-out, atomic JSON+MD co-located persistence, and `npm run eval` CLI with `--purpose`/`--no-save`/`--triple` flags.
+- A scorer `maxTokens` ceiling (200 → 500, `5c72af5`) fixed a 67% unscoreable rate surfaced by a smoke run — verbose naive/chunking answers were truncating mid-JSON before the sentinel path could fire; the fix unblocks the `--purpose baseline` sweep.
+- README gained an `## About this project` retrospective (`dbaece1`) and a promoted `## Testing` section covering all four layers (unit, integration, evaluations) with trigger lists, expected costs, and runnable examples.
+
+### ai-builder
+No activity for 1 days (last activity 2026-05-03)
+
+
 ## 2026-05-03
 
 ### document-analyzer
