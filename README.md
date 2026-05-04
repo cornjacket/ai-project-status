@@ -87,6 +87,8 @@ python3 tools/run.py --skip-commit   # don't advance state.json or commit
 
 ## Daily tracking (scheduled runs)
 
+**TL;DR:** scheduled at 09:13 UTC daily via Claude Code `/schedule`, runs `tools/daily.sh`, lands on `main` via auto-merge.
+
 `tools/run.py` is meant to be run once a day. Pick whichever of the two paths below fits your environment.
 
 ### Option A — Claude Code `/schedule` (recommended)
