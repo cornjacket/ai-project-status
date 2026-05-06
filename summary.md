@@ -4,6 +4,15 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-05-06
+
+### document-analyzer
+No activity for 2 days (last activity 2026-05-04)
+
+### ai-builder
+No activity for 3 days (last activity 2026-05-03)
+
+
 ## 2026-05-05
 
 ### document-analyzer
