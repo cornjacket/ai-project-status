@@ -16,8 +16,6 @@
 #       report_inactivity: false
 
 repos:
-  - name: document-analyzer
-    remote: https://github.com/cornjacket/document-analyzer.git
   - name: ai-builder
     remote: https://github.com/cornjacket/ai-builder.git
   - name: gsd-walkthru
