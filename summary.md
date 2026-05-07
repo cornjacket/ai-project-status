@@ -4,6 +4,28 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-05-07
+
+### document-analyzer
+
+- Bootstrapped for cross-repo activity tracking (`744e671..1543258b`): added `log.md`, `daily-plan.md`, a SessionStart hook (`check-daily-plan.py`) enforcing daily planning hygiene, and the corresponding `CLAUDE.md` rule block and `settings.json` registration — 170 lines across 4 files. No development work logged yet.
+
+### ai-builder
+
+- Bootstrapped for cross-repo status tracking (`f689f55..953afae`): added `log.md`, `daily-plan.md`, a `CLAUDE.md` rule block enforcing work-log discipline, and a SessionStart hook (`check-daily-plan.py`) that runs automatically on session open — 170 lines across 4 new files.
+
+### gsd-walkthru
+
+- Phase 3 (Body Handling & Public API Surface) fully delivered across 7 implementation tasks (`61e69b6..f6c9fa4`): raw-body capture middleware, a webhook provider registry with self-registering Stripe/GitHub/Shopify stubs, a `WebhookMetadata` discriminated union with compile-time narrowing proof, a `webhookErrorHandler()` Express error-middleware factory, the core `createWebhookMiddleware` factory, and the finalized public barrel — 67 tests green across 10 source files.
+- The 96-file, 22k-line commit range covers the repo's entire history bootstrapped from scratch, including a full planning corpus under `.planning/` and the production `src/` tree.
+- Post-phase rebase (`fd4631e`) integrated upstream bootstrap commits from `ai-project-status`, resolved `log.md` union conflicts, and separated `settings.local.json` from `.claude/settings.json` so per-user GSD hooks coexist with the project's SessionStart hook.
+- Next session planned around pushing to origin, fixing blocker `BL-01`, a code-review fix pass, and scoping Phase 4.
+
+### Cross-repo
+
+- Today's activity was largely a tracking-infrastructure rollout: **document-analyzer** and **ai-builder** both received identical bootstrap treatment (same 170-line, 4-file footprint: `log.md`, `daily-plan.md`, `check-daily-plan.py` SessionStart hook, `CLAUDE.md` rule block, `settings.json`), and **gsd-walkthru**'s post-phase rebase also pulled in bootstrap commits from `ai-project-status` to integrate the same hook infrastructure alongside its existing project hooks.
+
+
 ## 2026-05-06
 
 ### document-analyzer
