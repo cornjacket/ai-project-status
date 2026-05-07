@@ -89,11 +89,26 @@ The contract is enforced inside the tracked repo by a numbered rule in its `CLAU
 
 If a tracked repo does not have a `log.md`, it is flagged in `summary.md` and skipped until one exists.
 
+## Daily plans (forward-looking)
+
+Alongside the retrospective `log.md`/`summary.md` pair, every tracked repo also maintains a `daily-plan.md` at its root that captures **one day's intent** — single-day scope, always overwritten, never appended. The aggregator `tools/aggregate-plans.py` concatenates each repo's current `daily-plan.md` into a single `daily-plan-summary.md` at this repo's root, also overwritten on each run. There is no history at the plan layer — the historical record is `log.md`/`summary.md`.
+
+Plan freshness uses a **weekend-tolerant** rule: a plan is fresh iff `plan_date >= most_recent_weekday(today)`, where `most_recent_weekday` is today on Mon-Fri and the previous Friday on Sat/Sun. So a Friday plan is still considered fresh on Saturday and Sunday; Monday triggers a re-prompt. The plan file's first line is `# Daily plan — YYYY-MM-DD`, which the aggregator parses; an unparseable header is treated as stale.
+
+Two enforcement points keep `daily-plan.md` current:
+
+1. **End-of-session sign-off rule** in the tracked repo's `CLAUDE.md` marker block instructs Claude to overwrite `daily-plan.md` with tomorrow's plan when the user signs off (Friday signoff writes Monday's plan).
+2. **`SessionStart` hook** at `.claude/hooks/check-daily-plan.py` (installed by `setup-new-repo.sh`) checks freshness at every new Claude Code session and injects a system reminder asking for a fresh plan if the file is stale, missing, or malformed. Silent on the success path.
+
+The aggregator is deterministic — no `claude -p` call. Per-repo plans are concatenated as written, with a visible `STALE` flag in the section header for any repo whose plan failed the freshness check, and a `no plan committed` line for repos that don't have one yet. Repos with `enabled: false` are skipped entirely, matching `summary.md` behavior.
+
+If the daily routine is missed for a day or more (e.g., the user was offline and `tools/run.py` didn't run), the cure is to re-run it manually — `tools/run.py` will rebuild today's `daily-plan-summary.md` from whatever each repo's current `daily-plan.md` contains, and append a normal retrospective day section if there's been any activity.
+
 ## Bootstrapping a tracked repo
 
-`setup-new-repo.sh <remote-url> [branch]` clones the target repo into a temp directory, ensures `log.md` and a `CLAUDE.md` work-log rule exist (idempotent — re-runs are no-ops), commits the bootstrap, pushes to the remote, and cleans up. Pass `--update` to refresh the rule block in place.
+`setup-new-repo.sh <remote-url> [branch]` clones the target repo into a temp directory and idempotently installs five things: `log.md`, `daily-plan.md`, the work-log + daily-plan rule block in `CLAUDE.md` (between `<!-- ai-project-status:begin -->` markers), `.claude/hooks/check-daily-plan.py`, and a merged `.claude/settings.json` registering the hook on `SessionStart`. It then commits the bootstrap, pushes to the remote, and cleans up. Pass `--update` to refresh the rule block and the hook script in place after editing the templates.
 
-The injected rule block lives between `<!-- ai-project-status:begin -->` and `<!-- ai-project-status:end -->` markers so it can be detected and refreshed without touching the rest of `CLAUDE.md`. The block content is in `templates/claude-rule.md`; the initial `log.md` is in `templates/log.md`.
+Templates live under `templates/`: `log.md`, `daily-plan.md`, `claude-rule.md`, and `check-daily-plan.py`. The settings.json merge is intentionally conservative — only the hook entry is added; any other settings the user has are preserved.
 
 After bootstrapping, register the repo in `repos.yml` to start tracking it.
 
@@ -143,7 +158,7 @@ A single commit hash per repo drives change detection: `git diff <last_commit>..
 
 ### 4. `summary.md` — the deliverable
 
-Reverse-chronological, daily-resolution summary across all tracked repos. Newest day at the top. Each day has a section per **enabled** repo. Repos with new activity get a substantive summary; repos with no new activity (and `report_inactivity: true`) get a one-liner:
+Reverse-chronological, daily-resolution summary across all tracked repos. Newest day at the top. Each active repo gets its own `### <repo-name>` subsection with a substantive summary; all reportable inactive repos collapse into a single `### No updates` subsection at the bottom:
 
 ```markdown
 ## 2026-04-30
@@ -152,31 +167,58 @@ Reverse-chronological, daily-resolution summary across all tracked repos. Newest
 - Added vector store backend (commits abc1234..bcd2345; 12 files added, 3 changed, 0 deleted)
 - Refactored prompt cache layer to use TTL config
 
-### ai-bar
-- No activity for 8 days (last activity 2026-04-22)
+### No updates
+- ai-bar (for 8 days)
+- ai-baz (no activity recorded yet)
 ```
 
 Activity summaries are *interpretive*, not copy-paste — they capture intent at a level a stakeholder skimming the file can understand in seconds. Important details get pulled out; everything else is left in the source `log.md`. Git hashes are always referenced so a reader can drill in.
 
-### 5. `tools/` — scripts that do the boring work
+### 5. `daily-plan-summary.md` — the forward-looking deliverable
+
+Aggregated forward-looking plan. Overwritten on every run (no history). Each enabled repo contributes one section, copied through verbatim from its `daily-plan.md`. Repos with stale or missing plans are flagged in the section header so the reader can immediately see which repos drifted.
+
+```markdown
+# Daily plan summary — 2026-04-30
+
+## ai-foo — plan for 2026-04-30
+[copied body of ai-foo's daily-plan.md]
+
+## ai-bar — STALE (last plan: 2026-04-22)
+[copied body of ai-bar's daily-plan.md]
+
+## ai-baz — no plan committed
+```
+
+### 6. `tools/` — scripts that do the boring work
 
 Small, composable scripts so the orchestrator and individual `claude -p` calls each do exactly one thing:
 
 - `tools/sync.py` — clone or `git pull` every **enabled** repo in `repos.yml` into `tracked/`. When running inside a Claude `/schedule` routine sandbox (`CLAUDE_CODE_REMOTE=true`), each repo is symlinked from its platform-provided pre-clone at `/home/user/<name>` instead, since direct `https://github.com` clones are blocked by the Anthropic egress TLS-inspection proxy.
 - `tools/diff.py <repo>` — print the new `log.md` lines and `--stat` since the recorded `last_commit` for that repo (debugging aid)
 - `tools/new-work.py` — emit a single structured report covering every enabled repo. Active repos get diffs + `--stat` + commit list; inactive repos get `last_activity_date` and computed days-since-activity. The orchestrator parses this report and dispatches per-repo work.
-- `tools/run.py` — orchestrator and single entry point. Calls `sync.py`, parses `new-work.py` output, writes inactivity lines deterministically, spawns one `claude -p` per active repo, runs the cross-repo polish pass when ≥2 repos are active, prepends the result to `summary.md`, and calls `commit-state.py`.
-- `tools/commit-state.py` — advance `state.json` (bump `last_commit`, `last_synced` always; bump `last_activity_date` only when there was new work) and commit `summary.md` + `state.json` in one commit
+- `tools/aggregate-plans.py` — rebuild `daily-plan-summary.md` by reading each enabled repo's `daily-plan.md`, applying the weekend-tolerant staleness check, and concatenating with per-repo headers. Deterministic; no `claude -p` call.
+- `tools/run.py` — orchestrator and single entry point. Calls `sync.py`, parses `new-work.py` output, writes inactivity lines deterministically, spawns one `claude -p` per active repo, runs the cross-repo polish pass when ≥2 repos are active, prepends the result to `summary.md`, calls `aggregate-plans.py`, and finally calls `commit-state.py`.
+- `tools/commit-state.py` — advance `state.json` (bump `last_commit`, `last_synced` always; bump `last_activity_date` only when there was new work) and commit `summary.md` + `daily-plan-summary.md` + `state.json` in one commit.
 - `tools/_lib.py` — shared helpers (config/state I/O, git wrapper, paths)
 
-### 6. `prompts/` — versioned prompt templates
+### 7. `prompts/` — versioned prompt templates
 
 Prompt templates live in files so they can be reviewed, diffed, and edited without changing code:
 
 - `prompts/per-repo.md` — instructions for the per-repo summary call. Variables substituted by `run.py`: repo name, the repo's slice from `new-work.py`, and the summarization rules from `CLAUDE.md`.
 - `prompts/polish.md` — instructions for the cross-repo polish pass. Variables: today's date, the concatenated per-repo drafts.
 
-### 7. `CLAUDE.md` — operating directives
+### 8. `templates/` — files injected into tracked repos
+
+Bootstrap content copied into each tracked repo by `setup-new-repo.sh`:
+
+- `templates/log.md` — initial work log starter.
+- `templates/daily-plan.md` — initial plan starter (with placeholder header so the staleness check fires until a real plan is written).
+- `templates/claude-rule.md` — content of the `<!-- ai-project-status -->` block injected into the tracked repo's `CLAUDE.md`. Defines work-log rules and daily-plan rules.
+- `templates/check-daily-plan.py` — the `SessionStart` hook script copied to each tracked repo's `.claude/hooks/`. Reads `daily-plan.md`, applies the weekend-tolerant staleness rule, and writes a system reminder to stdout asking for a fresh plan if needed (silent on the success path).
+
+### 9. `CLAUDE.md` — operating directives
 
 Tells Claude (in future sessions) exactly how to run an update cycle, the rules for summarization (high-level, no copy-paste, reference hashes, daily resolution, newest-on-top, inactivity formatting), and where state lives. Short and prescriptive.
 
@@ -193,14 +235,15 @@ Internally, `run.py`:
 1. Calls `sync.py` to refresh local clones.
 2. Calls `new-work.py` and parses the per-repo report.
 3. For each repo:
-   - `INACTIVE` + `report_inactivity: true` → write a deterministic one-liner `No activity for N days (last activity YYYY-MM-DD)`.
+   - `INACTIVE` + `report_inactivity: true` → collect into the grouped `### No updates` block.
    - `INACTIVE_SUPPRESSED` or `enabled: false` → omit.
    - `ACTIVE` → spawn `claude -p` with `prompts/per-repo.md` and that repo's slice; capture the returned markdown.
 4. If ≥2 repos are active, runs a final `claude -p` polish pass (`prompts/polish.md`) over the collected drafts to surface cross-repo themes and tighten prose. Otherwise uses the drafts as-is.
-5. Prepends the polished `## YYYY-MM-DD` section to `summary.md`.
-6. Calls `commit-state.py`, which advances `state.json` and creates a single atomic commit of `summary.md` + `state.json`.
+5. Prepends the polished `## YYYY-MM-DD` section to `summary.md` (skipped when there are no drafts at all).
+6. Calls `aggregate-plans.py` to overwrite `daily-plan-summary.md` with each tracked repo's current `daily-plan.md`. This always runs, regardless of whether any retrospective work happened.
+7. Calls `commit-state.py`, which advances `state.json` and creates a single atomic commit of `summary.md` + `daily-plan-summary.md` + `state.json`.
 
-If every enabled repo has no new work AND every such repo has `report_inactivity: false`, the run produces no commit.
+If nothing changed (no new retrospective work AND no plans changed), the run produces no commit.
 
 ## Scheduling
 
@@ -234,6 +277,16 @@ Roughly in order:
     3. End-to-end `--dry-run` smoke test: build two tmp git repos with `log.md`, point a fixture `repos.yml`/`state.json` at them, run the orchestrator, assert a `## YYYY-MM-DD` section was prepended and `state.json` advanced.
 13. Do a manual end-to-end run against one real tracked repo to validate prose quality from the live `claude -p` calls.
 14. Set up the daily `/schedule` agent.
+
+## Known limitations
+
+### Single-developer assumption
+
+The current design assumes **one human developer** per tracked repo. `log.md` and `daily-plan.md` are single files at the repo root with no notion of authorship — multiple humans editing them concurrently will produce conflicting commits, merge churn, and a `summary.md` / `daily-plan-summary.md` that can't tell whose work is whose.
+
+If a tracked repo grows to multiple developers, the natural mitigation is to switch from repo-root files to a per-user namespace, e.g. `status/<username>/log.md` and `status/<username>/daily-plan.md`. The aggregation tools in this repo would need a corresponding update to walk those subdirectories and either merge per-user entries or label them with the owning username.
+
+This isn't implemented today. If your team grows beyond one contributor on a repo, plan for the migration.
 
 ## Non-goals
 

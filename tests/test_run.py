@@ -2,16 +2,30 @@
 import run
 
 
-def test_render_inactive_with_activity_date():
+def test_render_inactive_bullet_with_activity_date():
     e = {"name": "ai-foo", "days_inactive": 8, "last_activity_date": "2026-04-22"}
-    assert run.render_inactive(e) == (
-        "### ai-foo\nNo activity for 8 days (last activity 2026-04-22)"
-    )
+    assert run.render_inactive_bullet(e) == "- ai-foo (for 8 days)"
 
 
-def test_render_inactive_without_activity_date():
+def test_render_inactive_bullet_without_activity_date():
     e = {"name": "ai-foo", "days_inactive": None, "last_activity_date": None}
-    assert run.render_inactive(e) == "### ai-foo\nNo activity recorded yet"
+    assert run.render_inactive_bullet(e) == "- ai-foo (no activity recorded yet)"
+
+
+def test_render_inactives_block_empty():
+    assert run.render_inactives_block([]) == ""
+
+
+def test_render_inactives_block_groups_entries():
+    entries = [
+        {"name": "ai-foo", "days_inactive": 8, "last_activity_date": "2026-04-22"},
+        {"name": "ai-bar", "days_inactive": None, "last_activity_date": None},
+    ]
+    assert run.render_inactives_block(entries) == (
+        "### No updates\n"
+        "- ai-foo (for 8 days)\n"
+        "- ai-bar (no activity recorded yet)"
+    )
 
 
 def test_prepend_to_summary_inserts_after_marker(project, monkeypatch):

@@ -1,5 +1,7 @@
 """End-to-end smoke test: run the orchestrator in --dry-run mode against
 two tmp git repos and verify the pipeline wiring."""
+import re
+
 import yaml
 
 import _lib
@@ -23,7 +25,7 @@ def test_dry_run_orchestrator_pipeline(project, monkeypatch):
     # run.py imported SUMMARY_MD at its own import time, so the conftest
     # patch on _lib.SUMMARY_MD does not reach it. Patch the rebound name too.
     monkeypatch.setattr(run, "SUMMARY_MD", project / "summary.md")
-    monkeypatch.setattr("sys.argv", ["run.py", "--dry-run", "--skip-sync", "--skip-commit"])
+    monkeypatch.setattr("sys.argv", ["run.py", "--dry-run", "--skip-sync", "--skip-commit", "--skip-plans"])
 
     run.main()
 
@@ -57,7 +59,7 @@ def test_dry_run_with_single_active_skips_polish(project, monkeypatch):
     ]}))
 
     monkeypatch.setattr(run, "SUMMARY_MD", project / "summary.md")
-    monkeypatch.setattr("sys.argv", ["run.py", "--dry-run", "--skip-sync", "--skip-commit"])
+    monkeypatch.setattr("sys.argv", ["run.py", "--dry-run", "--skip-sync", "--skip-commit", "--skip-plans"])
 
     run.main()
 
@@ -85,11 +87,11 @@ def test_dry_run_mixed_active_and_inactive(project, monkeypatch):
     )
 
     monkeypatch.setattr(run, "SUMMARY_MD", project / "summary.md")
-    monkeypatch.setattr("sys.argv", ["run.py", "--dry-run", "--skip-sync", "--skip-commit"])
+    monkeypatch.setattr("sys.argv", ["run.py", "--dry-run", "--skip-sync", "--skip-commit", "--skip-plans"])
 
     run.main()
 
     text = (project / "summary.md").read_text()
     assert "### ai-foo" in text
-    assert "### ai-bar" in text
-    assert "No activity for 8 days (last activity 2026-04-22)" in text
+    assert "### No updates" in text
+    assert re.search(r"- ai-bar \(for \d+ days\)", text)

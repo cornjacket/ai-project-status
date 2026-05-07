@@ -7,8 +7,10 @@ Steps:
   3. for each ACTIVE repo: claude -p with prompts/per-repo.md
   4. for each INACTIVE repo (report_inactivity=true): deterministic one-liner
   5. if >=2 ACTIVE: claude -p with prompts/polish.md to merge cross-repo themes
-  6. prepend the day section to summary.md
-  7. commit-state.py — advance state.json, commit summary.md + state.json
+  6. prepend the day section to summary.md (when any drafts exist)
+  7. aggregate-plans.py — rebuild daily-plan-summary.md (always runs)
+  8. commit-state.py — advance state.json, commit summary.md +
+     daily-plan-summary.md + state.json as one atomic update
 
 Live-LLM steps (3, 5) can be skipped with --dry-run for offline testing.
 """
@@ -55,12 +57,17 @@ def render_per_repo(e: dict, dry_run: bool) -> str:
     return claude_p(prompt)
 
 
-def render_inactive(e: dict) -> str:
+def render_inactive_bullet(e: dict) -> str:
     if e["last_activity_date"]:
-        return (f"### {e['name']}\n"
-                f"No activity for {e['days_inactive']} days "
-                f"(last activity {e['last_activity_date']})")
-    return f"### {e['name']}\nNo activity recorded yet"
+        return f"- {e['name']} (for {e['days_inactive']} days)"
+    return f"- {e['name']} (no activity recorded yet)"
+
+
+def render_inactives_block(entries: list[dict]) -> str:
+    if not entries:
+        return ""
+    bullets = "\n".join(render_inactive_bullet(e) for e in entries)
+    return f"### No updates\n{bullets}"
 
 
 def polish(today: str, drafts_text: str, dry_run: bool) -> str:
@@ -94,6 +101,8 @@ def main():
                     help="skip the sync.py step (useful when iterating locally)")
     ap.add_argument("--skip-commit", action="store_true",
                     help="skip the commit-state.py step")
+    ap.add_argument("--skip-plans", action="store_true",
+                    help="skip the aggregate-plans.py step")
     args = ap.parse_args()
 
     if not args.skip_sync:
@@ -104,6 +113,7 @@ def main():
     report = gather_report(today=today)
 
     drafts: list[str] = []
+    inactive_entries: list[dict] = []
     active_count = 0
     for e in report:
         if e["status"] in ("INACTIVE_SUPPRESSED",):
@@ -112,26 +122,33 @@ def main():
             print(f"[run] WARNING: {e['name']} not synced; skipping", file=sys.stderr)
             continue
         if e["status"] == "INACTIVE":
-            drafts.append(render_inactive(e))
+            inactive_entries.append(e)
             continue
         # ACTIVE
         print(f"[run] summarizing {e['name']}...")
         drafts.append(render_per_repo(e, args.dry_run))
         active_count += 1
 
-    if not drafts:
-        print("[run] nothing to write; exiting")
-        return
+    inactives_block = render_inactives_block(inactive_entries)
+    if inactives_block:
+        drafts.append(inactives_block)
 
-    drafts_text = "\n\n".join(drafts)
-    if active_count >= 2:
-        print("[run] polishing cross-repo section...")
-        section = polish(today, drafts_text, args.dry_run)
+    if drafts:
+        drafts_text = "\n\n".join(drafts)
+        if active_count >= 2:
+            print("[run] polishing cross-repo section...")
+            section = polish(today, drafts_text, args.dry_run)
+        else:
+            section = f"## {today}\n\n{drafts_text}"
+
+        prepend_to_summary(section)
+        print(f"[run] prepended {today} section to summary.md")
     else:
-        section = f"## {today}\n\n{drafts_text}"
+        print("[run] no retrospective drafts; skipping summary.md update")
 
-    prepend_to_summary(section)
-    print(f"[run] prepended {today} section to summary.md")
+    if not args.skip_plans:
+        print("[run] aggregating daily plans...")
+        subprocess.run([sys.executable, str(TOOLS_DIR / "aggregate-plans.py")], check=True)
 
     if not args.skip_commit:
         print("[run] commit-state...")

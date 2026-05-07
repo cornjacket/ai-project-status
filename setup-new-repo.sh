@@ -24,8 +24,11 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TEMPLATE_LOG="$SCRIPT_DIR/templates/log.md"
 TEMPLATE_RULE="$SCRIPT_DIR/templates/claude-rule.md"
+TEMPLATE_PLAN="$SCRIPT_DIR/templates/daily-plan.md"
+TEMPLATE_HOOK="$SCRIPT_DIR/templates/check-daily-plan.py"
 BEGIN_MARKER="<!-- ai-project-status:begin -->"
 END_MARKER="<!-- ai-project-status:end -->"
+HOOK_CMD="python3 .claude/hooks/check-daily-plan.py"
 
 usage() {
   sed -n '2,/^$/p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
@@ -42,10 +45,12 @@ remote="${1:-}"
 branch="${2:-main}"
 [[ -z "$remote" ]] && usage 1
 
-[[ -f "$TEMPLATE_LOG" && -f "$TEMPLATE_RULE" ]] || {
-  echo "[setup] missing template under $SCRIPT_DIR/templates/" >&2
-  exit 1
-}
+for t in "$TEMPLATE_LOG" "$TEMPLATE_RULE" "$TEMPLATE_PLAN" "$TEMPLATE_HOOK"; do
+  [[ -f "$t" ]] || {
+    echo "[setup] missing template: $t" >&2
+    exit 1
+  }
+done
 
 name="$(basename "$remote" .git)"
 tmp="$(mktemp -d)"
@@ -88,15 +93,56 @@ else
   echo "[setup] appended work-log rule to existing CLAUDE.md"
 fi
 
-# 3. Commit + push if anything changed
+# 3. daily-plan.md (created if missing; never overwritten)
+if [[ ! -f "$target/daily-plan.md" ]]; then
+  cp "$TEMPLATE_PLAN" "$target/daily-plan.md"
+  echo "[setup] created daily-plan.md"
+else
+  echo "[setup] daily-plan.md already present; left as-is"
+fi
+
+# 4. .claude/hooks/check-daily-plan.py (always overwritten — upstream-managed)
+mkdir -p "$target/.claude/hooks"
+cp "$TEMPLATE_HOOK" "$target/.claude/hooks/check-daily-plan.py"
+chmod +x "$target/.claude/hooks/check-daily-plan.py"
+echo "[setup] installed .claude/hooks/check-daily-plan.py"
+
+# 5. .claude/settings.json — merge our SessionStart hook idempotently,
+#    leaving any other settings the user has untouched.
+python3 - "$target/.claude/settings.json" "$HOOK_CMD" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+cmd = sys.argv[2]
+data = json.loads(path.read_text()) if path.exists() else {}
+hooks = data.setdefault("hooks", {})
+session_start = hooks.setdefault("SessionStart", [])
+already = any(
+    any(h.get("command") == cmd for h in entry.get("hooks", []) or [])
+    for entry in session_start
+)
+if not already:
+    session_start.append({"hooks": [{"type": "command", "command": cmd}]})
+    print(f"[setup] added SessionStart hook to {path}")
+else:
+    print(f"[setup] SessionStart hook already present in {path}")
+path.parent.mkdir(parents=True, exist_ok=True)
+path.write_text(json.dumps(data, indent=2) + "\n")
+PY
+
+# 6. Commit + push if anything changed
 cd "$target"
 if [[ -z "$(git status --porcelain)" ]]; then
   echo "[setup] no changes — repo already bootstrapped"
   exit 0
 fi
 
-git add log.md CLAUDE.md
-git commit --quiet -m "Bootstrap log.md and work-log rule for ai-project-status tracking"
+# `git add -f` so a `.claude/` line in .gitignore doesn't silently skip the hook.
+git add log.md CLAUDE.md daily-plan.md
+git add -f .claude/hooks/check-daily-plan.py .claude/settings.json
+git commit --quiet -m "Bootstrap ai-project-status tracking (log.md, daily-plan.md, work-log rule, SessionStart hook)"
 git push --quiet origin "$branch"
 echo "[setup] committed and pushed to origin/$branch"
 

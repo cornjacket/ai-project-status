@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
-"""Advance state.json to current HEADs and commit summary.md + state.json."""
+"""Advance state.json to current HEADs and commit summary.md, state.json,
+and daily-plan-summary.md as a single atomic update."""
 from datetime import date
 
 from _lib import REPO_ROOT, advance_state, git
+
+TRACKED_FILES = ["summary.md", "state.json", "daily-plan-summary.md"]
 
 
 def main():
     today = date.today().isoformat()
     advance_state(today=today)
 
-    status = git(["status", "--porcelain", "summary.md", "state.json"], cwd=REPO_ROOT).stdout
+    existing = [f for f in TRACKED_FILES if (REPO_ROOT / f).exists()]
+    status = git(["status", "--porcelain"] + existing, cwd=REPO_ROOT).stdout
     if not status.strip():
         print("[commit-state] nothing to commit")
         return
-    git(["add", "summary.md", "state.json"], cwd=REPO_ROOT)
+    git(["add"] + existing, cwd=REPO_ROOT)
     git(["commit", "-m", f"status: {today} update"], cwd=REPO_ROOT)
     print(f"[commit-state] committed {today} update")
 

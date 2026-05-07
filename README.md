@@ -1,6 +1,10 @@
 # ai-project-status
 
-Tracks development activity across a portfolio of `ai-*` repos and produces a single, daily-resolution `summary.md` with newest activity at the top. Each tracked repo maintains a `log.md` of task-granularity entries; this tool reads those logs plus `git --stat`, summarizes per repo via `claude -p`, and runs a cross-repo polish pass when more than one repo has new work.
+Tracks development activity across a portfolio of `ai-*` repos and produces two cross-repo rollups: a retrospective `summary.md` (newest activity at the top, daily resolution) and a forward-looking `daily-plan-summary.md` (today's plan from each repo, overwritten daily). Each tracked repo maintains a `log.md` (task-granularity history) and a `daily-plan.md` (one day's intent); this tool reads those, summarizes activity per repo via `claude -p`, runs a cross-repo polish pass when more than one repo has new work, and aggregates the per-repo plans deterministically.
+
+**Current rollup: [`summary.md`](summary.md).** &nbsp; **Today's plan: [`daily-plan-summary.md`](daily-plan-summary.md).**
+
+> **Note:** this system assumes **one human developer per tracked repo**. With multiple developers contributing to the same repo, `log.md` and `daily-plan.md` will conflict. See [`DESIGN.md` — Known limitations](DESIGN.md#known-limitations) for the proposed `status/<username>/...` mitigation.
 
 For the architecture and rationale, see [`DESIGN.md`](DESIGN.md). For the rules an AI follows when running the update cycle, see [`CLAUDE.md`](CLAUDE.md).
 
@@ -24,9 +28,9 @@ Three steps: bootstrap the target repo, register it, and (if you use the `/sched
 ./setup-new-repo.sh git@github.com:cornjacket/ai-foo.git
 ```
 
-This clones `ai-foo` to a temp directory, drops in a starter `log.md`, injects a work-log rule block into `CLAUDE.md` (between `<!-- ai-project-status:begin -->` markers), commits, pushes, and cleans up. The rule tells Claude — when working in `ai-foo` — to maintain `log.md` at task granularity and announce every log edit and every commit in chat.
+This clones `ai-foo` to a temp directory, drops in starter `log.md` and `daily-plan.md` files, injects a work-log + daily-plan rule block into `CLAUDE.md` (between `<!-- ai-project-status:begin -->` markers), installs a `SessionStart` hook at `.claude/hooks/check-daily-plan.py` (with a merged `.claude/settings.json` registering it), commits, pushes, and cleans up. The rule tells Claude — when working in `ai-foo` — to maintain `log.md` at task granularity and to keep `daily-plan.md` fresh; the hook prompts for a fresh plan at session start when the file is stale or missing.
 
-The script is idempotent: re-running on an already-bootstrapped repo is a no-op. Pass `--update` to refresh the rule block in place after editing `templates/claude-rule.md`.
+The script is idempotent: re-running on an already-bootstrapped repo only adds anything that's missing. Pass `--update` to refresh the rule block and the hook script in place after editing `templates/claude-rule.md` or `templates/check-daily-plan.py`.
 
 Optional second argument selects a non-`main` branch:
 
@@ -70,10 +74,11 @@ Internally:
 
 1. `tools/sync.py` clones any new repo and fast-forward-pulls the rest into `tracked/`.
 2. `tools/new-work.py` classifies each repo as `ACTIVE`, `INACTIVE`, `INACTIVE_SUPPRESSED`, or `NOT_SYNCED`.
-3. For each `ACTIVE` repo, one `claude -p` call produces a per-repo summary; for each reportable `INACTIVE` repo, a deterministic one-liner `No activity for N days (last activity YYYY-MM-DD)`.
+3. For each `ACTIVE` repo, one `claude -p` call produces a per-repo summary; all reportable `INACTIVE` repos collapse into a single `### No updates` block at the bottom of the day section.
 4. If two or more repos are active, a final `claude -p` polish pass merges cross-repo themes.
 5. The polished day section is prepended to `summary.md`.
-6. `tools/commit-state.py` advances `state.json` and commits `summary.md` + `state.json` together.
+6. `tools/aggregate-plans.py` overwrites `daily-plan-summary.md` with each tracked repo's current `daily-plan.md`, applying a weekend-tolerant staleness check; missing or stale plans are visibly flagged.
+7. `tools/commit-state.py` advances `state.json` and commits `summary.md`, `daily-plan-summary.md`, and `state.json` together.
 
 ### Useful flags
 
@@ -81,6 +86,7 @@ Internally:
 python3 tools/run.py --dry-run       # skip claude -p; emit deterministic placeholders
 python3 tools/run.py --skip-sync     # don't clone/pull (useful when iterating locally)
 python3 tools/run.py --skip-commit   # don't advance state.json or commit
+python3 tools/run.py --skip-plans    # don't rebuild daily-plan-summary.md
 ```
 
 `--dry-run --skip-sync --skip-commit` exercises the full pipeline shape against your existing `tracked/` checkouts without spending any tokens or modifying state — handy for sanity-checking after editing prompts or templates.
@@ -137,9 +143,10 @@ Covers the deterministic layer (status classification, state advance, summary in
 
 - `repos.yml` — tracked-repo registry (committed)
 - `state.json` — last seen commit + activity date per repo (committed)
-- `summary.md` — the deliverable, newest day at the top (committed)
+- `summary.md` — retrospective rollup, newest day at the top (committed)
+- `daily-plan-summary.md` — forward-looking plan rollup, overwritten daily (committed)
 - `tracked/` — gitignored cache of cloned repos
 - `tools/` — Python plumbing
 - `prompts/` — `claude -p` prompt templates (`per-repo.md`, `polish.md`)
-- `templates/` — files injected by `setup-new-repo.sh` (`log.md`, `claude-rule.md`)
+- `templates/` — files injected into tracked repos by `setup-new-repo.sh` (`log.md`, `daily-plan.md`, `claude-rule.md`, `check-daily-plan.py`)
 - `tests/` — pytest suite for the deterministic layer
