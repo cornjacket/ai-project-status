@@ -93,13 +93,13 @@ python3 tools/run.py --skip-plans    # don't rebuild daily-plan-summary.md
 
 ## Daily tracking (scheduled runs)
 
-**TL;DR:** scheduled at 09:13 UTC daily via Claude Code `/schedule`, runs `tools/daily.sh`, lands on `main` via auto-merge.
+**TL;DR:** scheduled at 12:13 UTC daily via Claude Code `/schedule`, runs `tools/daily.sh`, lands on `main` via auto-merge.
 
 `tools/run.py` is meant to be run once a day. Pick whichever of the two paths below fits your environment.
 
 ### Option A — Claude Code `/schedule` (recommended)
 
-The current daily routine is at https://claude.ai/code/routines/trig_01BLz2BYyE95n44TCDKaFcnA — fires daily at 09:13 UTC. To create a fresh routine, in an interactive Claude Code session run `/schedule` and supply the prompt:
+The current daily routine is at https://claude.ai/code/routines/trig_01BLz2BYyE95n44TCDKaFcnA — fires daily at 12:13 UTC. To create a fresh routine, in an interactive Claude Code session run `/schedule` and supply the prompt:
 
 ```
 bash /home/user/ai-project-status/tools/daily.sh
