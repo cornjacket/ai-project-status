@@ -4,6 +4,21 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-05-08
+
+### gsd-walkthru
+
+- Completed Phase 4 (Stripe webhook provider) across commits `a99bbe7..cb09563`: implemented a 9-step HMAC-SHA256 (Hash-based Message Authentication Code) validator in `src/providers/stripe.ts` covering header parsing, constant-time multi-segment comparison, and a configurable replay-protection window (default 300 s); 15 unit tests added covering all security-critical paths — suite now 86/86 green across 11 files.
+- Two preparatory type-level changes landed before the Stripe implementation: `WebhookValidationReason` union widened with `'invalid_signature_format'` (needed for malformed Stripe headers), and a `tolerance?: number` option added to the middleware factory so providers can receive a timestamp window without touching the `Provider` interface.
+- Phase 3 close-out fixes were folded in (`a99bbe7`): `raw-body` promoted from a transitive express dependency to an explicit runtime dep (ship-blocker under pnpm/Yarn PnP), unknown-provider error message made dynamic via a new `listProviders()` registry export, and whitespace-only secrets now rejected — bringing the suite to 68 tests before Phase 4 work began.
+- Wrote the initial `README.md` (`628867d`): project description, per-provider gotchas (Stripe timestamp window, GitHub SHA-256 + dedup header, Shopify base64-not-hex), and ASCII data-flow diagrams for both the system boundary and the internal middleware chain.
+- Fixed a UTC-vs-Pacific timezone bug (`0ac66f1`) where the Claude Code sandbox's lack of a `TZ` env var caused `daily-plan.md` dates to land two calendar days ahead of the user's local date; corrected by setting `TZ=America/Los_Angeles` in the user-global Claude settings.
+- Plan for 2026-05-08 targets Phase 5 (GitHub and Shopify providers) in a single session arc, with explicit pre-plan discussion flagged for two known failure modes: GitHub's deprecated SHA-1 header and Shopify's base64-vs-hex signature encoding.
+
+### No updates
+- ai-builder (for 1 days)
+
+
 ## 2026-05-07
 
 ### document-analyzer
