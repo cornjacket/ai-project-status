@@ -20,3 +20,5 @@ repos:
     remote: https://github.com/cornjacket/ai-builder.git
   - name: gsd-walkthru
     remote: https://github.com/cornjacket/gsd-walkthru.git
+  - name: customer-req-responder
+    remote: https://github.com/cornjacket/customer-req-responder.git
