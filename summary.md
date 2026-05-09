@@ -4,6 +4,24 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-05-09
+
+### gsd-walkthru
+
+- Phase 5 (GitHub & Shopify webhook signature providers) shipped end-to-end across `6c7241c..5977253` via discuss → plan → parallel worktree execution, replacing Phase 3 stubs in `src/providers/github.ts` and `src/providers/shopify.ts` with real HMAC-SHA256 validators. Test suite grew from 86 to 110 tests across 13 files.
+- Both providers share an 8-step validation order (raw body guard → header parse → HMAC → timing-safe compare → metadata extraction → JSON parse → result build). Notable divergence from the Stripe provider: Buffer-direct HMAC avoids a UTF-8 round-trip. Two day-one correctness fixes applied: WR-02 (outer `expect(...).toThrow` guards on error-case tests) and WR-03 (three-way auth-header split distinguishing missing / malformed / deprecated headers).
+- GitHub provider (`a96ae16`) silently ignores the deprecated SHA-1 `x-hub-signature` header — SHA-1-only requests fall through to `'missing_header'`. Shopify provider (`7fb70b4`) resolves hex-vs-base64 ambiguity via length-mismatch in the timing-safe compare path, surfacing as `'signature_mismatch'` without widening the error union.
+- Code review (`5977253`) passed with 0 blockers; 5/5 must-haves confirmed. Phase 5 closed; 3 advisory warnings carried into `05-REVIEW.md` for Phase 6.
+- Phase 6 scoped (`bb1667d`): `@vitest/coverage-v8` with `perFile` thresholds, integration suites at `tests/integration/{stripe,github,shopify}.test.ts`, 90% coverage gate, and a manual guard-removal verification protocol covering 8 carry-over advisories from Phases 4–5.
+
+### customer-req-responder
+
+- Project bootstrapped (`c974694..bce68578`): 7 files added, including a rough-draft spec (`spec-rough-draft.md`) and `open-questions.md` to seed the design space before formal specification begins.
+
+### No updates
+- ai-builder (for 2 days)
+
+
 ## 2026-05-08
 
 ### gsd-walkthru
