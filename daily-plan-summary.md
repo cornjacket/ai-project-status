@@ -1,4 +1,4 @@
-# Daily plan summary — 2026-05-10
+# Daily plan summary — 2026-05-11
 
 <!-- Auto-aggregated by tools/aggregate-plans.py from each tracked repo's daily-plan.md. Overwritten on every run. -->
 
@@ -6,7 +6,7 @@
 
 > Could not extract `# Daily plan — YYYY-MM-DD` header. The repo's SessionStart hook will prompt for a fresh plan.
 
-## gsd-walkthru — plan for 2026-05-10
+## gsd-walkthru — STALE (last plan: 2026-05-10)
 
 Carry Phase 6 (Integration Tests, Coverage Gate & Negative-Case Audit) from
 context → plan → execute in one sitting, same arc as Phase 4 and Phase 5.
@@ -51,7 +51,7 @@ Notes:
 - **EOD signoff**: if Phase 6 closes cleanly, only Phase 7 (README + runnable
   example app) remains for v1.0. Write Monday's plan or signal Phase 7 ready.
 
-## customer-req-responder — plan for 2026-05-09
+## customer-req-responder — STALE (last plan: 2026-05-09)
 
 Walk the initial brainstorm (`spec-rough-draft.md` + `open-questions.md`) through the Get-Shit-Done methodology — resolve open questions, then move from rough draft into a structured SPEC, discuss, and plan.
 
