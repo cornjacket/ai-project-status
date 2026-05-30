@@ -4,6 +4,29 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+Looking at the two drafts: gsd-walkthru is closing out a webhook validation library's test suite; customer-req-responder is resuming a planning phase with a framework switch. No genuine cross-repo theme — the TDD mentions are incidental and unrelated in substance. Omitting the `### Cross-repo` subsection.
+
+## 2026-05-30
+
+### gsd-walkthru
+
+- Phase 6 (integration tests, coverage gate, negative-case audit) closed across 33 files, 4800+ insertions (`4b6e7a99..21d10022`). The project is now 6 of 7 phases complete for v1.0.
+- Added a per-file >90% V8 branch/line/function/statement coverage gate via `@vitest/coverage-v8`, scoped to Node 22 × Express 5.x in CI — then fixed a silent misconfiguration where vitest 4.x ignored thresholds placed at the config root instead of inside the `test:` block (`a7acdc1`).
+- Built three Supertest integration test files (Stripe, GitHub, Shopify) covering both body-parser wiring modes; suite grew from 110 → 139 tests across 16 files.
+- Resolved all 8 advisory carry-overs from phases 4–5: tightened the Stripe `v1=` header parser to reject array-shaped headers and non-numeric timestamp fields, added loud-fail guards for invalid tolerance values at factory call time, and made body-leakage assertions non-vacuous (`a94558d`).
+- A post-merge `tsc` type error (not caught by vitest) required making `toleranceSeconds` optional on the Stripe validator to preserve the `Provider` interface contract — a concrete reminder that test-pass ≠ type-soundness (`41c8fa8`).
+- Seeded `07-SECURITY-NOTES-SEED.md` flagging a test-oracle gap: hand-rolled `makeSignature` helpers share authorship with the validator, so they prove wiring correctness but not spec conformance. Prescribed fix: capture ground-truth fixtures from Stripe CLI, GitHub redeliver, and Shopify sandbox (`1dfff46`).
+
+### customer-req-responder
+
+- After a long gap since initial brainstorming, the project resumed with a framework decision: eight frameworks (GSD, Superpowers, RooFlow, Claude Skills, and others) were evaluated via parallel research agents, and the project switched to Superpowers — chosen for TDD alignment and its value as a single, non-stacked framework (`d4c3406`).
+- Sketched a blueprint for a deferred LLM evaluation skill in `eval-skill-sketch.md` (132 lines): directory shape, judge prompt design, fixture format, and the split between reusable and project-specific logic — permanent home designated as a new `ai-skills` repo, symlinked into `~/.claude/skills/` (`e98779e`).
+- Open questions around eval-gap coverage and TDD non-determinism captured in `open-questions.md` to seed the upcoming design/spec session; 5 files touched total (`bce68578..04d4285e`).
+
+### No updates
+- ai-builder (for 23 days)
+
+
 ## 2026-05-29
 
 ### No updates
