@@ -4,6 +4,14 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-05-31
+
+### No updates
+- ai-builder (for 24 days)
+- gsd-walkthru (for 1 days)
+- customer-req-responder (for 1 days)
+
+
 Looking at the two drafts: gsd-walkthru is closing out a webhook validation library's test suite; customer-req-responder is resuming a planning phase with a framework switch. No genuine cross-repo theme — the TDD mentions are incidental and unrelated in substance. Omitting the `### Cross-repo` subsection.
 
 ## 2026-05-30
