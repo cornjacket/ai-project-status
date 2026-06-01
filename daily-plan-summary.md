@@ -1,4 +1,4 @@
-# Daily plan summary — 2026-05-31
+# Daily plan summary — 2026-06-01
 
 <!-- Auto-aggregated by tools/aggregate-plans.py from each tracked repo's daily-plan.md. Overwritten on every run. -->
 
@@ -27,7 +27,7 @@ Planned order:
 Milestone: 6 of 7 phases complete (v1.0). Phase 7 (README quickstarts + security
 notes + runnable example app) is all that remains.
 
-## customer-req-responder — plan for 2026-05-29
+## customer-req-responder — STALE (last plan: 2026-05-29)
 
 Decide the workflow methodology for this project going forward. Researched the field
 (GSD, Superpowers, Claude Skills, chub, Everything Claude Code, paperclip, RooFlow, Open Design)
