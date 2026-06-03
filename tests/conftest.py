@@ -28,11 +28,17 @@ def init_git_repo(path: Path) -> None:
 
 
 def commit_log(path: Path, line: str, msg: str | None = None) -> str:
-    """Append a line to log.md and commit. Returns the commit SHA."""
-    log = path / "log.md"
-    existing = log.read_text() if log.exists() else ""
-    log.write_text(existing + line + "\n")
-    _git(["add", "log.md"], path)
+    """Make a commit recording `line` as its telemetry title, touching a tracked
+    file so `git diff --stat` is non-empty. Returns the commit SHA.
+
+    Historically this appended to log.md; the project migrated to git-native
+    telemetry, so the narrative now lives in the commit message itself, not a
+    log file. `msg` overrides the full commit message (e.g. to exercise the
+    `<domain>(<scope>): … / - [Context]: / - [Impact]:` schema)."""
+    work = path / "work.txt"
+    existing = work.read_text() if work.exists() else ""
+    work.write_text(existing + line + "\n")
+    _git(["add", "work.txt"], path)
     _git(["commit", "-m", msg or line], path)
     return _git(["rev-parse", "HEAD"], path).stdout.strip()
 

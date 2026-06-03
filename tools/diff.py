@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Show new log.md entries and --stat for one repo since its recorded last_commit."""
+"""Show new commit telemetry and --stat for one repo since its recorded last_commit."""
 import sys
 
-from _lib import EMPTY_TREE, git, load_state, repo_dir
+from _lib import EMPTY_TREE, format_telemetry, git, git_telemetry, load_state, repo_dir
 
 
 def main():
@@ -16,8 +16,8 @@ def main():
         sys.exit(f"tracked/{name} does not exist — run sync.py first")
 
     print(f"=== {name}: {last[:8]}..HEAD ===\n")
-    print("--- log.md additions ---")
-    print(git(["diff", f"{last}..HEAD", "--", "log.md"], cwd=d).stdout or "(no log.md changes)")
+    print("--- commit telemetry ---")
+    print(format_telemetry(git_telemetry(d, f"{last}..HEAD")))
     print("--- file stat ---")
     print(git(["diff", "--stat", f"{last}..HEAD"], cwd=d).stdout or "(no file changes)")
 

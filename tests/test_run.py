@@ -77,14 +77,21 @@ def test_format_slice_includes_all_sections():
         "name": "ai-foo",
         "last_commit": "abc1234567",
         "head": "def9876543",
-        "log_diff": "+ added thing",
-        "file_stat": " log.md | 1 +",
+        "commit_telemetry": [{
+            "hash": "def9876",
+            "title": "feat(store): added thing",
+            "context": "needed a place to put things",
+            "impact": "things now have a home",
+        }],
+        "file_stat": " work.txt | 1 +",
         "commit_list": "def9876 added thing",
     }
     out = run.format_slice(e)
     assert "abc12345..def98765" in out
-    assert "## log.md additions" in out
-    assert "+ added thing" in out
+    assert "## commit telemetry" in out
+    assert "feat(store): added thing" in out
+    assert "[Context]: needed a place to put things" in out
+    assert "[Impact]: things now have a home" in out
     assert "## file stat" in out
     assert "## commits" in out
 
@@ -94,7 +101,7 @@ def test_format_slice_handles_empty_fields():
         "name": "ai-foo",
         "last_commit": "abc1234567",
         "head": "def9876543",
-        "log_diff": "",
+        "commit_telemetry": None,
         "file_stat": "",
         "commit_list": "",
     }

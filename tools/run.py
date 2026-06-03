@@ -19,7 +19,7 @@ import subprocess
 import sys
 from datetime import date
 
-from _lib import REPO_ROOT, SUMMARY_MD, gather_report
+from _lib import REPO_ROOT, SUMMARY_MD, format_telemetry, gather_report
 
 PROMPTS_DIR = REPO_ROOT / "prompts"
 TOOLS_DIR = REPO_ROOT / "tools"
@@ -41,7 +41,7 @@ def claude_p(prompt: str) -> str:
 def format_slice(e: dict) -> str:
     return (
         f"Range: {e['last_commit'][:8]}..{e['head'][:8]}\n\n"
-        f"## log.md additions\n{e['log_diff'] or '(none)'}\n\n"
+        f"## commit telemetry\n{format_telemetry(e['commit_telemetry'])}\n\n"
         f"## file stat\n{e['file_stat'] or '(none)'}\n\n"
         f"## commits\n{e['commit_list'] or '(none)'}\n"
     )
@@ -103,6 +103,9 @@ def main():
                     help="skip the commit-state.py step")
     ap.add_argument("--skip-plans", action="store_true",
                     help="skip the aggregate-plans.py step")
+    ap.add_argument("--since", "--window", dest="since", metavar="WHEN",
+                    help="ad-hoc commit-window override (e.g. '24 hours ago'); "
+                         "default uses the durable last_commit..HEAD range")
     args = ap.parse_args()
 
     if not args.skip_sync:
@@ -110,7 +113,7 @@ def main():
         subprocess.run([sys.executable, str(TOOLS_DIR / "sync.py")], check=True)
 
     today = date.today().isoformat()
-    report = gather_report(today=today)
+    report = gather_report(today=today, since=args.since)
 
     drafts: list[str] = []
     inactive_entries: list[dict] = []

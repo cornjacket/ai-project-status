@@ -8,6 +8,10 @@ import _lib
 from conftest import init_git_repo, commit_log
 
 
+def titles(entry):
+    return [c["title"] for c in (entry["commit_telemetry"] or [])]
+
+
 def write_repos(project, entries):
     (project / "repos.yml").write_text(yaml.safe_dump({"repos": entries}))
 
@@ -39,8 +43,8 @@ def test_active_on_first_run_uses_empty_tree_baseline(project):
     assert report[0]["status"] == "ACTIVE"
     assert report[0]["head"] == head
     assert report[0]["last_commit"] == _lib.EMPTY_TREE
-    assert "first entry" in report[0]["log_diff"]
-    assert "log.md" in report[0]["file_stat"]
+    assert "first entry" in titles(report[0])
+    assert "work.txt" in report[0]["file_stat"]
     assert head[:7] in report[0]["commit_list"]
 
 
@@ -60,7 +64,7 @@ def test_inactive_when_head_matches_last_commit(project):
     assert report[0]["status"] == "INACTIVE"
     assert report[0]["days_inactive"] == 8
     assert report[0]["last_activity_date"] == "2026-04-22"
-    assert report[0]["log_diff"] is None
+    assert report[0]["commit_telemetry"] is None
 
 
 def test_inactive_suppressed_when_flag_false(project):
@@ -98,9 +102,9 @@ def test_active_with_new_commits_since_last(project):
     assert e["status"] == "ACTIVE"
     assert e["head"] == second
     assert e["last_commit"] == first
-    assert "+new work" in e["log_diff"]
-    assert "+old work" not in e["log_diff"]  # not an added line in this slice
-    assert "log.md" in e["file_stat"]
+    assert "new work" in titles(e)
+    assert "old work" not in titles(e)  # not in this slice
+    assert "work.txt" in e["file_stat"]
     assert second[:7] in e["commit_list"]
     assert first[:7] not in e["commit_list"]
 
@@ -149,6 +153,60 @@ def test_advance_state_bumps_activity_date_when_head_moved(project):
     assert s["last_commit"] == second
     assert s["last_synced"] == "2026-04-30"
     assert s["last_activity_date"] == "2026-04-30"
+
+
+def test_git_telemetry_parses_context_impact_schema(project):
+    """The structured commit schema is parsed into title/context/impact, and
+    multi-line bodies survive — both with and without a blank line after the
+    title (git folds the whole first paragraph into %s, so we parse %B)."""
+    repo = project / "tracked" / "ai-foo"
+    init_git_repo(repo)
+    # No blank line after the title (matches the CLAUDE.md schema verbatim).
+    commit_log(repo, "x", msg=(
+        "engine(telemetry): swap log.md for git telemetry\n"
+        "- [Context]: log.md duplicated history; this removes the\n"
+        "  duplicate-logging overhead.\n"
+        "- [Impact]: backward-looking reports read commit messages."
+    ))
+    # With a blank line (conventional git style).
+    commit_log(repo, "y", msg=(
+        "feat(api): add retry logic\n\n"
+        "- [Context]: upstream flakiness caused 502s.\n"
+        "- [Impact]: success rate up, no API change."
+    ))
+
+    commits = _lib.git_telemetry(repo, "HEAD")
+    by_title = {c["title"]: c for c in commits}
+
+    eng = by_title["engine(telemetry): swap log.md for git telemetry"]
+    assert "duplicate-logging overhead" in eng["context"]  # continuation folded in
+    assert eng["impact"] == "backward-looking reports read commit messages."
+
+    api = by_title["feat(api): add retry logic"]
+    assert api["context"] == "upstream flakiness caused 502s."
+    assert api["impact"] == "success rate up, no API change."
+
+
+def test_since_override_activates_repo_independent_of_state(project):
+    """`since` is an ad-hoc override: a repo INACTIVE by state.json becomes
+    ACTIVE when the time window contains commits (Locked decision #1)."""
+    repo = project / "tracked" / "ai-foo"
+    init_git_repo(repo)
+    head = commit_log(repo, "old work")
+    write_repos(project, [{"name": "ai-foo", "remote": "git@example.com:foo.git"}])
+    # state says we're caught up to head → default run would be INACTIVE.
+    write_state(project, {"ai-foo": {
+        "last_commit": head,
+        "last_synced": "2026-04-29",
+        "last_activity_date": "2026-04-29",
+    }})
+
+    default = _lib.gather_report(today="2026-04-30")[0]
+    assert default["status"] == "INACTIVE"
+
+    windowed = _lib.gather_report(today="2026-04-30", since="1 year ago")[0]
+    assert windowed["status"] == "ACTIVE"
+    assert "old work" in titles(windowed)
 
 
 def test_advance_state_preserves_activity_date_when_idle(project):
