@@ -3,41 +3,37 @@
   This block is injected and refreshed by ai-project-status:
   https://github.com/cornjacket/ai-project-status
 
-  It defines how this repo's log.md must be maintained so the
-  meta-repo can summarize cross-portfolio activity in summary.md.
+  It defines the commit-message discipline this repo must follow so
+  the meta-repo can summarize cross-portfolio activity in summary.md.
 
   Do not edit between the begin/end markers — local edits will be
   overwritten on the next `setup-new-repo.sh --update`. To change
   the rules, edit templates/claude-rule.md in ai-project-status
   and re-run `setup-new-repo.sh --update <this-repo-remote>`.
 -->
-## Work log (log.md)
+## Knowledge Extraction & Git Automation
 
-This repo is monitored by [`ai-project-status`](https://github.com/cornjacket/ai-project-status). You MUST maintain `log.md` at the repo root as a date-ordered, task-granularity record of work. The mechanism is documented in [`ai-builder-lessons` lesson 038](https://github.com/cornjacket/ai-builder-lessons/blob/main/lessons/038-work-log-at-task-granularity.md).
+This repo is monitored by [`ai-project-status`](https://github.com/cornjacket/ai-project-status). It no longer reads a `log.md` file — backward-looking activity is reconstructed **directly from your git history**. Your job is to make every commit message a high-level, self-contained telemetry record so the meta-repo can summarize cross-portfolio activity in `summary.md`.
+
+### Commit-message schema
+
+Every commit MUST follow this shape:
+
+```
+<domain>(<scope>): <high-level functional summary>
+- [Context]: Why this was done / what was learned.
+- [Impact]: How it alters the project or system behavior.
+```
 
 ### Rules
 
-1. **Granularity is task / question / concept — never per-prompt.** Multiple prompts inside the same task share one entry. Open a new entry only when the focus changes (a new task starts, the user asks a substantively different question, or a meaningfully new concept comes up). Both failure modes corrupt the log: **entries-per-prompt** (noise that drowns out signal) and **tasks-without-entries** (gaps that make the log untrustworthy). When unsure whether the latest message starts a new task or continues one, **ask before writing** — picking the wrong granularity is harder to undo than asking.
+1. **The title summarizes the functional change, not the files.** Describe the overall behavior change or architectural decision (`engine(telemetry): replace log.md mining with commit parsing`), NOT a list of touched file names (`update _lib.py and tests`). A reader scanning `git log` should grasp *what changed in the system* from the title alone.
 
-2. **Entry format is fixed** — one or two sentences of *what changed and why*, ending with the short commit hash:
+2. **`[Context]` and `[Impact]` are required on any non-trivial commit.** `[Context]` captures the why / the lesson learned; `[Impact]` captures how the project or system behavior changes. Each may span multiple lines. Trivial mechanical commits (typo, formatting) may omit them.
 
-   ```
-   - **YYYY-MM-DD** — <what changed and why>. Task: `<task-name>`. [Subtask: `<subtask-name>`.] Commit: `<short-hash>`.
-   ```
+3. **Commit at task granularity — never per-prompt.** Multiple prompts inside one task land in one commit. Open a new commit when the focus changes (a new task, a substantively different question, a meaningfully new concept). Avoid both **commit-per-prompt** (noise that drowns out signal) and **task-without-a-commit** (gaps that make the history untrustworthy).
 
-   Use the fully-qualified task name (matching commit trailers and any task READMEs). Include `Subtask:` only when the entry is subtask-scoped.
-
-3. **The commit hash is required.** If the entry is written before the commit lands, write `Commit: \`_pending_\`` and back-fill the short hash after the commit. **Do not create a dedicated commit just to back-fill the hash** — let the resolution ride into the next task's commit. Two commits per task is a smell.
-
-4. **Announce every `log.md` edit.** Immediately after appending a new entry or back-filling a hash, output the literal string `📝 log.md updated` on its own line in chat. Silent edits do not count as a record of work — without the announcement, log activity is invisible inside long tool-call sequences.
-
-<!--
-  TODO: Rule 5 is a candidate for removal. ai-project-status only needs log.md
-  discipline (rules 1–4); how a tracked repo announces commits in chat is a
-  per-project Claude-Code-ergonomics concern and arguably belongs in each
-  repo's own CLAUDE.md, not in a block injected by this meta-repo.
--->
-5. **Announce every commit.** Immediately after creating a commit, output the literal string `✅ commit <short-hash>` on its own line in chat. This makes commits scannable in the transcript without scrolling tool calls.
+4. **Automate the commit before session close.** Stage the work (`git add`) and run `git commit -m` with a schema-compliant message before ending the session. Do not leave completed work uncommitted — uncommitted work is invisible to the meta-repo.
 
 ## Daily plan (daily-plan.md)
 
