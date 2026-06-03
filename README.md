@@ -1,10 +1,10 @@
 # ai-project-status
 
-Tracks development activity across a portfolio of `ai-*` repos and produces two cross-repo rollups: a retrospective `summary.md` (newest activity at the top, daily resolution) and a forward-looking `daily-plan-summary.md` (today's plan from each repo, overwritten daily). Each tracked repo maintains a `log.md` (task-granularity history) and a `daily-plan.md` (one day's intent); this tool reads those, summarizes activity per repo via `claude -p`, runs a cross-repo polish pass when more than one repo has new work, and aggregates the per-repo plans deterministically.
+Tracks development activity across a portfolio of `ai-*` repos and produces two cross-repo rollups: a retrospective `summary.md` (newest activity at the top, daily resolution) and a forward-looking `daily-plan-summary.md` (today's plan from each repo, overwritten daily). Backward-looking activity is read directly from each repo's git commit telemetry (structured commit messages — title + `[Context]`/`[Impact]`); forward-looking intent comes from each repo's `daily-plan.md` (one day's intent). This tool reads those, summarizes activity per repo via `claude -p`, runs a cross-repo polish pass when more than one repo has new work, and aggregates the per-repo plans deterministically.
 
 **Current rollup: [`summary.md`](summary.md).** &nbsp; **Today's plan: [`daily-plan-summary.md`](daily-plan-summary.md).**
 
-> **Note:** this system assumes **one human developer per tracked repo**. With multiple developers contributing to the same repo, `log.md` and `daily-plan.md` will conflict. See [`DESIGN.md` — Known limitations](DESIGN.md#known-limitations) for the proposed `status/<username>/...` mitigation.
+> **Note:** this system assumes **one human developer per tracked repo**. With multiple developers contributing to the same repo, `daily-plan.md` will conflict. See [`DESIGN.md` — Known limitations](DESIGN.md#known-limitations) for the proposed `status/<username>/...` mitigation.
 
 For the architecture and rationale, see [`DESIGN.md`](DESIGN.md). For the rules an AI follows when running the update cycle, see [`CLAUDE.md`](CLAUDE.md).
 
@@ -28,7 +28,9 @@ Three steps: bootstrap the target repo, register it, and (if you use the `/sched
 ./setup-new-repo.sh git@github.com:cornjacket/ai-foo.git
 ```
 
-This clones `ai-foo` to a temp directory, drops in starter `log.md` and `daily-plan.md` files, injects a work-log + daily-plan rule block into `CLAUDE.md` (between `<!-- ai-project-status:begin -->` markers), installs a `SessionStart` hook at `.claude/hooks/check-daily-plan.py` (with a merged `.claude/settings.json` registering it), commits, pushes, and cleans up. The rule tells Claude — when working in `ai-foo` — to maintain `log.md` at task granularity and to keep `daily-plan.md` fresh; the hook prompts for a fresh plan at session start when the file is stale or missing.
+This clones `ai-foo` to a temp directory, drops in a starter `daily-plan.md` file, injects a git-automation + daily-plan rule block into `CLAUDE.md` (between `<!-- ai-project-status:begin -->` markers), installs a `SessionStart` hook at `.claude/hooks/check-daily-plan.py` (with a merged `.claude/settings.json` registering it), commits, pushes, and cleans up. The rule tells Claude — when working in `ai-foo` — to write structured, telemetry-bearing commit messages at task granularity and to keep `daily-plan.md` fresh; the hook prompts for a fresh plan at session start when the file is stale or missing.
+
+To migrate a repo that was previously bootstrapped with the old `log.md` workflow, run `./migrate-target-telemetry.sh <local-checkout>` against a local clone — it removes `log.md`, swaps the managed `CLAUDE.md` block for the git-automation rules, and leaves `daily-plan.md` untouched. Review the diff and commit.
 
 The script is idempotent: re-running on an already-bootstrapped repo only adds anything that's missing. Pass `--update` to refresh the rule block and the hook script in place after editing `templates/claude-rule.md` or `templates/check-daily-plan.py`.
 
@@ -128,7 +130,8 @@ Pushes to *non-default* branches work fine, so the daily routine pushes to `auto
 
 ## Other tools
 
-- `python3 tools/diff.py <repo-name>` — print the new `log.md` lines and `git --stat` since the recorded `last_commit` for one repo. Debugging aid.
+- `python3 tools/diff.py <repo-name>` — print the new commit telemetry and `git --stat` since the recorded `last_commit` for one repo. Debugging aid.
+- `./migrate-target-telemetry.sh <local-checkout>` — migrate an already-tracked repo off the old `log.md` workflow onto git telemetry. Idempotent.
 - `python3 tools/new-work.py` — emit the structured per-repo report `run.py` consumes.
 
 ## Tests
@@ -148,5 +151,5 @@ Covers the deterministic layer (status classification, state advance, summary in
 - `tracked/` — gitignored cache of cloned repos
 - `tools/` — Python plumbing
 - `prompts/` — `claude -p` prompt templates (`per-repo.md`, `polish.md`)
-- `templates/` — files injected into tracked repos by `setup-new-repo.sh` (`log.md`, `daily-plan.md`, `claude-rule.md`, `check-daily-plan.py`)
+- `templates/` — files injected into tracked repos by `setup-new-repo.sh` (`daily-plan.md`, `claude-rule.md`, `check-daily-plan.py`)
 - `tests/` — pytest suite for the deterministic layer
