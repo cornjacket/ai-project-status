@@ -1,4 +1,4 @@
-# Daily plan summary — 2026-06-02
+# Daily plan summary — 2026-06-03
 
 <!-- Auto-aggregated by tools/aggregate-plans.py from each tracked repo's daily-plan.md. Overwritten on every run. -->
 
@@ -6,26 +6,22 @@
 
 > Could not extract `# Daily plan — YYYY-MM-DD` header. The repo's SessionStart hook will prompt for a fresh plan.
 
-## gsd-walkthru — STALE (last plan: 2026-06-01)
+## gsd-walkthru — plan for 2026-06-03
 
-Phase 6 closed Friday — verified passed (QUAL-01..04), all work committed. Next
-session resumes at the Phase 6 → 7 boundary: an optional retroactive security
-pass on Phase 6, a progress check, then start discussing Phase 7 (Documentation
-& Example App) — the last phase of v1.0.
-
-Planned order:
-1. `/gsd-secure-phase 6`  — retroactive threat-mitigation verify (optional gate; no 06-SECURITY.md yet)
-2. `/gsd-progress`        — confirm roadmap state (6/7 phases done, Phase 7 next)
-3. `/gsd-discuss-phase 7` — gather context before planning the final phase
+Phase 7 context is locked (`07-CONTEXT.md`). Today moves to the **plan** macro step:
+`/gsd-plan-phase 7` — research the README/example-app implementation against the locked
+decisions, produce `PLAN.md`(s), and run the plan-checker verification loop. Stretch goal
+if planning lands clean: begin `/gsd-execute-phase 7` (README restructure + example app).
+This is the final v1.0 phase, so keep an eye on the milestone close after execution.
 
 ```
-  [Phase 6 ✓]──► secure-phase 6 ──► progress ──► discuss-phase 7 ──►(plan→execute)
-   committed         gate            check          last phase
-   6/7 done        optional         confirm        README + example app
+07-CONTEXT.md ✅ ──► [ PLAN Phase 7 ] ──► PLAN.md(s) ──► (stretch) EXECUTE ──► v1.0 🎉
+   (yesterday)          ▲ today                            README + example app
+                  research → plan → check
 ```
 
-Milestone: 6 of 7 phases complete (v1.0). Phase 7 (README quickstarts + security
-notes + runnable example app) is all that remains.
+Milestone: 6 of 7 phases complete. Phase 7 (docs + runnable example app) is the last
+remaining; planning it today is the gate to closing v1.0.
 
 ## customer-req-responder — STALE (last plan: 2026-05-29)
 

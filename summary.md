@@ -4,6 +4,19 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-06-03
+
+### gsd-walkthru
+
+- Phase 6 (webhook-signature verification library) was formally closed out with a security audit (`2f56a28`): a 17-threat STRIDE (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege) register was built from prior threat models, an automated auditor verified 16/17 mitigations against code, and the one remaining open item was a stale documentation row — resolved with a doc-only edit. `SECURITY.md` written with zero open threats.
+- Phase 7 (Documentation & Example App, the final v1.0 phase) was scoped via a design discussion (`d95ec21`, `7971bf6`): the existing README will be rebuilt into canonical OSS shape (install → quickstart → config → security), and the currently-empty `examples/` directory will become a self-contained demo that boots a server, fires three cryptographically-signed mock webhook requests, and exits cleanly. A `package.json` version mismatch (0.0.1 vs v1.0) was flagged for the planning step.
+- 8 files, ~400 lines added across the planning tree, capturing the STRIDE register, Phase 7 design decisions, and an updated daily plan targeting Phase 7 execution.
+
+### No updates
+- ai-builder (for 27 days)
+- customer-req-responder (for 4 days)
+
+
 ## 2026-06-02
 
 ### No updates
