@@ -4,6 +4,28 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-06-04
+
+### ai-builder
+
+- Retired the hand-maintained `log.md` work-log subsystem in favor of structured git commit messages as the single source of truth (`6101dd4..a53a002`). The old tooling — shell scripts, markdown templates, and associated `CLAUDE.md` instructions — was removed (8 files, net −354 lines), with per-task context now carried directly in commit bodies via `[Context]`/`[Impact]` annotations.
+
+### gsd-walkthru
+
+- **v1.0 milestone complete** (`1e40ea91..c0f543d1`): all 7 phases done, 139/139 tests passing across 16 files.
+- The README was rebuilt from scratch (`0facf4f`): installation instructions, three self-contained per-provider quickstarts (Stripe, GitHub, Shopify), a config reference table, and a security notes section with a replay-protection comparison. Version bumped to 1.0.0 in `package.json` and the exported `VERSION` constant (`9806796`).
+- A standalone example app landed under `examples/example-app/` (`654bcad`, `3f10758`): three independent mock webhook senders using `crypto.createHmac` directly — intentionally bypassing the library's own signing helper so HMAC bugs can't be masked. `npm start` fires all three in parallel.
+- Closing docs: `ARCHITECTURE.md` for contributors (`639c472`), a v1.0 milestone summary at `.planning/reports/MILESTONE_SUMMARY-v1.0.md` (`1e56789`), and a post-mortem queued in `daily-plan.md` (`c0f543d`). Repo signals it should be archived as complete.
+
+### customer-req-responder
+
+- Migrated commit telemetry from `log.md` to structured git-native commit messages (`66f65fc`): `CLAUDE.md` now enforces the `domain(scope) title` + `[Context]/[Impact]` schema so the upstream tracker can reconstruct activity directly from git history. Net −16 lines across the two affected files.
+
+### Cross-repo
+
+Both **ai-builder** and **customer-req-responder** completed the same migration today: retiring hand-maintained `log.md` work logs in favor of structured git commit messages. This brings both repos onto the telemetry discipline this tracker consumes.
+
+
 ## 2026-06-03
 
 ### gsd-walkthru
