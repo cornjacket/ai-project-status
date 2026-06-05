@@ -1,4 +1,4 @@
-# Daily plan summary — 2026-06-04
+# Daily plan summary — 2026-06-05
 
 <!-- Auto-aggregated by tools/aggregate-plans.py from each tracked repo's daily-plan.md. Overwritten on every run. -->
 
@@ -6,7 +6,7 @@
 
 > Could not extract `# Daily plan — YYYY-MM-DD` header. The repo's SessionStart hook will prompt for a fresh plan.
 
-## gsd-walkthru — plan for 2026-06-04
+## gsd-walkthru — STALE (last plan: 2026-06-04)
 
 **Project complete.** v1.0 shipped — all 7 phases delivered and verified, milestone summary
 generated, and architecture documentation (`ARCHITECTURE.md`) extracted from the build
