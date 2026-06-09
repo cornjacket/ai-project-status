@@ -1,4 +1,4 @@
-# Daily plan summary — 2026-06-08
+# Daily plan summary — 2026-06-09
 
 <!-- Auto-aggregated by tools/aggregate-plans.py from each tracked repo's daily-plan.md. Overwritten on every run. -->
 
