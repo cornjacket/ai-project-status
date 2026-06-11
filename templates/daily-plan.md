@@ -6,7 +6,7 @@
   daily-plan-summary.md.
 
   - First line MUST be `# Daily plan — YYYY-MM-DD` (the date is the staleness signal).
-  - Body: one short paragraph + a small ASCII diagram of the day's shape.
+  - Body: a short bullet list of the day's intent + a small ASCII diagram of the day's shape.
   - At end-of-session signoff, overwrite with tomorrow's plan (Friday writes Monday's).
   - On Saturday/Sunday a Friday plan is still considered fresh.
 -->
