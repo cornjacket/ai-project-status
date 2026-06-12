@@ -4,6 +4,25 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-06-12
+
+### ai-builder
+
+- Bootstrapped into the cross-repo status tracking system (`3f34758`): added `daily-plan.md`, commit-message discipline rule in `CLAUDE.md`, and the `SessionStart` hook that enforces daily planning on session open.
+
+### gsd-walkthru
+
+- Bootstrapped into the cross-repo status tracking system (`f1efd3c`): added `daily-plan.md`, commit-message discipline rule in `CLAUDE.md`, and the `SessionStart` hook.
+
+### customer-req-responder
+
+- Onboarded into the cross-repo status tracking system (`c73a7fd`): added `daily-plan.md`, commit-message discipline rule in `CLAUDE.md`, and the `SessionStart` hook.
+
+### Cross-repo
+
+- All three repos received identical tracking scaffolding today: `daily-plan.md`, git-automation commit-message discipline in `CLAUDE.md`, and the `SessionStart` hook — the triad required for each repo's activity to flow into this rollup.
+
+
 ## 2026-06-11
 
 ### No updates
