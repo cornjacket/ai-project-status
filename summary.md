@@ -4,6 +4,14 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-06-27
+
+### No updates
+- ai-builder (for 15 days)
+- gsd-walkthru (for 15 days)
+- customer-req-responder (for 15 days)
+
+
 ## 2026-06-26
 
 ### No updates
