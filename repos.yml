@@ -22,3 +22,5 @@ repos:
     remote: https://github.com/cornjacket/gsd-walkthru.git
   - name: customer-req-responder
     remote: https://github.com/cornjacket/customer-req-responder.git
+  - name: second-brain-devkit
+    remote: https://github.com/cornjacket/second-brain-devkit.git
