@@ -24,3 +24,5 @@ repos:
     remote: https://github.com/cornjacket/customer-req-responder.git
   - name: second-brain-devkit
     remote: https://github.com/cornjacket/second-brain-devkit.git
+  - name: second-brain-test
+    remote: https://github.com/cornjacket/second-brain-test.git
