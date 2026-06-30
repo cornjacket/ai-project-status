@@ -4,6 +4,32 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-06-30
+
+### second-brain-devkit
+
+- Fresh repo bootstrapped from scratch: 11 files, 653 lines added across specs, docs, tooling config, and hooks (`5578387..cc0c174`).
+- `README.md` (`c8d6cdc`) documents the core "write for humans, index for machines" philosophy — the embed→hydrate→search pipeline, sidecar schema, and dual human/AI value proposition.
+- Spec and planning docs reorganized to eliminate drift (`cc0c174`): `SPEC.md` owns system-level design (three-repo workflow: golden→devkit→mothball, validation loop, non-goals); `PLAN.md` tracks generator milestones (G1–G3) gated on brain validation; `open-questions.md` records interim decisions.
+- Dev scaffolding wired up: Gemini CLI support, open-questions tracking, and ai-project-status integration (daily-plan + SessionStart hook) in `aba47ab`/`dd96ede`.
+
+### second-brain-test
+
+- New repo bootstrapped from scratch (`8f111c0..dd9be80`): 21 files, ~920 lines — a full semantic-search pipeline including an embedder, SQLite-backed vector store, git pre-commit hook that embeds staged files, cache hydration script, and vault search interface.
+- Initial content follows the PARA method (Projects, Areas, Resources, Archive) with seed markdown notes; `SPEC.md` and `PLAN.md` lay out the longer-term agent-memory vision.
+- Tracking infrastructure wired in (`d24e611`): daily-plan, git-automation commit-message discipline, and the SessionStart hook.
+- Today's focus (`dd9be80`): M1 milestone — activating the embed hook and symlink, then verifying the full embed→hydrate→search flow end-to-end. Registering/ingesting external content (M2) is a stretch goal.
+
+### Cross-repo
+
+Both `second-brain-devkit` and `second-brain-test` were bootstrapped today as complementary halves of the same system: `devkit` supplies the generator tooling and spec (three-repo workflow, sidecar schema), while `second-brain-test` is the first live brain being built against it — already running the embed→hydrate→search pipeline the devkit is designed to produce.
+
+### No updates
+- ai-builder (for 18 days)
+- gsd-walkthru (for 18 days)
+- customer-req-responder (for 18 days)
+
+
 ## 2026-06-29
 
 ### No updates

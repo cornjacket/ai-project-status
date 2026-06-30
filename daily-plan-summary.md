@@ -1,4 +1,4 @@
-# Daily plan summary — 2026-06-29
+# Daily plan summary — 2026-06-30
 
 <!-- Auto-aggregated by tools/aggregate-plans.py from each tracked repo's daily-plan.md. Overwritten on every run. -->
 
@@ -58,4 +58,34 @@ Superpowers and start brainstorm on the 6 blocking open questions toward SPEC.md
   │ DECISION: Superpowers ok │        │ (2,4,5,7,9,11)               │
   └──────────────────────────┘        └─────────────────────────────┘
    replace GSD, keep ai-builder log     own the eval loop separately
+```
+
+## second-brain-devkit — STALE (last plan: 2026-06-29)
+
+- Land the project `README.md` (philosophy + dual-interface overview). ✅
+- Tidy onboarding docs so a newcomer can grasp the kit at a glance.
+- Keep `SPEC.md` / `open-questions.md` cross-links coherent with the new README.
+- Defer pipeline scripting; today is documentation, not generator code.
+
+```
+docs day:  README ──> onboarding polish ──> SPEC/OQ cross-check
+           [done]        [in progress]          [if time]
+
+           (generator scripts → later)
+```
+</content>
+
+## second-brain-test — plan for 2026-06-30
+
+Drive **second-brain-test** to a working core pipeline. PLAN.md is the canonical tracker; this is just the day's shape.
+
+- Re-orient: skim PLAN.md, the `scripts/` pipeline, and SPEC.md invariants before touching code.
+- Finish Milestone 1: activate the embed hook + symlink, then verify the full embed → hydrate → search loop end-to-end and commit the generated sidecars.
+- Stretch (if time): start Milestone 2 — `register.py` injects an idempotent brain block into a target repo; smoke-test ingestion.
+- Respect invariants: one embedder for notes + queries, no hand-edited sidecars, local-first only.
+- Known blocker: real semantic-quality check needs the `ollama` backend (unavailable here); `test` backend proves plumbing only.
+
+```
+Warm-up ──> M1: activate + verify pipeline ──> commit sidecars ──> [stretch] M2: register + ingest
+ reorient        embed → hydrate → search          working brain        idempotent block
 ```
