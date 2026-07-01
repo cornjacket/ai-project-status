@@ -16,14 +16,13 @@
 #       report_inactivity: false
 
 repos:
-  - name: ai-builder
-    remote: https://github.com/cornjacket/ai-builder.git
-  - name: gsd-walkthru
-    remote: https://github.com/cornjacket/gsd-walkthru.git
+  - name: second-brain-test
+    remote: https://github.com/cornjacket/second-brain-test.git
   - name: customer-req-responder
     remote: https://github.com/cornjacket/customer-req-responder.git
   - name: second-brain-devkit
     remote: https://github.com/cornjacket/second-brain-devkit.git
     enabled: false
-  - name: second-brain-test
-    remote: https://github.com/cornjacket/second-brain-test.git
+  - name: ai-builder
+    remote: https://github.com/cornjacket/ai-builder.git
+    enabled: false
