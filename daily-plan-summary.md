@@ -1,4 +1,4 @@
-# Daily plan summary — 2026-06-30
+# Daily plan summary — 2026-07-01
 
 <!-- Auto-aggregated by tools/aggregate-plans.py from each tracked repo's daily-plan.md. Overwritten on every run. -->
 
@@ -60,32 +60,48 @@ Superpowers and start brainstorm on the 6 blocking open questions toward SPEC.md
    replace GSD, keep ai-builder log     own the eval loop separately
 ```
 
-## second-brain-devkit — STALE (last plan: 2026-06-29)
+## second-brain-devkit — plan for 2026-07-01
 
-- Land the project `README.md` (philosophy + dual-interface overview). ✅
-- Tidy onboarding docs so a newcomer can grasp the kit at a glance.
-- Keep `SPEC.md` / `open-questions.md` cross-links coherent with the new README.
-- Defer pipeline scripting; today is documentation, not generator code.
+**Focus:** The brain's core pipeline is now proven & committed
+(`../second-brain-test` finished M1a→M1b: embed→hydrate→search works, sidecars
+committed). The G1 gate is lifting — start generator planning against the now
+stable, known-good golden reference.
 
-```
-docs day:  README ──> onboarding polish ──> SPEC/OQ cross-check
-           [done]        [in progress]          [if time]
-
-           (generator scripts → later)
-```
-</content>
-
-## second-brain-test — plan for 2026-06-30
-
-Drive **second-brain-test** to a working core pipeline. PLAN.md is the canonical tracker; this is just the day's shape.
-
-- Re-orient: skim PLAN.md, the `scripts/` pipeline, and SPEC.md invariants before touching code.
-- Finish Milestone 1: activate the embed hook + symlink, then verify the full embed → hydrate → search loop end-to-end and commit the generated sidecars.
-- Stretch (if time): start Milestone 2 — `register.py` injects an idempotent brain block into a target repo; smoke-test ingestion.
-- Respect invariants: one embedder for notes + queries, no hand-edited sidecars, local-first only.
-- Known blocker: real semantic-quality check needs the `ollama` backend (unavailable here); `test` backend proves plumbing only.
+- Decide the G1 **template strategy**: how to productize the brain's `SPEC.md` /
+  `CLAUDE.md` / `scripts/` / hook / PARA roots + `seeds/` into emitted templates.
+- Sketch the G2 **validation loop** early: generate → diff vs `../second-brain-test`
+  → clean diff = acceptance. This leans on the deterministic `test` embedder
+  (semantic/Ollama quality is a *separate*, later check — not needed for the diff).
+- Track what's still open in the brain before a full G1: `register.py` (M2) and
+  semantic validation (Ollama, blocked) — plan around them, don't block on them.
+- Keep generator *code* deferred until the template strategy is chosen (avoid rework).
 
 ```
-Warm-up ──> M1: activate + verify pipeline ──> commit sidecars ──> [stretch] M2: register + ingest
- reorient        embed → hydrate → search          working brain        idempotent block
+ brain (second-brain-test):  0001–0003 ✅  ·  M1b plumbing ✅   →  G1 gate lifting
+                                                                       │
+ devkit today ▸ G1 template strategy  ──►  sketch G2 diff-vs-golden harness
+                                                                       │
+                              (brain M2 register + Ollama semantic still pending)
+```
+
+## second-brain-test — plan for 2026-07-01
+
+**Focus:** Milestone 2 — registration & ingestion. The pipeline plumbing is proven
+(M1b), so wire the brain into a target project and then eye the devkit.
+
+- Build `scripts/register.py` — inject an idempotent managed block into a target
+  repo's `CLAUDE.md` pointing at this brain.
+- Verify idempotency: re-running refreshes the block, never duplicates it.
+- Ingestion smoke test: record a note via the registered flow → `search_vault.py`
+  finds it.
+- Stretch: scaffold `devkit/` now that this repo is a known-good oracle to diff against.
+- Watch: semantic validation stays blocked until an Ollama backend is available
+  (the `test` backend only proves plumbing).
+
+```
+ done ▸ 0001 vault/ · 0002 guard · 0003 seed · M1b plumbing ✅
+                              │
+ today ▸ M2: register.py → verify idempotent → ingest smoke test
+                              │
+                    stretch ▸ devkit/ scaffold (reproduce this reference)
 ```

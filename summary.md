@@ -4,6 +4,28 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-01
+
+### second-brain-devkit
+- Planning-only update: `daily-plan.md` rewritten for 2026-07-01 now that second-brain-test's embed→hydrate→search pipeline is complete, unblocking work that had been on hold (b063c6c).
+- Focus shifts from documentation to designing "G1" (template-generation strategy) against the now-stable brain reference output, plus an early validation approach ("G2") — a diff-against-golden-output check using a deterministic test embedder — while deferring anything dependent on the brain's still-unfinished semantic-search features.
+
+### second-brain-test
+- Finished layout restructuring (Task 0001, `59c9d67`): notes now live under a single Obsidian-openable `vault/` folder, with generated search-index files kept in `data/`; this activates an automatic commit-time embedding hook.
+- Verified the full note-search pipeline end-to-end for the first time (`267084f`) — four sample notes embedded, loaded, and returning ranked results, proving the plumbing works, though the placeholder embedding model means result quality isn't real yet (needs a follow-up Ollama integration).
+- Added a repeatable test harness (Task 0003, `1a3cddd`): a `seeds/` baseline plus `scripts/seed_vault.py` enables wipe→reseed→search cycles, guardrailed to only ever touch note files.
+- Added a non-blocking safety net (Task 0002, `31056e0`) warning on commits when a note exceeds 300 lines, verified across editors including Obsidian.
+- ~32 files changed, ~3,800 lines added (`dd9be808..0da0d766`), mostly generated embedding sidecars and task/plan docs; tomorrow's plan (`0da0d76`) pivots to Milestone 2 — registering this pipeline into other repos and adding an ingestion smoke test.
+
+### No updates
+- ai-builder (for 19 days)
+- gsd-walkthru (for 19 days)
+- customer-req-responder (for 19 days)
+
+### Cross-repo
+- second-brain-test's completed embed→hydrate→search pipeline (`267084f`, `59c9d67`) directly unblocked second-brain-devkit's planning (`b063c6c`), which now designs its template-generation strategy against that stable output.
+
+
 ## 2026-06-30
 
 ### second-brain-devkit
