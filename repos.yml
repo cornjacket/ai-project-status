@@ -18,11 +18,11 @@
 repos:
   - name: second-brain-test
     remote: https://github.com/cornjacket/second-brain-test.git
-  - name: customer-req-responder
-    remote: https://github.com/cornjacket/customer-req-responder.git
   - name: second-brain-devkit
     remote: https://github.com/cornjacket/second-brain-devkit.git
-    enabled: false
+    enabled: true 
+  - name: customer-req-responder
+    remote: https://github.com/cornjacket/customer-req-responder.git
   - name: ai-builder
     remote: https://github.com/cornjacket/ai-builder.git
     enabled: false
