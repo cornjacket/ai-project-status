@@ -91,7 +91,9 @@ Change detection is git-native regardless: a repo is ACTIVE when `HEAD != last_c
 
 ## Daily plans (forward-looking)
 
-Alongside the retrospective git-telemetry/`summary.md` pair, every tracked repo also maintains a `daily-plan.md` at its root that captures **one day's intent** — single-day scope, always overwritten, never appended. The aggregator `tools/aggregate-plans.py` concatenates each repo's current `daily-plan.md` into a single `daily-plan-summary.md` at this repo's root, also overwritten on each run. There is no history at the plan layer — the historical record is git history/`summary.md`.
+Alongside the retrospective git-telemetry/`summary.md` pair, every tracked repo also maintains a `daily-plan.md` at its root that captures **one day's intent** — single-day scope, always overwritten, never appended. The aggregator `tools/aggregate-plans.py` concatenates each repo's current `daily-plan.md` into a single `daily-plan-summary.md` at this repo's root, also overwritten on each run.
+
+The per-repo `daily-plan.md` files have no plan-layer history — their record is each repo's git history/`summary.md`. The **aggregated** `daily-plan-summary.md` is the daily deliverable, though, so it *is* archived: each run snapshots it into `daily-plan-archive/YYYY-MM-DD.md`, keyed by the summary's own date. This gives a browsable, append-only history of every day's cross-repo plan — the intended use is reviewing plan *quality* over time (e.g. spotting plans that drift too low-level) without spelunking git history. The snapshot is idempotent per day: re-running on the same date overwrites that date's file rather than accumulating duplicates.
 
 Plan freshness uses a **weekend-tolerant** rule: a plan is fresh iff `plan_date >= most_recent_weekday(today)`, where `most_recent_weekday` is today on Mon-Fri and the previous Friday on Sat/Sun. So a Friday plan is still considered fresh on Saturday and Sunday; Monday triggers a re-prompt. The plan file's first line is `# Daily plan — YYYY-MM-DD`, which the aggregator parses; an unparseable header is treated as stale.
 
@@ -192,6 +194,10 @@ Aggregated forward-looking plan. Overwritten on every run (no history). Each ena
 ## ai-baz — no plan committed
 ```
 
+### 5a. `daily-plan-archive/` — dated history of the plan deliverable
+
+`daily-plan-summary.md` is overwrite-only, so on its own it retains no history — yet it is the one artifact worth reviewing after the fact (are the plans well-formed? too granular? do they track the actual work in `summary.md`?). Each run therefore snapshots the freshly-built summary into `daily-plan-archive/YYYY-MM-DD.md`, keyed by the summary's own header date. Committed alongside `daily-plan-summary.md`. Idempotent per day — a re-run overwrites that day's snapshot. This is the *only* history layer for plans; the per-repo `daily-plan.md` files are still overwrite-only (their history is each repo's git log).
+
 ### 6. `tools/` — scripts that do the boring work
 
 Small, composable scripts so the orchestrator and individual `claude -p` calls each do exactly one thing:
@@ -199,9 +205,9 @@ Small, composable scripts so the orchestrator and individual `claude -p` calls e
 - `tools/sync.py` — clone or `git pull` every **enabled** repo in `repos.yml` into `tracked/`. When running inside a Claude `/schedule` routine sandbox (`CLAUDE_CODE_REMOTE=true`), each repo is symlinked from its platform-provided pre-clone at `/home/user/<name>` instead, since direct `https://github.com` clones are blocked by the Anthropic egress TLS-inspection proxy.
 - `tools/diff.py <repo>` — print the new commit telemetry and `--stat` since the recorded `last_commit` for that repo (debugging aid)
 - `tools/new-work.py` — emit a single structured report covering every enabled repo. Active repos get commit telemetry + `--stat` + commit list; inactive repos get `last_activity_date` and computed days-since-activity. The orchestrator parses this report and dispatches per-repo work. A `--since`/`--window` override switches the content window to an ad-hoc time range (e.g. `"24 hours ago"`); the default stays the durable `last_commit..HEAD` range.
-- `tools/aggregate-plans.py` — rebuild `daily-plan-summary.md` by reading each enabled repo's `daily-plan.md`, applying the weekend-tolerant staleness check, and concatenating with per-repo headers. Deterministic; no `claude -p` call.
+- `tools/aggregate-plans.py` — rebuild `daily-plan-summary.md` by reading each enabled repo's `daily-plan.md`, applying the weekend-tolerant staleness check, and concatenating with per-repo headers. Also snapshots the result into `daily-plan-archive/YYYY-MM-DD.md`. Deterministic; no `claude -p` call.
 - `tools/run.py` — orchestrator and single entry point. Calls `sync.py`, parses `new-work.py` output, writes inactivity lines deterministically, spawns one `claude -p` per active repo, runs the cross-repo polish pass when ≥2 repos are active, prepends the result to `summary.md`, calls `aggregate-plans.py`, and finally calls `commit-state.py`.
-- `tools/commit-state.py` — advance `state.json` (bump `last_commit`, `last_synced` always; bump `last_activity_date` only when there was new work) and commit `summary.md` + `daily-plan-summary.md` + `state.json` in one commit.
+- `tools/commit-state.py` — advance `state.json` (bump `last_commit`, `last_synced` always; bump `last_activity_date` only when there was new work) and commit `summary.md` + `daily-plan-summary.md` + `daily-plan-archive/` + `state.json` in one commit.
 - `tools/_lib.py` — shared helpers (config/state I/O, git wrapper, paths)
 
 ### 7. `prompts/` — versioned prompt templates
@@ -241,8 +247,8 @@ Internally, `run.py`:
    - `ACTIVE` → spawn `claude -p` with `prompts/per-repo.md` and that repo's slice; capture the returned markdown.
 4. If ≥2 repos are active, runs a final `claude -p` polish pass (`prompts/polish.md`) over the collected drafts to surface cross-repo themes and tighten prose. Otherwise uses the drafts as-is.
 5. Prepends the polished `## YYYY-MM-DD` section to `summary.md` (skipped when there are no drafts at all).
-6. Calls `aggregate-plans.py` to overwrite `daily-plan-summary.md` with each tracked repo's current `daily-plan.md`. This always runs, regardless of whether any retrospective work happened.
-7. Calls `commit-state.py`, which advances `state.json` and creates a single atomic commit of `summary.md` + `daily-plan-summary.md` + `state.json`.
+6. Calls `aggregate-plans.py` to overwrite `daily-plan-summary.md` with each tracked repo's current `daily-plan.md`, and to snapshot that summary into `daily-plan-archive/YYYY-MM-DD.md`. This always runs, regardless of whether any retrospective work happened.
+7. Calls `commit-state.py`, which advances `state.json` and creates a single atomic commit of `summary.md` + `daily-plan-summary.md` + `daily-plan-archive/` + `state.json`.
 
 If nothing changed (no new retrospective work AND no plans changed), the run produces no commit.
 

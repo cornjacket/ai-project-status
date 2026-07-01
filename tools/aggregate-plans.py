@@ -10,6 +10,12 @@ This tool reads each plan, applies a weekend-tolerant staleness check (a plan
 is fresh iff its date is on or after `most_recent_weekday(today)`), and writes
 one aggregated `daily-plan-summary.md` at the repo root, overwriting any
 prior version. Repos with `enabled: false` are skipped entirely.
+
+The aggregated summary is the daily deliverable, so each run also snapshots it
+into `daily-plan-archive/YYYY-MM-DD.md` (keyed by the summary's own date). The
+canonical `daily-plan-summary.md` is overwrite-only; the dated archive keeps a
+browsable history of every day's plan for later review. Per-repo `daily-plan.md`
+files remain overwrite-only — their history lives in each repo's git log.
 """
 import re
 import sys
@@ -19,6 +25,7 @@ from pathlib import Path
 from _lib import REPO_ROOT, TRACKED_DIR, enabled_repos
 
 DAILY_PLAN_SUMMARY = REPO_ROOT / "daily-plan-summary.md"
+DAILY_PLAN_ARCHIVE_DIR = REPO_ROOT / "daily-plan-archive"
 PLAN_HEADER_RE = re.compile(
     r"^#\s+Daily plan\s+[—\-]\s+(\d{4}-\d{2}-\d{2})\s*$",
     re.MULTILINE,
@@ -88,11 +95,24 @@ def build_summary(today: date | None = None, repos=None) -> str:
     )
 
 
+def archive_summary(today: date, summary: str) -> Path:
+    """Snapshot the aggregated summary into daily-plan-archive/<today>.md.
+
+    Keyed by the summary's own date, so re-running on the same day overwrites
+    that day's snapshot (idempotent) rather than accumulating duplicates."""
+    DAILY_PLAN_ARCHIVE_DIR.mkdir(exist_ok=True)
+    dest = DAILY_PLAN_ARCHIVE_DIR / f"{today.isoformat()}.md"
+    dest.write_text(summary)
+    return dest
+
+
 def main():
     today = date.today()
     summary = build_summary(today=today)
     DAILY_PLAN_SUMMARY.write_text(summary)
     print(f"[aggregate-plans] wrote {DAILY_PLAN_SUMMARY}", file=sys.stderr)
+    dest = archive_summary(today, summary)
+    print(f"[aggregate-plans] archived {dest}", file=sys.stderr)
 
 
 if __name__ == "__main__":

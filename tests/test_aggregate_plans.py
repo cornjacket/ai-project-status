@@ -119,3 +119,20 @@ def test_build_summary_skips_disabled(tmp_path, monkeypatch):
 def test_build_summary_header_includes_today():
     out = ap.build_summary(today=date(2026, 5, 6), repos=[])
     assert "# Daily plan summary — 2026-05-06" in out
+
+
+def test_archive_summary_writes_dated_snapshot(tmp_path, monkeypatch):
+    monkeypatch.setattr(ap, "DAILY_PLAN_ARCHIVE_DIR", tmp_path / "daily-plan-archive")
+    summary = "# Daily plan summary — 2026-05-06\n\nbody\n"
+    dest = ap.archive_summary(date(2026, 5, 6), summary)
+    assert dest == tmp_path / "daily-plan-archive" / "2026-05-06.md"
+    assert dest.read_text() == summary
+
+
+def test_archive_summary_is_idempotent_per_day(tmp_path, monkeypatch):
+    monkeypatch.setattr(ap, "DAILY_PLAN_ARCHIVE_DIR", tmp_path / "daily-plan-archive")
+    ap.archive_summary(date(2026, 5, 6), "first\n")
+    ap.archive_summary(date(2026, 5, 6), "second\n")
+    files = list((tmp_path / "daily-plan-archive").iterdir())
+    assert [f.name for f in files] == ["2026-05-06.md"]
+    assert files[0].read_text() == "second\n"

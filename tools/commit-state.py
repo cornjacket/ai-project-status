@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 """Advance state.json to current HEADs and commit summary.md, state.json,
-and daily-plan-summary.md as a single atomic update."""
+daily-plan-summary.md, and the daily-plan-archive/ snapshots as a single
+atomic update."""
 from datetime import date
 
 from _lib import REPO_ROOT, advance_state, git
 
-TRACKED_FILES = ["summary.md", "state.json", "daily-plan-summary.md"]
+TRACKED_FILES = [
+    "summary.md",
+    "state.json",
+    "daily-plan-summary.md",
+    "daily-plan-archive",
+]
 
 
 def main():
