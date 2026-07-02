@@ -4,6 +4,34 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-02
+
+### second-brain-test
+
+- Core build is now feature-complete through Milestone 2 (M2) and Task 0004; this repo's role shifts from active development to serving as the stable "golden" reference/oracle that a new `second-brain-devkit` repo generates from and diffs against (`97a94bf`).
+- Added `scripts/register.py`, an idempotent block-injector for other projects' `CLAUDE.md` that points their AI at this brain for saving/searching durable lessons — verified byte-identical on repeat runs and end-to-end (a note gets embedded, hydrated, and surfaces as the top search result) (`6a8b2ec`).
+- Reworked embedding-vector handling: real-vault vectors dropped from git (regenerable, model-specific), a fixed set of test vectors moved to `tests/fixtures/vault/` for byte-reproducible regression testing, plus a new `self_test.py` structural check and a two-tier testing writeup (`1926342`).
+- `SPEC.md` churned between repos — removed here in favor of a devkit copy (`f675fe3`), then restored since this repo remains the active build/reference target until full retirement later (`e934dcb`).
+- Rewrote `README.md` as a task-oriented operating guide rather than a design document (`9ed9356`).
+- Net: 25 files touched, ~3,185 lines of committed vector data removed, ~2,058 added — mostly documentation and test-fixture rework (`0da0d766..97a94bf8`).
+
+### second-brain-devkit
+
+- Completed the templatizing step of milestone G1: built a `template/` tree (28 files) by copying the golden reference repo byte-for-byte, auto-scrubbing 4 files of internal tracking references, and verifying clean via an automated guard (`2f6e7f6`, `ec40130`).
+- Added `emit-manifest.toml` as the single source of truth classifying all 42 golden-repo files (copy as-is / clean before copying / generate at build time / don't ship), now driving the generator, diff-checker, and reference guard (`4ce520c`, `cd212e3`).
+- Locked in an automated scanner enforcing that no file shipped to end users can mention this internal tracking system (`3012492`).
+- Same `SPEC.md` location churn as upstream: briefly duplicated here, then reverted — spec now lives only in the golden reference repo and is never shipped to generated brains (`dab1163`, `cd212e3`, `d3b3a41`).
+- Documented two generation modes sharing the same build logic: throwaway validation (build → compare to golden → discard) and production (build → user's own repo, kept permanently) (`4232858`).
+- Next up: implement `generate()`, a sandbox runner to exercise it, and a structural diff check against the golden repo (`95204d0`).
+
+### Cross-repo
+
+- `second-brain-test` and `second-brain-devkit` are converging into one system: the former is settling into a frozen "golden" reference while the latter builds the generator and diff-checker that treats it as ground truth. Both repos independently churned on where `SPEC.md` should live today and landed on the same resolution — spec stays only in `second-brain-test`, never shipped to generated brains (`f675fe3`/`e934dcb` vs `dab1163`/`cd212e3`/`d3b3a41`).
+
+### No updates
+- customer-req-responder (for 20 days)
+
+
 ## 2026-07-01
 
 ### second-brain-devkit
