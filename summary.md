@@ -4,6 +4,33 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-03
+
+### second-brain-test
+
+- Replaced full-rebuild search indexing with incremental updates — `--upsert`/`--delete` for single notes and `--from-commit` for commit-driven updates, wired into a new post-commit hook so notes become searchable immediately after `git commit` (`20eb3ef`, `ccce176`).
+- Moved the embedding backend to a per-project setting in `config/embedder.toml`: this golden reference copy pins the deterministic test backend, while generated brains default to Ollama, with an env var override still available (`04a9d31`, `84cbffb`).
+- Added a "second-brain" skill (lightweight shell interface, not a persistent server) letting other AI coding agents query this knowledge base for existing conventions, with install docs (`c9b8838`, `40fc98f`).
+- Added `scripts/embed_vault.py` for one-shot bulk re-embedding (first-time setup or backend switches), an annotated note template, and a README tip on phrasing notes for better retrieval (`135bcfb`, `38cc6e8`, `71e2536`).
+- Daily plan (2026-07-02) freezes this repo as a stable reference copy — only reactive fixes expected — while active development moves to `second-brain-devkit` (`3df0261`).
+
+### second-brain-devkit
+
+- Closed the "G1" milestone: `generate()` now produces a personal knowledge-base repo from a template, validated with a byte-exact structural diff against the reference copy (33/33 files matching) (`f748894..04a0177`).
+- Shipped production-mode generation — `new_brain.py` now creates a real, user-owned git repo rather than a throwaway test copy (`91cddb4`).
+- Made tests self-sufficient by vendoring the ~42-file golden brain directly into the repo and adding a GitHub Actions CI workflow, removing the dependency on an external repo (`f23c9ab..5018f9f`).
+- Verified real-world search quality with Ollama and fixed a bug where newly generated brains returned garbage results unless a user manually set an env var — search now works out of the box (`1e388f0`, `b036221`).
+- Rolled the AI skill, incremental index updates, auto-sync-on-commit, and a guided note-taking template into every newly generated brain (`06903b7`, `0503449`, `14c6cd1`, `c0f8856`, `87261ab`, `bec1a0c`).
+- Found a real data-consistency bug (note on disk but missing from the index), setting tomorrow's plan: build a "doctor" tool to check/repair vault-database consistency (`1f9c8c6`).
+
+### No updates
+- customer-req-responder (for 21 days)
+
+### Cross-repo
+
+`second-brain-test` and `second-brain-devkit` converged on the same feature set today — incremental search-index updates, auto-sync-on-commit, and the AI query skill — landing in the golden reference copy and then getting baked into every brain the generator produces.
+
+
 ## 2026-07-02
 
 ### second-brain-test
