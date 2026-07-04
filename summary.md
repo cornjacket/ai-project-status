@@ -4,6 +4,34 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-04
+
+### second-brain-test
+
+- Added `scripts/doctor.py`, a health-check command verifying the chain from notes on disk to the search database, catching drift (missing/stale/wrong-format cache entries) with a `--repair` flag to auto-fix (c3f15da).
+- Hardened SQLite for concurrent access: switched to WAL mode with a 5-second retry window so readers (search) and writers (cache updates) no longer collide (0520c0f).
+- `install_skill.py` gained an opt-in "nudge" install mode that adds a reflexive reminder to consult this brain into global Claude/Gemini config, plus a matching `--uninstall`, round-trip tested against a scratch home directory (b73aaca).
+- README now documents enabling semantic search via Ollama and using `doctor.py` as a health check, verified end-to-end against a live Ollama server (c08be09).
+- Plan: continue as the hand-built prototyping/correctness reference for `second-brain-devkit`, which will vendor back the next hydrate/cache layer and a first MCP server (276f3dd).
+- Range `0520c0f..276f3dd6`: 5 files, ~580 lines added, concentrated in `doctor.py` (new) and `install_skill.py`.
+
+### second-brain-devkit
+
+- Shipped `doctor.py` into every generated brain as a live-tested (not just prototyped) setup/consistency check (`e180069..9793ed5`).
+- Enabled SQLite WAL mode plus a busy-timeout in generated brains so readers and background cache writes no longer collide (`ba4f3ba`).
+- Added the reflexive "consult before designing" install trigger with `--uninstall`, and Ollama setup/readiness docs to the generated README — 14 files, ~1,480 lines added, mostly regenerated template/golden fixtures (`7178c57..9793ed5`).
+- Scoped (not yet built) an MCP server for AI clients like Claude Desktop that can't run local Python scripts; decided it must run over stdio, not the web, and needs a safe "rebuild without deleting the live database" approach first since the server holds a long-running connection (`4eb17e8`, `c0888eb`).
+- Decided the devkit will never auto-install dependencies (detect-and-instruct instead), and flagged a gap: no supported way to upgrade an existing populated brain in place, only regenerate from scratch — fix now planned (`46424ac`).
+- Plan: build the safer in-place rebuild first, then a first MCP server version (`62c8bb4`).
+
+### No updates
+- customer-req-responder (for 22 days)
+
+### Cross-repo
+
+Both `second-brain-test` and `second-brain-devkit` landed the same trio of features today — a `doctor.py` health check, SQLite WAL mode for concurrent reader/writer access, and a reflexive install-nudge with `--uninstall` — with `second-brain-test` prototyping and `second-brain-devkit` vendoring the hardened versions into its templates. Both also converged on scoping an MCP server as the next major piece of work.
+
+
 ## 2026-07-03
 
 ### second-brain-test
