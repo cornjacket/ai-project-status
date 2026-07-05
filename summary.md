@@ -4,6 +4,33 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-05
+
+### second-brain-test
+
+- Made cache rebuilds concurrency-safe: `hydrate_cache.py` now rebuilds the search cache in-place inside a single transaction instead of delete-and-recreate, so readers never see a missing/empty cache mid-rebuild and failed rebuilds roll back cleanly (5604fb4).
+- Added a read-only MCP server (`scripts/mcp_server.py`, 103 lines) exposing search and note-retrieval over the vault, reusing the existing CLI/skill's search logic rather than duplicating it (4867eec).
+- Found and fixed a Claude Desktop compatibility bug: an auto-generated schema field its older MCP client didn't support was hiding the tools; disabling that field fixed it, verified end-to-end after restart (d9d4260).
+- Documented MCP setup in depth — full Desktop install/config walkthrough with troubleshooting, plus a standalone verification recipe that confirms the server works without opening Desktop (ff7fd84, e70fbd4; README +~125 lines).
+- Scoped (not yet built) a hybrid search upgrade: fusing today's vector-only search with keyword search (FTS5) to catch exact-term matches pure semantic search misses (e70fbd4).
+- Plan going forward: hold steady as the reference implementation while devkit builds CI coverage and an upgrade tool; prototype hybrid search here next, on demand (2c64264, range 276f3dd6..2c642643).
+
+### second-brain-devkit
+
+- Shipped MCP server v1 across every generated brain (4e5bdc0..420a6cb): first landed the same concurrency prerequisite as second-brain-test (in-place cache rebuild, avoiding a race with the server's open connection), then generated the read-only MCP server into each brain, closing the last open design question.
+- Fixed the same Claude Desktop compatibility bug (66a6664) — a structured-output schema field broke Desktop integration — and in the process found that CI only byte-diffs the generated server script without ever running it, so a broken server could still pass.
+- Scoped the CI fix in two planning commits (4055af5, 6abca08): add a hermetic syntax-check gate plus an opt-in test that spawns and exercises the server, and a new task for a non-destructive "upgrade an existing brain" tool.
+- Chased a reported search-quality bug to a false alarm (Desktop hallucinated a bad result; the tool was fine), but used the investigation to scope hybrid keyword+vector search via Reciprocal Rank Fusion, designed in depth in a new architecture doc (6792458, b3c16c5; +171 lines).
+- Rewrote tomorrow's plan (b2a029e) to prioritize CI hardening for the MCP server before starting the brain-upgrade tool, since both the server and the search-quality design landed ahead of schedule over the weekend.
+
+### Cross-repo
+
+- second-brain-test and second-brain-devkit converged on the same day: both shipped MCP server v1 behind the identical concurrency fix (in-place cache rebuild — 5604fb4 / 4e5bdc0..420a6cb), both hit and fixed the same Claude Desktop schema-compatibility bug (d9d4260 / 66a6664), and both are now scoping the same hybrid keyword+vector (RRF) search upgrade as their next feature (e70fbd4 / 6792458, b3c16c5) — devkit is templating what test is prototyping.
+
+### No updates
+- customer-req-responder (for 23 days)
+
+
 ## 2026-07-04
 
 ### second-brain-test
