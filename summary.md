@@ -4,6 +4,27 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-07
+
+### second-brain-test
+
+- No functional changes — still a deliberately idle "diff oracle" baseline, untouched since July 4th since companion devkit work hasn't yet produced anything to prototype here (`8f5b23e`).
+- Daily plan refreshed to flag two prototype candidates: a post-merge sync hook (big-brain Approach A, pending task #6) and hybrid FTS5 search (task #3).
+- Still slated for eventual retirement once those prototypes are validated elsewhere.
+
+### second-brain-devkit
+
+- Added two CI safety nets (`9e09371`, `cfd4d5b`): syntax-checking every generated script, and spinning up the generated MCP server to verify real runtime behavior — closing the gap that let a prior Claude Desktop bug ship untested.
+- Shipped `tools/update_brain.py` (`b7e08c2`), a non-destructive upgrade path that refreshes a brain's tooling scaffold in place while preserving notes and git history, replacing the old delete-and-regenerate workaround. Dry-run by default; `--apply` commits a revertable snapshot.
+- Designed a git-remote-based sync approach for sharing a brain across machines (`ea3f54e`, `8d6c996`, `f49ef8b`): pull/push over git rather than a hosted database, explicitly excluding embeddings from commits since they aren't byte-reproducible across machines.
+- Planned the next build task — `new_brain` creating a brain wired to a remote repo from the start, auto-sync on by default, with a preflight check and CI-testability without real credentials (`ab1953b`, `1381e8c`, `7f39f95`).
+- Added a source map and Claude Desktop setup walkthrough (`e8fecab`) as a single onboarding reference from fresh brain to working Desktop integration.
+- Queued a PDF-ingestion backlog item, flagging that PDFs need chunked, multi-embedding handling — breaking the current one-note-per-embedding model (`6b32153`). Range `b2a029e2..6b321537`, docs-heavy, 12 files (~984 lines added).
+
+### No updates
+- customer-req-responder (for 25 days)
+
+
 ## 2026-07-06
 
 ### No updates
