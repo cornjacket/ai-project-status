@@ -4,6 +4,28 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-08
+
+### second-brain-test
+- Daily plan updated for 2026-07-08 (`e4e78be`), resuming this repo as the prototyping ground for the devkit after a period of inactivity; sync-hook/FTS5 work is deprioritized in favor of this.
+- Plan: prototype a splice helper for task #10 (programmatically insert/update managed text blocks) and refactor `install_skill.py`'s `--nudge` flag to use it, verified via a round-trip test against a local Ollama model.
+- Also kicks off task #8: auto-link related notes by embedding canonical body text into `related_auto` frontmatter, tracking a `content_hash` to detect when re-embedding is needed.
+- Only `daily-plan.md` changed (19 insertions/20 deletions) — planning ahead of implementation, no code yet.
+
+### second-brain-devkit
+- Shipped task #6: brain creation can now connect to a git remote on the spot via `--remote`, with safety checks (git identity configured, remote reachable, remote empty) run upfront so a failed setup never leaves a half-built brain; a new hermetic test verifies the full connect→push→clone-as-a-second-machine flow (`3d6cf08`).
+- Renamed `new_brain.py` to the clearer `create_second_brain.py` throughout code and docs, and added an installation checklist so a freshly created brain is verified runnable, not just generated (`b41dbd6`).
+- Queued three backlog design docs: task #8, vector-similarity auto-linking between notes without creating a feedback loop where auto-links get folded back into re-indexing (`d196a4d`); task #9, letting the toolkit own a marked region of a brain's README so it can push updates without overwriting user edits (`a4e36d7`); and task #10, a shared text-splicing helper to unify #8, #9, and an existing similar feature (`5ac2f03`).
+- Tomorrow's plan: build the task #10 helper first, then start task #8 auto-linking (`1157288`).
+- Touched 16 files (~1,023 insertions), including two new design docs and a ~210-line test script for the remote-connection feature (`6b321537..11572886`).
+
+### Cross-repo
+- second-brain-devkit spent today designing tasks #8 (embedding-based auto-linking) and #10 (shared splice helper) and queued both for tomorrow, while second-brain-test picked up the same two tasks as its prototyping plan the same day — the two repos are converging on identical feature work in lockstep.
+
+### No updates
+- customer-req-responder (for 26 days)
+
+
 ## 2026-07-07
 
 ### second-brain-test
