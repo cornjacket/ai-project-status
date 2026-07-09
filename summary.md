@@ -4,6 +4,32 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-09
+
+### second-brain-test
+
+- Auto-linking (task #8) landed: `d086620` writes a `related_auto:` block into frontmatter with suggested neighbor links, gated to never overwrite a hand-written `related:` field or an in-body link — built on the read-only calibration tool from `6ad86cc` that reports neighbor distances for tuning the similarity cutoff.
+- Two embedding fixes underpin it: `9e827a5` embeds only body text (stripping frontmatter) so auto-links don't feed back into and skew a note's own vector; `44ea6f6` adds task-specific prefixes so a search query and a stored note no longer embed identically.
+- `2bc1f27` adds a content fingerprint so notes re-embed only when their text changes, not on metadata-only edits.
+- `578f20a`/`babeb00` are supporting refactors: decoupling auto-link logic from the vector database for standalone testing, and extracting a shared marked-region helper reused by the upcoming README feature.
+- Range `e4e78be0..b25ac58e`, ~2,000 lines across 12 files (incl. regenerated fixtures). Next up: prototype README status markers (#9), then seed a larger topic-diverse test vault (#15) to stress-test linking thresholds.
+
+### second-brain-devkit
+
+- Built a reusable 100-note, 10-topic test corpus with install/remove tooling (`119f7d6`, `9de9a8c`), then rewrote all notes longer and more topic-focused (`a64496d`), lifting nearest-neighbor clustering accuracy from 69%→79% (top match) and 55%→75% (top 5).
+- Advanced auto-linking (similarity-based `related_auto:` frontmatter links) end-to-end: substance-only embedding (`caba3a3`), direction-aware search/clustering prefixes (`a336184`, `638b5d3`), a calibration tool for the similarity cutoff (`8042520`), the write path itself (`e0e218f`), and a CI check confirming Obsidian-graphable formatting (`e82f692`).
+- Shipped a perf fix skipping re-embedding of unchanged notes (`aa4e692`) and extracted a shared "marked block" helper reused by both auto-linking and the README-update feature (`ac0b305`).
+- Queued: closing out README auto-update (#9), renaming to `create-second-brain` (#11), a retrieval-enhancement ablation/benchmarking effort (#12/#13), a public getting-started writeup (#14), and the diverse test corpus (#15) needed before final threshold tuning (`0ed572a`, `d12d36f`, `d4b8a0f`, `8b3d1ab`).
+- Tightened process: commit messages must now read clearly to outside reviewers, and the agent commits autonomously without pushing unless asked (`faff004`, `3af3f76`, `ca8aac2`).
+
+### No updates
+- customer-req-responder (for 27 days)
+
+### Cross-repo
+
+- Both repos advanced the same auto-linking feature in lockstep today — substance-only embedding, direction-aware prefixes, similarity calibration tooling, skip-unchanged-notes optimization, and a shared marked-block helper. `second-brain-test` landed it as a consumer (`d086620`), while `second-brain-devkit` built the generalized version plus the corpus to validate it (`e0e218f`, `a64496d`), with both queuing the README-status-marker feature and a larger diverse test vault (#15) next.
+
+
 ## 2026-07-08
 
 ### second-brain-test
