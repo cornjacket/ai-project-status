@@ -29,6 +29,8 @@ Every commit MUST follow this shape:
 
 1. **The title summarizes the functional change, not the files.** Describe the overall behavior change or architectural decision (`engine(telemetry): replace log.md mining with commit parsing`), NOT a list of touched file names (`update _lib.py and tests`). A reader scanning `git log` should grasp *what changed in the system* from the title alone.
 
+1a. **Write for a reader unfamiliar with the project — carry enough top-level context to be self-contained.** These commits are summarized **across the whole portfolio** in `summary.md`, so a low-level, jargon-only message summarizes poorly. Name the capability in plain language and say *what it does for the product or user*, not just the internal mechanic; lead with the outcome, then the detail. Prefer `feat(auth): let users reset a forgotten password by email` over `add token TTL check to reset handler`. Assume the reader knows neither the file names nor the internal shorthand — a bare `refactor: lazy-import db` or `wire gate 4/7` is too esoteric on its own. This applies to the title **and** `[Context]`/`[Impact]`.
+
 2. **`[Context]` and `[Impact]` are required on any non-trivial commit.** `[Context]` captures the why / the lesson learned; `[Impact]` captures how the project or system behavior changes. Each may span multiple lines. Trivial mechanical commits (typo, formatting) may omit them.
 
 3. **Commit at task granularity — never per-prompt.** Multiple prompts inside one task land in one commit. Open a new commit when the focus changes (a new task, a substantively different question, a meaningfully new concept). Avoid both **commit-per-prompt** (noise that drowns out signal) and **task-without-a-commit** (gaps that make the history untrustworthy).
