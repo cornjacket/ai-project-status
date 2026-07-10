@@ -4,6 +4,21 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-10
+
+### second-brain-devkit
+
+- Fixed a dogfooding-surfaced bug where upgrading the devkit would silently overwrite any personal notes users had added to their "brain" README: `update_brain` used to regenerate the whole file from the template on every upgrade (622572b).
+- The template README now wraps its devkit-authored content in invisible HTML comment markers; everything outside those markers belongs to the user and is preserved byte-for-byte across upgrades via a new block-splicing helper.
+- If a user's README has no markers (meaning they've taken full ownership of the file) or has malformed/duplicate markers, the tool now leaves it untouched and reports it as skipped rather than guessing how to merge it — each README is reported as new, changed, or skipped.
+- Added a new automated test (`check_readme_block.py`) covering the full lifecycle — create, user edit, then apply an update — bringing the CI gate to 8/8 checks, implemented with only git and the Python standard library.
+- Also swept in an unrelated housekeeping sync of the reference daily-plan file, which doesn't affect the shipped tool. Change spans 9 files, including ~170 new lines for the new test.
+
+### No updates
+- second-brain-test (for 1 days)
+- customer-req-responder (for 28 days)
+
+
 ## 2026-07-09
 
 ### second-brain-test
