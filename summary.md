@@ -4,6 +4,21 @@ Auto-maintained by ai-project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-11
+
+### second-brain-devkit
+
+- Completed task #15, a new 200-note benchmark corpus spanning 10 unrelated subject areas (cooking, acting, dancing, astronomy, biology, distributed systems, history, law, music theory, personal finance), built to test whether the note-clustering/retrieval system can cleanly separate topics that aren't closely related (`1280344..3d80101`, ~200 files added). A generalized install tool (`test_corpus.py`, `3d80101`) now serves this alongside the existing corpus without disrupting it, and a companion labeled query set (30 query→note pairs, `9f4ddca`) gives the system a graded test.
+- Ran that benchmark against a live Ollama-backed instance and it passed cleanly: 98% topic-purity on the top match and 96% within the top 5, with retrieval hitting 27/30 exact and 30/30 within the top 5 (`cdb2768`, `65f0e8d`). This is a much cleaner result than the earlier all-technical-topics corpus (79% purity), confirming that closely related subjects (like different IT topics) are inherently harder to separate than distinct ones.
+- Wrote up the practical options for improving separation of closely-related topics — hybrid keyword+semantic search (task #3) ranked as the highest-value next step, alongside stronger embedding models and other tuning techniques (`d273d50`).
+- Scoped a new "glossary" feature (task #19): a dedicated folder for definition-style notes that stays out of the semantic search index by design, since definitions are meant to be looked up by exact term rather than found by similarity (`0d0aa79`, `1ab94ce`).
+- Set Monday's plan: start the feature-comparison groundwork (task #13), then the benchmark-driven comparison harness (task #12) that consumes today's new corpus, alongside the hybrid-search work (task #3) (`9189949`).
+
+### No updates
+- second-brain-test (for 2 days)
+- customer-req-responder (for 29 days)
+
+
 ## 2026-07-10
 
 ### second-brain-devkit
