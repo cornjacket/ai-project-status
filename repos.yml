@@ -26,3 +26,5 @@ repos:
   - name: ai-builder
     remote: https://github.com/cornjacket/ai-builder.git
     enabled: false
+  - name: background-tracker
+    remote: https://github.com/cornjacket/background-tracker.git
