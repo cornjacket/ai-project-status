@@ -4,6 +4,40 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-12
+
+### second-brain-test
+
+- New hybrid search prototype (`a51870c`) blends FTS5 keyword search with RRF ranking — prototype #3 in the devkit's search experimentation track — landing mainly in `scripts/search_vault.py` with supporting cache/update-script changes.
+- Today's plan (`4858785`) scopes the next step: a `features.toml` toggle to switch the prototype on/off.
+- README cleanup (`75b9411`) adds markers so the auto-update script won't clobber hand-written notes.
+- Wired into this project-status tracker (`2dcc232`): daily-plan file + automation hook added.
+- Range `b25ac58e..75b94119`: 9 files, ~194 insertions — new `scripts/note_view.py` (39 lines) plus a substantial `search_vault.py` rework (+90/-lines).
+
+### second-brain-devkit
+
+- Landed hybrid search: vector (meaning-based) search now merges with SQLite full-text search via Reciprocal Rank Fusion, closing a blind spot where exact terms (error codes, config keys) got buried (`e0a713`, task #3). Verified end-to-end against a live embedding model, no regressions, no new dependency.
+- Rebuilt the evaluation query set (`9b6c309`) after finding the original was too easy and masked real differences between approaches. The harder set revealed an earlier "model A decisively beats model B" finding was an artifact of question phrasing, not a real difference — correction applied retroactively to prior benchmark docs.
+- Built a formal ablation harness (`tools/ablation.py`, `335c695`, `b60e70d`): one doc-formatting technique helps graph readability but not search accuracy, and a "symmetric" query-prefixing scheme actually hurts accuracy. A follow-on test (`f85c1c7`) showed embedding-model choice matters a lot on topically-similar content but not diverse content — explaining the earlier disagreement.
+- Scoped (not yet built) two features: exposing the vault's glossary via dedicated lookup tools outside semantic search (task #20, `08666b6`), and security tests for path-traversal/data-isolation on the vault query server (task #21, `ac1a309`).
+- Large diff: ~1,100 lines across 23 files, spanning live scripts, mirrored test fixtures, and new quality/benchmark docs (`9189949..94dae19`).
+
+### customer-req-responder
+
+- Administrative only: wired into the project-status tracker rather than product changes (`4d4f22e`, range `c73a7fdd..4d4f22e5`) — `daily-plan.md` convention, git-automation rule block, and SessionStart hook added, 2 files touched.
+
+### captains-log
+
+- Onboarded into the project-status tracking workflow — `daily-plan.md`, shared git-automation rule block, and a SessionStart hook, across three bootstrap commits (`63c9b1e`, `29ee159`, `e019be7`) totaling 4 files/178 lines.
+- `7f2e82f` fixed a stale doc reference, renaming the aggregator repo from "ai-project-status" to "project-status" (docs-only).
+- `c63da16` logged today's daily plan: a study day on Google/Kaggle's "The New SDLC With Vibe Coding" paper, "Introduction to Agents," and hands-on testing of the Pi coding-agent harness.
+
+### Cross-repo
+
+- Hybrid search (FTS5/vector search fused via RRF) landed the same day in both `second-brain-devkit` (the production implementation) and `second-brain-test` (its prototype track, #3) — same technique, two layers of the same project.
+- Three repos (`second-brain-test`, `customer-req-responder`, `captains-log`) were freshly onboarded into this project-status tracker today, each picking up the standard `daily-plan.md` + automation-hook bootstrap.
+
+
 ## 2026-07-11
 
 ### second-brain-devkit
