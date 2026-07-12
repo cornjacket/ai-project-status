@@ -68,12 +68,27 @@ if [[ ! -f "$claude" ]]; then
 elif grep -qF "$BEGIN_MARKER" "$claude"; then
   if (( update_mode )); then
     # Replace the existing block (anything between begin and end markers, inclusive).
-    awk -v begin="$BEGIN_MARKER" -v end="$END_MARKER" -v repl="$rule_block" '
-      BEGIN { in_block = 0; printed = 0 }
-      $0 == begin { in_block = 1; if (!printed) { print repl; printed = 1 }; next }
-      $0 == end   { in_block = 0; next }
-      !in_block   { print }
-    ' "$claude" >"$claude.tmp" && mv "$claude.tmp" "$claude"
+    # Python, not awk: BSD awk (macOS default) rejects the multi-line template
+    # passed via -v ("newline in string") and silently leaves the block stale.
+    python3 - "$claude" "$TEMPLATE_RULE" "$BEGIN_MARKER" "$END_MARKER" <<'PY'
+import sys, pathlib
+claude_path, tmpl_path, begin, end = sys.argv[1:5]
+repl = pathlib.Path(tmpl_path).read_text().rstrip("\n")
+out, in_block, printed = [], False, False
+for line in pathlib.Path(claude_path).read_text().splitlines():
+    if line == begin:
+        in_block = True
+        if not printed:
+            out.append(repl)
+            printed = True
+        continue
+    if line == end:
+        in_block = False
+        continue
+    if not in_block:
+        out.append(line)
+pathlib.Path(claude_path).write_text("\n".join(out) + "\n")
+PY
     echo "[setup] refreshed git-automation rule in CLAUDE.md (--update)"
   else
     echo "[setup] CLAUDE.md already contains the git-automation rule; pass --update to refresh"
