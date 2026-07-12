@@ -69,7 +69,7 @@ learning ground that feeds the homegrown ai-builder framework, and low-risk to t
 Two known gaps to own deliberately: (a) no LLM/eval phase like GSD's AI-SPEC / eval-review — will
 hand-spec the eval or author an own eval skill; (b) draft-quality is non-deterministic, so TDD
 covers the plumbing while a separate Gemini-as-judge eval loop covers generation. The log.md /
-daily-plan.md / ai-project-status discipline is framework-agnostic and stays. Next: set up
+daily-plan.md / project-status discipline is framework-agnostic and stays. Next: set up
 Superpowers and start brainstorm on the 6 blocking open questions toward SPEC.md.
 
 ```

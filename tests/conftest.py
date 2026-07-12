@@ -52,7 +52,7 @@ def project(tmp_path, monkeypatch):
     (tmp_path / "tracked").mkdir()
     (tmp_path / "summary.md").write_text(
         "# AI Project Status Summary\n\n"
-        "Auto-maintained by ai-project-status. Newest activity at the top.\n\n"
+        "Auto-maintained by project-status. Newest activity at the top.\n\n"
         "<!-- new sections inserted below -->\n"
     )
     (tmp_path / "state.json").write_text("{}\n")

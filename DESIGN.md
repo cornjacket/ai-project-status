@@ -1,8 +1,8 @@
-# ai-project-status — Design
+# project-status — Design
 
 ## Purpose
 
-`ai-project-status` is a meta-repo that tracks development progress across a portfolio of other `ai-*` repos. It is **not** an aggregator of raw logs — it is a status reporter. The deliverable is a single `summary.md` that gives a high-level, human-readable picture of what has been built across the tracked repos, with the most recent activity at the top.
+`project-status` is a meta-repo that tracks development progress across a portfolio of other `ai-*` repos. It is **not** an aggregator of raw logs — it is a status reporter. The deliverable is a single `summary.md` that gives a high-level, human-readable picture of what has been built across the tracked repos, with the most recent activity at the top.
 
 This repo does no AI development work itself. It observes other repos, summarizes their activity at a daily resolution, and stays in sync via a scheduled daily run.
 
@@ -222,7 +222,7 @@ Prompt templates live in files so they can be reviewed, diffed, and edited witho
 Bootstrap content copied into each tracked repo by `setup-new-repo.sh`:
 
 - `templates/daily-plan.md` — initial plan starter (with placeholder header so the staleness check fires until a real plan is written).
-- `templates/claude-rule.md` — content of the `<!-- ai-project-status -->` block injected into the tracked repo's `CLAUDE.md`. Defines git-automation (commit-telemetry) rules and daily-plan rules.
+- `templates/claude-rule.md` — content of the `<!-- project-status -->` block injected into the tracked repo's `CLAUDE.md`. Defines git-automation (commit-telemetry) rules and daily-plan rules.
 - `templates/check-daily-plan.py` — the `SessionStart` hook script copied to each tracked repo's `.claude/hooks/`. Reads `daily-plan.md`, applies the weekend-tolerant staleness rule, and writes a system reminder to stdout asking for a fresh plan if needed (silent on the success path).
 
 ### 9. `CLAUDE.md` — operating directives
@@ -258,7 +258,7 @@ A daily scheduled agent (via `/schedule`) runs the procedure above. Local execut
 
 The remote `/schedule` flow has two extra moving parts driven by sandbox limitations:
 
-1. **Pre-cloned sources.** The sandbox's egress proxy intercepts `https://github.com` and returns 401 even for public repos. Routines must declare every tracked repo (plus `ai-project-status` itself) in their `sources`; the platform pre-clones each at `/home/user/<name>` and `tools/sync.py` symlinks them into `tracked/`.
+1. **Pre-cloned sources.** The sandbox's egress proxy intercepts `https://github.com` and returns 401 even for public repos. Routines must declare every tracked repo (plus `project-status` itself) in their `sources`; the platform pre-clones each at `/home/user/<name>` and `tools/sync.py` symlinks them into `tracked/`.
 2. **Side-branch + auto-merge.** The Claude GitHub App identity used by the routine cannot push to the default branch. So `tools/daily.sh` pushes the run's commit to `auto/status-YYYY-MM-DD` and `.github/workflows/auto-merge-status.yml` fast-forwards `main` to it (using the runner's standard `GITHUB_TOKEN`, which is not subject to the App restriction) and deletes the side branch. See `README.md` → "Why a side branch?" for the limitation rationale.
 
 Local cron execution skips both — direct `git clone` works, and `tools/run.py` + `git push` lands on `main` without the side-branch detour.

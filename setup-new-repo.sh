@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# setup-new-repo.sh — bootstrap a target repo for tracking by ai-project-status.
+# setup-new-repo.sh — bootstrap a target repo for tracking by project-status.
 #
 # Clones the target into a temporary directory, ensures it has:
 #   - CLAUDE.md         (with the git-automation rule injected between markers)
@@ -7,7 +7,7 @@
 #
 # Idempotent: re-running on an already-bootstrapped repo is a no-op. Pass
 # --update to refresh the rule block in place (replaces content between the
-# ai-project-status markers).
+# project-status markers).
 #
 # Usage:
 #   ./setup-new-repo.sh <remote-url> [branch]
@@ -132,13 +132,13 @@ fi
 # `git add -f` so a `.claude/` line in .gitignore doesn't silently skip the hook.
 git add CLAUDE.md daily-plan.md
 git add -f .claude/hooks/check-daily-plan.py .claude/settings.json
-git commit --quiet -m "Bootstrap ai-project-status tracking (daily-plan.md, git-automation rule, SessionStart hook)"
+git commit --quiet -m "Bootstrap project-status tracking (daily-plan.md, git-automation rule, SessionStart hook)"
 git push --quiet origin "$branch"
 echo "[setup] committed and pushed to origin/$branch"
 
 cat <<EOF
 
-[setup] done. Next step — register this repo with ai-project-status:
+[setup] done. Next step — register this repo with project-status:
 
   Add to repos.yml:
     - name: $name

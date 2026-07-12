@@ -1,4 +1,4 @@
-# CLAUDE.md — ai-project-status operating directives
+# CLAUDE.md — project-status operating directives
 
 ## Purpose
 

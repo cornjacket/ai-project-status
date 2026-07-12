@@ -1,19 +1,19 @@
 <!-- ai-project-status:begin -->
 <!--
-  This block is injected and refreshed by ai-project-status:
-  https://github.com/cornjacket/ai-project-status
+  This block is injected and refreshed by project-status:
+  https://github.com/cornjacket/project-status
 
   It defines the commit-message discipline this repo must follow so
   the meta-repo can summarize cross-portfolio activity in summary.md.
 
   Do not edit between the begin/end markers — local edits will be
   overwritten on the next `setup-new-repo.sh --update`. To change
-  the rules, edit templates/claude-rule.md in ai-project-status
+  the rules, edit templates/claude-rule.md in project-status
   and re-run `setup-new-repo.sh --update <this-repo-remote>`.
 -->
 ## Knowledge Extraction & Git Automation
 
-This repo is monitored by [`ai-project-status`](https://github.com/cornjacket/ai-project-status). It no longer reads a `log.md` file — backward-looking activity is reconstructed **directly from your git history**. Your job is to make every commit message a high-level, self-contained telemetry record so the meta-repo can summarize cross-portfolio activity in `summary.md`.
+This repo is monitored by [`project-status`](https://github.com/cornjacket/project-status). It no longer reads a `log.md` file — backward-looking activity is reconstructed **directly from your git history**. Your job is to make every commit message a high-level, self-contained telemetry record so the meta-repo can summarize cross-portfolio activity in `summary.md`.
 
 ### Commit-message schema
 
@@ -41,7 +41,7 @@ Every commit MUST follow this shape:
 
 ## Daily plan (daily-plan.md)
 
-`daily-plan.md` is a **forward-looking** plan file at the repo root. It captures the intent for one working day. ai-project-status aggregates every tracked repo's `daily-plan.md` into [`daily-plan-summary.md`](https://github.com/cornjacket/ai-project-status/blob/main/daily-plan-summary.md).
+`daily-plan.md` is a **forward-looking** plan file at the repo root. It captures the intent for one working day. project-status aggregates every tracked repo's `daily-plan.md` into [`daily-plan-summary.md`](https://github.com/cornjacket/project-status/blob/main/daily-plan-summary.md).
 
 ### Rules
 

@@ -2,7 +2,7 @@
 
 <!--
   Forward-looking companion to log.md. Single-day scope. Always overwritten,
-  never appended. Aggregated across repos by ai-project-status into
+  never appended. Aggregated across repos by project-status into
   daily-plan-summary.md.
 
   - First line MUST be `# Daily plan — YYYY-MM-DD` (the date is the staleness signal).

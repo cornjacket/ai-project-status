@@ -1,6 +1,6 @@
 # AI Project Status Summary
 
-Auto-maintained by ai-project-status. Newest activity at the top.
+Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
@@ -250,7 +250,7 @@ Both `second-brain-test` and `second-brain-devkit` landed the same trio of featu
 - Fresh repo bootstrapped from scratch: 11 files, 653 lines added across specs, docs, tooling config, and hooks (`5578387..cc0c174`).
 - `README.md` (`c8d6cdc`) documents the core "write for humans, index for machines" philosophy — the embed→hydrate→search pipeline, sidecar schema, and dual human/AI value proposition.
 - Spec and planning docs reorganized to eliminate drift (`cc0c174`): `SPEC.md` owns system-level design (three-repo workflow: golden→devkit→mothball, validation loop, non-goals); `PLAN.md` tracks generator milestones (G1–G3) gated on brain validation; `open-questions.md` records interim decisions.
-- Dev scaffolding wired up: Gemini CLI support, open-questions tracking, and ai-project-status integration (daily-plan + SessionStart hook) in `aba47ab`/`dd96ede`.
+- Dev scaffolding wired up: Gemini CLI support, open-questions tracking, and project-status integration (daily-plan + SessionStart hook) in `aba47ab`/`dd96ede`.
 
 ### second-brain-test
 
@@ -761,12 +761,12 @@ Looking at the two drafts: gsd-walkthru is closing out a webhook validation libr
 
 - Phase 3 (Body Handling & Public API Surface) fully delivered across 7 implementation tasks (`61e69b6..f6c9fa4`): raw-body capture middleware, a webhook provider registry with self-registering Stripe/GitHub/Shopify stubs, a `WebhookMetadata` discriminated union with compile-time narrowing proof, a `webhookErrorHandler()` Express error-middleware factory, the core `createWebhookMiddleware` factory, and the finalized public barrel — 67 tests green across 10 source files.
 - The 96-file, 22k-line commit range covers the repo's entire history bootstrapped from scratch, including a full planning corpus under `.planning/` and the production `src/` tree.
-- Post-phase rebase (`fd4631e`) integrated upstream bootstrap commits from `ai-project-status`, resolved `log.md` union conflicts, and separated `settings.local.json` from `.claude/settings.json` so per-user GSD hooks coexist with the project's SessionStart hook.
+- Post-phase rebase (`fd4631e`) integrated upstream bootstrap commits from `project-status`, resolved `log.md` union conflicts, and separated `settings.local.json` from `.claude/settings.json` so per-user GSD hooks coexist with the project's SessionStart hook.
 - Next session planned around pushing to origin, fixing blocker `BL-01`, a code-review fix pass, and scoping Phase 4.
 
 ### Cross-repo
 
-- Today's activity was largely a tracking-infrastructure rollout: **document-analyzer** and **ai-builder** both received identical bootstrap treatment (same 170-line, 4-file footprint: `log.md`, `daily-plan.md`, `check-daily-plan.py` SessionStart hook, `CLAUDE.md` rule block, `settings.json`), and **gsd-walkthru**'s post-phase rebase also pulled in bootstrap commits from `ai-project-status` to integrate the same hook infrastructure alongside its existing project hooks.
+- Today's activity was largely a tracking-infrastructure rollout: **document-analyzer** and **ai-builder** both received identical bootstrap treatment (same 170-line, 4-file footprint: `log.md`, `daily-plan.md`, `check-daily-plan.py` SessionStart hook, `CLAUDE.md` rule block, `settings.json`), and **gsd-walkthru**'s post-phase rebase also pulled in bootstrap commits from `project-status` to integrate the same hook infrastructure alongside its existing project hooks.
 
 
 ## 2026-05-06

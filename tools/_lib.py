@@ -1,4 +1,4 @@
-"""Shared helpers for ai-project-status tools."""
+"""Shared helpers for project-status tools."""
 import json
 import os
 import subprocess

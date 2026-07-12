@@ -5,7 +5,7 @@
 # Operates IN PLACE on a local checkout (it does not clone, commit, or push —
 # review the diff and commit yourself). For each target it:
 #   1. removes log.md (git rm if tracked, rm if untracked, skip if absent)
-#   2. swaps the ai-project-status CLAUDE.md block (between the begin/end
+#   2. swaps the project-status CLAUDE.md block (between the begin/end
 #      markers) for the new "Knowledge Extraction & Git Automation" rules,
 #      creating CLAUDE.md if it is missing
 #   3. flags any remaining unmanaged `log.md` mentions for manual review
