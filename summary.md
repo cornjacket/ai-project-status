@@ -4,6 +4,35 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-13
+
+### second-brain-test
+
+- Sun 07-12 (`22f4f37`, since `75b94119`) added two opt-in features to the vault, both hand-built here first before porting into the shared devkit: a hybrid-search toggle and a glossary layer.
+- Hybrid search: new `config/features.toml` + `scripts/features.py` toggle keyword/semantic blending and tune its ranking (`rrf_k`, reciprocal rank fusion), resolved from env var → config file → default.
+- Glossary layer: new `glossary/` namespace with a scanner/link engine that auto-detects and links glossary terms, a pre-commit auto-link step, and two embedding-free MCP lookup tools (list, exact-match) — no model calls needed to look up a term.
+- Both features wired into the existing doctor/vault-search scripts and validated against the test-backend baseline before vendoring into the devkit (CI 8/8).
+- Sizable change: 15 files, ~934 lines added, including two new glossary READMEs (seeds and live vault).
+
+### second-brain-devkit
+- Shipped the glossary feature end to end: controlled-vocabulary namespace (`bad5a0f`), on-demand term-linking scanner (`6ce0d0c`), automatic linking on term/note creation plus an opt-in pre-commit hook (`71ffc72`) — task #19 complete.
+- Hardened it against the brain upgrade path: term-note template is now tool-generated rather than read from a seed file, so upgraded brains don't break on new terms (`497a301`).
+- Exposed the glossary over MCP with list-terms and look-up-term tools, deliberately excluded from semantic search so entries don't crowd out real results (`0642a09`, task #20).
+- Closed out hybrid search (task #3): added a config toggle blending vector similarity with BM25 keyword search (`87da37f`); results are situational — helps on overlapping topics, slightly hurts when topics are well-separated — written up in a new experiment log (`695ddf2`, `9fb2170`).
+- Added a "signal over noise" guideline to every generated brain's instructions, giving users a concrete keep/discard test (`1fd532b`).
+- Large day: 41 files, ~2,264 lines added (`94dae19a..d68426c8`); tomorrow's plan adds security/edge-case tests for the new MCP glossary tools (`d68426c`).
+
+### captains-log
+
+- Housekeeping-only day: `ff3f89d` rolled the `daily-plan.md` header from 2026-07-12 to 2026-07-13 so the portfolio aggregator wouldn't flag it as stale — plan itself unchanged (still "The New SDLC With Vibe Coding," "Introduction to Agents," Raspberry Pi coding harness work).
+
+### No updates
+- customer-req-responder (for 1 days)
+
+### Cross-repo
+- Glossary and hybrid-search landed in tandem across both second-brain repos: second-brain-test hand-built and validated both features (`22f4f37`), then second-brain-devkit shipped them as the canonical, MCP-exposed implementation (`bad5a0f`..`0642a09` for glossary, `87da37f`/`695ddf2`/`9fb2170` for hybrid search) — the test repo is functioning as the devkit's proving ground.
+
+
 ## 2026-07-12
 
 ### second-brain-test
