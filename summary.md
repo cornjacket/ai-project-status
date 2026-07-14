@@ -4,6 +4,36 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-14
+
+### second-brain-test
+
+- `add_note` MCP tool lets Claude Desktop write a new note directly into the right PARA folder, commit, and push — reusing the existing pre-commit embedding hook rather than a separate write path; filenames are slug-restricted to prevent path traversal or overwriting an existing note (`0309f46`).
+- The "is this worth a note?" editorial bar previously lived only in `CLAUDE.md`, which Desktop never reads, so Desktop could push disposable notes into the vault. It's now duplicated into the note template Desktop fetches, with a CI check that fails the build if the two copies drift (`d2393cd`).
+- Fixed a silent-failure trap: a failed push (offline, dead remote) still reported success, burying the push failure as the third line. Failures now lead with a bolded "PARTIAL SUCCESS — ACTION NEEDED" banner (`0b34cb6`).
+- Added a `list_vault` tool so the model can see the PARA folder structure before filing a note, and refreshed the README's tool table; 5 files touched (`22f4f37f..d2393cdd`).
+
+### second-brain-devkit
+
+- Second brains gained their first write path from Claude Desktop: `add_note` (`813d844`) commits and pushes a new note into the vault, with protections against path traversal, clobbering in-progress work, or hanging on a credential prompt.
+- The "does this deserve to be a note" bar was duplicated into the note template Desktop actually reads (`18c39ee`), with a new CI check (gate 9 of 9) that fails the build if that copy drifts from `CLAUDE.md`.
+- A push failure was previously buried three lines into a "success" response; `5548d7d` makes partial failures lead with a clear action-needed banner.
+- A reported four-minute `add_note` hang turned out to be an unclicked Desktop approval dialog, not a server issue (`b42e614`, `6bbe427`) — but the investigation surfaced four real hang risks (e.g. an unbounded network call in the embedding step, subprocesses able to read the server's own communication channel), now tracked as follow-up hardening.
+- A security/negative-test suite (`15f7a67`) verifies path-traversal rejection and confirms the glossary lookup stays isolated from the semantic-search index.
+- Docs now cover a Mac-specific SSH quirk that silently blocked note-pushing (`fd22a83`), and commit messages were reformatted for scannable `git log` output (`1662138`).
+- Housekeeping: scoped a future investigation into packaging the brain as a Claude Code plugin (`4033026`), and flagged glossary flashcards/graph-view docs as needing hands-on Obsidian verification before write-up (`22cce02`).
+
+Range: `d68426c8..fd22a835` — 20 files changed, largely in `template/scripts/mcp_server.py`, `tools/check_mcp_server.py`, and `PLAN.md`.
+
+### Cross-repo
+
+- second-brain-test and second-brain-devkit shipped the same feature set in lockstep: the `add_note` write path (`0309f46` / `813d844`), the `CLAUDE.md`-to-template duplication of the note-worthiness bar with a drift-checking CI gate (`d2393cd` / `18c39ee`), and the push-failure banner fix (`0b34cb6` / `5548d7d`) — devkit is likely the template source these changes were ported between.
+
+### No updates
+- customer-req-responder (for 2 days)
+- captains-log (for 1 days)
+
+
 ## 2026-07-13
 
 ### second-brain-test
