@@ -4,6 +4,35 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-15
+
+### second-brain-test
+
+- Today's plan (`48a52e3`) targets two prototypes: a vector-index-drift "doctor" check and MCP server hardening against hangs.
+- Added `add_glossary_term` (`5aeeb7e`), giving Claude Desktop write access to the glossary — builds the term note, rejects duplicate terms/aliases, auto-links it into every note that mentions it, and commits+pushes just those files.
+- Fixed a mislabeled search score (`9f42626`): the RRF relevance score was displayed as "distance," misleading a reviewer into thinking search was broken. Display-only fix, not a ranking change.
+- Closed a linking-pipeline inefficiency and integrity bug: inserting a `[[wikilink]]` no longer forces a full re-embed since the note's meaning didn't change (`bb525e4`), and a partial-commit hook edit now properly resyncs the tracked index instead of leaving a ghost revert that could silently undo it (`9a36850`).
+- Documented a Claude Desktop SSH push failure caused by a missing SSH agent, with fix and verification steps (`bcc77c4`).
+- ~250 lines across 7 files: MCP server, note-view/embedding logic, self-tests, docs (`d2393cdd..48a52e3b`).
+
+### second-brain-devkit
+
+- Shipped `add_glossary_term` (`4b4df11`), extending the write path to glossary entries alongside the prior day's note-creation tool. The vault-wide auto-link sweep it triggers is treated as intended behavior, not overhead.
+- Made that sweep cheap: link markup is now stripped before computing a note's embedding hash, so adding a link no longer forces re-embedding (`cd7eb88`) — the change that made the glossary tool practical to ship.
+- Fixed a live data-corruption bug (task #28, `698d412`) where adding a note could silently revert an unrelated wikilink edit via a stale git partial-commit index; added CI gate 10 (`6a7e633`) to specifically test optional feature toggles in their non-default state, since that's the only way this bug surfaced.
+- Fixed the same "distance"-labeled relevance score issue that had misled a reviewer into suspecting the embedding backend was broken (`e2a3d59`).
+- Filed a plan (task #30, `1f34842`) to detect vaults with stale vectors after an embedding-format change, since the upgrade tool doesn't currently catch this.
+- ~1,180 lines across the MCP server, embedding logic, CI tooling, and docs (`fd22a83..4938861`), with the day's plan prioritizing hardening this new functionality before further additions.
+
+### Cross-repo
+
+- second-brain-test and second-brain-devkit landed near-identical work today: a new `add_glossary_term` write tool, the same wikilink-triggered re-embedding fix, the same git partial-commit "ghost revert" integrity fix, and the same "distance"-labeled search-score correction — consistent with test's role as the proving ground that feeds fixes into devkit.
+
+### No updates
+- customer-req-responder (for 3 days)
+- captains-log (for 2 days)
+
+
 ## 2026-07-14
 
 ### second-brain-test
