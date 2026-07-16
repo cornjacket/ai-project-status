@@ -4,6 +4,30 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-16
+
+### second-brain-test
+
+- Hardened the MCP server against hangs: unbounded waits on Ollama or SSH credential/host-key prompts could freeze the headless brain server indefinitely. Every such wait now has a timeout, git/ssh subprocesses have stdin closed off so they can't misread protocol traffic, and timeouts surface as clear errors instead of hangs or raw tracebacks (`e4cc545`).
+- Added a "stale embedding" check to `doctor`: flags notes whose stored vector no longer matches current content (edited-but-not-reembedded, or invalidated by an earlier canonicalization change), with `--repair` to auto-fix (`1a10689`).
+- Small, targeted change: 3 files, ~65 lines across server, embedder, and doctor scripts (`48a52e3b..e4cc5457`).
+
+### second-brain-devkit
+
+- Closed four ways the MCP server could freeze permanently under Claude Desktop: the embedding-model HTTP call now times out instead of hanging on a stalled/cold model, the git helper no longer reads the server's own protocol channel as stdin, SSH pushes fail fast instead of waiting on an unreachable passphrase prompt, and timeouts surface as clean errors instead of raw crash traces. A new automated, time-bounded check enforces all four fixes (`56cb1be`).
+- Added a "doctor" health check catching stale search vectors — notes whose embedding no longer matches current content, from manual edits or from embedding-conversion changes — flagging them for targeted re-embedding via a repair flag (`092c6fb`).
+- Follow-up (`bdf368d`) fixed two rough edges: a stray compiled-Python cache file leaking into the brain template (and every generated brain), and an over-eager staleness warning that fired on any code touch rather than only embedding-affecting ones — now reworded to defer to the doctor check.
+- Full range `4938861..bdf368d`, ~524 added / 70 removed across 15 files, including two new CI safety gates; CI green throughout.
+
+### Cross-repo
+
+- second-brain-test and second-brain-devkit shipped the same pair of fixes in lockstep: MCP server hang-hardening (Ollama/SSH timeouts, stdin isolation) and a new `doctor` stale-embedding check with `--repair`. devkit's version adds enforcing CI gates and a same-day follow-up fix; test's is the smaller, downstream application of the same work.
+
+### No updates
+- customer-req-responder (for 4 days)
+- captains-log (for 3 days)
+
+
 ## 2026-07-15
 
 ### second-brain-test
