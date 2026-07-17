@@ -32,6 +32,42 @@ PLAN_HEADER_RE = re.compile(
 )
 
 
+def remote_to_url(remote: str | None) -> str | None:
+    """Convert a git remote into a browsable https URL, or None if it doesn't
+    look like one. Handles the forms we actually keep in repos.yml:
+
+        https://github.com/owner/repo.git   -> https://github.com/owner/repo
+        git@github.com:owner/repo.git       -> https://github.com/owner/repo
+        ssh://git@github.com/owner/repo.git  -> https://github.com/owner/repo
+
+    The link is derived here (single source of truth = repos.yml) rather than
+    self-reported by each tracked repo, so it can't drift when a repo is
+    renamed — repos.yml is already updated on rename.
+    """
+    if not remote:
+        return None
+    r = remote.strip()
+    if r.startswith("git@"):
+        # git@host:owner/repo(.git)
+        host_path = r[len("git@"):]
+        if ":" not in host_path:
+            return None
+        host, path = host_path.split(":", 1)
+        r = f"https://{host}/{path}"
+    elif r.startswith("ssh://"):
+        r = "https://" + r[len("ssh://"):]
+        # drop any embedded creds like git@ in ssh://git@host/...
+        scheme, rest = r.split("://", 1)
+        if "@" in rest.split("/", 1)[0]:
+            rest = rest.split("@", 1)[1]
+            r = f"{scheme}://{rest}"
+    elif not r.startswith(("http://", "https://")):
+        return None
+    if r.endswith(".git"):
+        r = r[: -len(".git")]
+    return r
+
+
 def most_recent_weekday(today: date) -> date:
     """Return today if it's Mon-Fri, else the previous Friday."""
     if today.weekday() < 5:
@@ -53,25 +89,33 @@ def parse_plan(text: str):
     return plan_date, body
 
 
-def render_repo_section(name: str, plan_path: Path, today: date) -> str:
+def render_repo_section(
+    name: str, plan_path: Path, today: date, remote: str | None = None
+) -> str:
+    # Link the repo name to its browsable URL (derived from repos.yml's remote)
+    # so the aggregated summary is one click away from each repo. Falls back to
+    # a plain name when the remote is absent or unrecognized.
+    url = remote_to_url(remote)
+    label = f"[{name}]({url})" if url else name
+
     if not plan_path.exists():
-        return f"## {name} — no plan committed\n"
+        return f"## {label} — no plan committed\n"
 
     text = plan_path.read_text()
     plan_date, body = parse_plan(text)
 
     if plan_date is None:
         return (
-            f"## {name} — plan file present but unparseable\n\n"
+            f"## {label} — plan file present but unparseable\n\n"
             "> Could not extract `# Daily plan — YYYY-MM-DD` header. "
             "The repo's SessionStart hook will prompt for a fresh plan.\n"
         )
 
     expected = most_recent_weekday(today)
     if plan_date < expected:
-        header = f"## {name} — STALE (last plan: {plan_date.isoformat()})"
+        header = f"## {label} — STALE (last plan: {plan_date.isoformat()})"
     else:
-        header = f"## {name} — plan for {plan_date.isoformat()}"
+        header = f"## {label} — plan for {plan_date.isoformat()}"
 
     if not body:
         return f"{header}\n\n> Plan file has no body content.\n"
@@ -82,7 +126,12 @@ def build_summary(today: date | None = None, repos=None) -> str:
     today = today or date.today()
     repos = repos if repos is not None else enabled_repos()
     sections = [
-        render_repo_section(r["name"], TRACKED_DIR / r["name"] / "daily-plan.md", today)
+        render_repo_section(
+            r["name"],
+            TRACKED_DIR / r["name"] / "daily-plan.md",
+            today,
+            r.get("remote"),
+        )
         for r in repos
         if r.get("enabled", True)
     ]

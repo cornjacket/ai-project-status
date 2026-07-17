@@ -105,6 +105,57 @@ def test_render_repo_section_malformed(tmp_path):
     assert "unparseable" in out
 
 
+def test_remote_to_url_https_strips_git():
+    assert ap.remote_to_url("https://github.com/cornjacket/ai-foo.git") == \
+        "https://github.com/cornjacket/ai-foo"
+
+
+def test_remote_to_url_https_without_git():
+    assert ap.remote_to_url("https://github.com/cornjacket/ai-foo") == \
+        "https://github.com/cornjacket/ai-foo"
+
+
+def test_remote_to_url_scp_form():
+    assert ap.remote_to_url("git@github.com:cornjacket/ai-foo.git") == \
+        "https://github.com/cornjacket/ai-foo"
+
+
+def test_remote_to_url_ssh_form():
+    assert ap.remote_to_url("ssh://git@github.com/cornjacket/ai-foo.git") == \
+        "https://github.com/cornjacket/ai-foo"
+
+
+def test_remote_to_url_none_and_unrecognized():
+    assert ap.remote_to_url(None) is None
+    assert ap.remote_to_url("") is None
+    assert ap.remote_to_url("not-a-remote") is None
+
+
+def test_render_repo_section_links_name_when_remote_given(tmp_path):
+    plan = tmp_path / "daily-plan.md"
+    plan.write_text("# Daily plan — 2026-05-06\n\nDo the thing.\n")
+    out = ap.render_repo_section(
+        "ai-foo", plan, date(2026, 5, 6),
+        "https://github.com/cornjacket/ai-foo.git",
+    )
+    assert "## [ai-foo](https://github.com/cornjacket/ai-foo) — plan for 2026-05-06" in out
+
+
+def test_render_repo_section_plain_name_without_remote(tmp_path):
+    plan = tmp_path / "daily-plan.md"
+    plan.write_text("# Daily plan — 2026-05-06\n\nDo the thing.\n")
+    out = ap.render_repo_section("ai-foo", plan, date(2026, 5, 6))
+    assert "## ai-foo — plan for 2026-05-06" in out
+
+
+def test_render_repo_section_missing_file_is_linked(tmp_path):
+    out = ap.render_repo_section(
+        "ai-foo", tmp_path / "missing.md", date(2026, 5, 6),
+        "git@github.com:cornjacket/ai-foo.git",
+    )
+    assert "## [ai-foo](https://github.com/cornjacket/ai-foo) — no plan committed" in out
+
+
 def test_build_summary_skips_disabled(tmp_path, monkeypatch):
     monkeypatch.setattr(ap, "TRACKED_DIR", tmp_path)
     repos = [
