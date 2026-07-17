@@ -4,6 +4,39 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-17
+
+### second-brain-test
+
+- Tag-hygiene guidance now tells writers to reuse existing tags instead of coining near-miss variants (e.g. `agents` vs `ai-agents`), moving provenance links into the note body instead — closing a gap where the rule lived only in tool descriptions Claude Code never reads (`46c43c1`).
+- New deterministic tooling (`tag_hygiene.py`, `tag_lint.py`, `tag_apply.py`) detects near-miss, overly broad, overlapping, and title-leaked tags, and can now remove a bad tag outright rather than only renaming or merging it — backed by 15 passing tests (`3431858`, `d37a3a4`).
+- MCP list tools (`list_vault`, `list_glossary_terms`) gained filtering and a result cap that explicitly flags truncation, replacing a prior silent cap that risked the assistant treating an incomplete list as complete. A new `list_tags` tool exposes tag usage counts (`2646676`).
+- ~865 lines added across 7 files, mostly `mcp_server.py` (+139) and the new `tag_hygiene.py` (418 lines).
+- Daily plan confirms this work was prototyped here before being vendored into the devkit's generated MCP server, with today's plan trimmed to standby/devkit-only tooling (`2f1d450..b66b09b`).
+
+### second-brain-devkit
+
+- Task #33 shipped: a human-driven Claude Desktop acceptance suite. Since no API can drive the Desktop app, a person pastes five canned prompts while a script checks side effects (note created, glossary term added, path-traversal refused) rather than judging chat output (`1c254ef..2dfaf39`, new `desktop-e2e/`).
+- Task #32 (tag hygiene) is now fully wired into every generated brain — detection, apply, and removal — plus a new CI gate (#13) and a fix for a bytecode-pollution bug that gate introduced (`cb4b089..6983908`, ~1,000 lines).
+- Task #27 landed: MCP list tools now support filtering and a capped, truncation-aware result size, plus a `list_tags` tool so the assistant stops inventing near-duplicate tags (`396eb9d`). Every generated brain's `CLAUDE.md` now also carries a tag-discipline directive (`be2dcf2`).
+- Task #34 was planned but not yet built: run the Desktop suite against the user's real vault on a disposable branch, including a fix to fully rebuild the search index on branch swap so stale results don't look like corruption (`86ea6d2..60e7703`).
+- Wide-reaching range overall: 37 files changed, ~2,540 lines added, including two new ~400-line modules and the `desktop-e2e/` harness (`bdf368d2..60e77032`).
+
+### captains-log
+
+- Daily-plan maintenance only, no code changes, single file (`daily-plan.md`) across `ff3f89d4..ce639bd4`.
+- `4d3d411` rolled the plan forward and added a task to set up a dotfiles repo for `~/.claude/CLAUDE.md` and shell config.
+- `3dbda85` added a task to configure Claude Desktop's global custom instructions (it doesn't read CLAUDE.md) and adopt "Projects" for per-workstream reference material.
+- `ce639bd` rolled the plan to today, marked the dotfiles task done, and deferred a software-development-lifecycle paper for later.
+
+### Cross-repo
+
+- Tag-hygiene tooling and the MCP list-tool truncation fix/`list_tags` addition were prototyped in second-brain-test (`3431858`, `d37a3a4`, `2646676`) and vendored into second-brain-devkit's generated brains the same day (`cb4b089..6983908`, `396eb9d`).
+
+### No updates
+- customer-req-responder (for 5 days)
+
+
 ## 2026-07-16
 
 ### second-brain-test
