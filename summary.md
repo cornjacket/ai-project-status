@@ -4,6 +4,36 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-18
+
+### second-brain-test
+
+- Prototyped the Desktop-to-brain connectivity test kit into this golden reference repo — the first step toward vendoring it into every generated brain (`0b36319`).
+- Added a pure-client test (#36) that seeds canary values, deletes the chat, then re-queries in a fresh session — ruling out false-positive retrieval from conversational memory rather than actual storage (`0915acf`).
+- Both land as ~807 lines across 25 files of new test scaffolding — prompts, verifiers, setup/teardown harnesses for a disposable branch (`b66b09b3..70545e25`).
+- Plan: the e2e kit is fully vendored, so future fixes to Suite A or the tag-listing filter should start here before flowing through the vendor/build/CI pipeline (`70545e2`).
+
+### second-brain-devkit
+
+- Shipped two Desktop e2e suites into every generated brain: a connectivity suite that safely exercises real user data on a disposable git branch (`7e9b56f`, `daf7456`), and a new cross-session retrieval suite (#36) proving a note added in one chat is actually retrievable in a fresh chat, not just recalled from context (`faba8fe`, `d19ddd6`).
+- The retrieval suite ("Suite B") passed its first live run 4-for-4; today's plan (`33e6024`) targets running the older 5-scenario "Suite A" live too, plus a tag-listing filter fix and a cosmetic no-op in the disposable-branch push.
+- Large templating push — 56 files, ~1,400 lines — to keep suites, prompts, and harnesses in sync across the devkit source, its golden fixture, and the generated-brain template.
+
+### customer-req-responder
+
+- Onboarded into the tracker: `daily-plan.md` and the git-automation rule block added to `CLAUDE.md`, enabling commit telemetry and plan aggregation going forward (`8928387`).
+
+### captains-log
+
+- Onboarded into the tracker: added `daily-plan.md`, the git-automation rule block, and the SessionStart hook enforcing them (`482e517`).
+- Bootstrap only — limited to `CLAUDE.md` (6 insertions, 2 deletions), no functional code touched.
+
+### Cross-repo
+
+- second-brain-test and second-brain-devkit are converging on the same Desktop e2e test kit — connectivity (Suite A) plus the new cross-session retrieval suite (Suite B) — moving toward vendoring it into every generated brain.
+- customer-req-responder and captains-log were both onboarded into this tracker today via the identical bootstrap (`daily-plan.md` + git-automation rule block).
+
+
 ## 2026-07-17
 
 ### second-brain-test
