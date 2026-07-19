@@ -4,6 +4,34 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-19
+
+### second-brain-test
+
+- PDF ingestion milestone M1 kicks off: `daily-plan.md` now targets hand-building `chunker.py` and `pdf_extract.py` plus a fixture PDF here, before vendoring into the devkit (`2c7ae3d`).
+- README updated to describe hybrid retrieval (vector + FTS5/BM25 via RRF) as shipped rather than planned; the toggle now defaults on and the `search_document:`/`search_query:` embedding prefixes are documented as current behavior (`b8f8022`).
+- Fixed two e2e gaps in the desktop harness: the cross-session tag query now filters by a specific match term instead of relying on a result-list size cap, and teardown now actually deletes disposable test branches from the remote (`2a3ea21`).
+
+### second-brain-devkit
+
+- Finalized (but didn't yet build) the design for PDF ingestion, milestone M0 of #7: PDFs need multiple chunks per source document, breaking the current one-note-per-vector model, so storage/chunking/manual-add-command decisions are locked before writing code (`9dc9e5d`). 7/19 plan: finish the design review, then start the chunker/extractor prototype (`c9ac7e5`).
+- Declined packaging as a Claude Code plugin (#23): the bundled MCP server only works from the CLI and Desktop's Code tab, not Desktop Chat where this tool is actually used, so the two-step install stays. A future Desktop "Connector" extension was deferred pending a real second-user onboarding case (`eb77125`, `f037756`).
+- Fixed a test-infra bug where a tracked repo's daily-plan file was leaking into this repo's regression-test snapshot; now excluded, CI green (`39a5e96`).
+- Corrected docs still claiming hybrid search (vector + keyword) was unbuilt — it shipped weeks ago; both READMEs rewritten to describe the shipped behavior (`357df6f`).
+- Hardened two flaky e2e tests found during a live desktop run: the tag-search check now filters correctly at any data size instead of silently passing on small data, and disposable test branches no longer get pushed and orphaned on the real GitHub remote (`ec0b652`).
+- Logged an unscheduled backlog idea: visualize what a knowledge base is "about" via clustering and labeling document chunks (`f2d91c2`).
+
+### Cross-repo
+
+- Both repos advanced PDF ingestion (#7) today: devkit locked the M0 design (chunking breaks the one-note-per-vector model) while second-brain-test kicked off M1 by starting the chunker/extractor build directly, ahead of vendoring back into the devkit (`9dc9e5d`/`c9ac7e5` ↔ `2c7ae3d`).
+- Both READMEs were corrected the same day to describe hybrid search (vector + FTS5/BM25 via RRF) as already shipped rather than planned (`b8f8022`, `357df6f`).
+- The same e2e flakiness was fixed in both repos: the tag-search test now filters by match term instead of relying on a size cap, and teardown no longer leaves orphaned test branches on the remote (`2a3ea21`, `ec0b652`).
+
+### No updates
+- customer-req-responder (for 1 days)
+- captains-log (for 1 days)
+
+
 ## 2026-07-18
 
 ### second-brain-test
