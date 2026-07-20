@@ -4,6 +4,33 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-20
+
+### second-brain-test
+
+- Shipped PDF ingestion end-to-end (task #7, milestones M1–M6, `b42de88..2aaedfa`): PDFs are chunked into overlapping page-tagged passages, embedded into a sidecar file, cached alongside notes, and searched via fused vector+keyword retrieval that returns a specific passage and page rather than just a matching file.
+- Built in layers — chunking (`b42de88`), embedding (`7d8cdbd`), cache tables (`db44ee3`), fused search (`86ce032`) — then `811e597` wires it into a single "add a PDF" flow and `873a8ac` adds the config block for enabling/tuning ingestion per brain.
+- `cf5a948` adds four new MCP tools so Desktop and CLI users can browse, ingest, and search passages; `2aaedfa` adds a guided click-through picker for the CLI specifically, since it supports interactive prompts Desktop chat doesn't.
+- `9b36efb` adds README docs and fixes a doctor bug that risked mis-flagging PDF cache files as broken notes; `8f10395` documents CLI setup.
+- 25 files changed (~3,870 lines), plus a glossary commit (`9d03c1c`) and a plan update (`33a94e4`) setting tomorrow's focus on distinguishing an unreadable source folder from an empty one.
+
+### second-brain-devkit
+
+- PDF ingestion (task #7) shipped end-to-end across six milestones: page-tagged extraction/chunking, a per-PDF vector sidecar file, cache tables bolted onto the note DB via shared row ID, passage-level search, and the ingest engine plus four new MCP tools (`4d191a4..1bf3583`).
+- PDF modules moved from prototype-only into the template — every generated brain now ships the full ingest/search engine, `[pdf]` config, README docs, doctor parity, and a new CI gate 14 running all seven PDF test suites against emitted code (`6616a4a..1bf3583`, ~5,474 lines across 46 files).
+- Follow-up added a guided PDF-adding flow (`add_pdf_guided`) with its design doc, and re-vendored updated glossary and CLI registration docs into the shared README/template (`086fb17`, `9587079`, `563c97b`).
+- Memory/design docs updated to mark task #7 fully shipped, noting MCP-based interactive elicitation as a deferred enhancement since Desktop's chat interface doesn't need it (`7e11fcf`, `3a49046`).
+- Day closed pivoting to a real bug found while ingesting an actual PDF: an unreadable source folder (e.g., macOS's protected Downloads) is silently reported as "no PDFs found" instead of raising a permission error — flagged next across folder listing, the MCP listing tool, and doctor preflight (`72c4291`).
+
+### Cross-repo
+
+- Both repos shipped the same PDF ingestion milestone (task #7, M1–M6) today — devkit landed it in the template/CI, test consumed it in a generated brain — and both closed the day on the identical next bug: distinguishing an unreadable/permission-denied source folder from a genuinely empty one (`33a94e4` in second-brain-test, `72c4291` in second-brain-devkit).
+
+### No updates
+- customer-req-responder (for 2 days)
+- captains-log (for 2 days)
+
+
 ## 2026-07-19
 
 ### second-brain-test
