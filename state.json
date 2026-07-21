@@ -5,14 +5,14 @@
     "last_synced": "2026-07-01"
   },
   "captains-log": {
-    "last_activity_date": "2026-07-18",
-    "last_commit": "482e517e409c8a8830905a95945bd4373dcb12f1",
-    "last_synced": "2026-07-20"
+    "last_activity_date": "2026-07-21",
+    "last_commit": "f9881ad1b0f61c925295e88d59757e994a027ceb",
+    "last_synced": "2026-07-21"
   },
   "customer-req-responder": {
     "last_activity_date": "2026-07-18",
     "last_commit": "8928387f8d32864c1eed4614860d75c2395e6ef0",
-    "last_synced": "2026-07-20"
+    "last_synced": "2026-07-21"
   },
   "gsd-walkthru": {
     "last_activity_date": "2026-06-12",
@@ -20,13 +20,13 @@
     "last_synced": "2026-07-01"
   },
   "second-brain-devkit": {
-    "last_activity_date": "2026-07-20",
-    "last_commit": "72c4291ccc97425278669d11c1bdc3852150f80b",
-    "last_synced": "2026-07-20"
+    "last_activity_date": "2026-07-21",
+    "last_commit": "23ef6b0e9c9fdba62de20489a0306036a5c24697",
+    "last_synced": "2026-07-21"
   },
   "second-brain-test": {
-    "last_activity_date": "2026-07-20",
-    "last_commit": "33a94e465252494c9b4cf9a89d7956122769bb42",
-    "last_synced": "2026-07-20"
+    "last_activity_date": "2026-07-21",
+    "last_commit": "83f7aebf48b3f8452dcf42e358bf32a8e8ac9e5b",
+    "last_synced": "2026-07-21"
   }
 }

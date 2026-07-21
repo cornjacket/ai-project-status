@@ -4,6 +4,39 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-21
+
+### second-brain-test
+
+- Ingest safety overhaul: PDFs were only *untracked*, not excluded — a stray `git add -A` could commit a multi-megabyte file. Now checks with git whether a file would be ignored (`8fb8f90`).
+- Downloads dropped as a document source since a background script can never get macOS's folder permission for it; the brain now reads only from its in-vault inbox (`4242802`). Unreadable source folders now fail loudly across the CLI, tool, and health check instead of silently reporting empty (`d5fb3e6`).
+- Guided document picker: fixed a schema-type mismatch that kept the selection form from rendering at all (`bfd67fb`), and failed sessions now report the real cause — unsupported client, user declined/cancelled, or request error — instead of one generic message (`39863c1`).
+- Housekeeping: glossary moved to root-level `GLOSSARY.md` to stop cluttering the Obsidian graph view and avoid README collisions (`2b4a165`, `469afed`); `.gitignore` widened to cover Obsidian's per-machine state and macOS Finder metadata that was leaving the tree dirty (`afea888`, `258abc3`).
+- Range `33a94e4..83f7aeb`, 16 files, +421/-193; closed with a plan (`83f7aeb`) to prototype an "embed-excluded" text block for keeping decorative content out of embeddings/hashing.
+
+### second-brain-devkit
+
+- Fixed the guided PDF import picker: it built its choice menu in a form the MCP SDK's validator rejected outright, so the client never showed a form. Verified end-to-end on a live Claude Code CLI session (`7a3dd11..5080f86`, `7ae9c5e`, `f857734`).
+- PDF-ingestion safety nets: generated brains now distinguish a permission-denied source folder from a genuinely empty one across CLI, tool listing, and health check; Downloads dropped as a default import source since background processes can't get its macOS permission; ingested documents are now actually excluded from version control instead of just untracked (`9898290`, `63b146b`, `e1bf3a5`). The picker also now explains why an interactive pick failed — unsupported client, declined, cancelled, or request error — instead of always blaming the client (`3e353fe`).
+- Glossary moved out of the vault to root-level `GLOSSARY.md` so Obsidian's knowledge graph doesn't show a spurious doc node; graph color-coding settled on tag-based (every glossary term already tagged) rather than folder path (`9fbe490`, `1324500`).
+- Generated brains now ignore per-vault Obsidian UI settings and macOS Finder metadata, so opening a vault in either tool no longer dirties the working tree (`5771d5b`, `587fdf1`).
+- Auto-linking design split in two: switching on the existing nearest-neighbor similarity engine is ready now; an auto-calibrating similarity threshold stays blocked on a more varied test dataset (`08e448b`).
+- README now lists PDF ingestion as a headline feature (`9d25c0a`); next up is a marker to exclude decorative ASCII art from embeddings and the change-detection hash, since oversized art was overflowing the embedding model's input limit and diluting note vectors (`71dc977`, `23ef6b0`).
+
+### captains-log
+
+- Logged a roadmap idea for "task-devkit" — extracting the task-tracking system embedded in ai-builders into a standalone generator droppable into other repos (e.g. second-brain), alongside a related "pluggable-markdown-subsystem" pattern (`ff4c2bb`). Added a self-imposed caution: don't over-build before a second real user, get the task data format right first, and clarify ownership when two generators write into one target repo (`f9881ad`).
+- Tomorrow's plan: sketch out task-devkit and carry over the unfinished Claude Desktop configuration work (`3b7a6e7`).
+- Study-track upkeep: fixed a stale plan date so the tracker stops flagging it inactive, and queued reading Google/Kaggle's "Agent Quality" whitepaper as the day's first task (`ad9096c`, `84117af`).
+
+### No updates
+- customer-req-responder (for 3 days)
+
+### Cross-repo
+
+- second-brain-test and second-brain-devkit landed matching PDF-ingestion fixes today: excluding ingested documents from version control instead of just untracking them, dropping Downloads as a source (background scripts can't get its macOS permission), surfacing permission-denied vs. empty source folders, fixing the guided picker's form-rendering bug and its failure-reason reporting, and relocating the glossary to a root-level `GLOSSARY.md` to keep it out of the Obsidian graph.
+
+
 ## 2026-07-20
 
 ### second-brain-test
