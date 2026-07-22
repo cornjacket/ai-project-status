@@ -4,6 +4,19 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-22
+
+### captains-log
+
+- Restored the paper reading list and References section in `daily-plan.md` that had been accidentally dropped in the prior day's rewrite, reordering it so the SDLC (software development life cycle) paper's second read comes after Agent Quality, Introduction to Agents, and the Pi harness papers (`b3526bb`).
+- Added a new task to integrate the task-devkit subsystem into captains-log's own daily plan, effectively having the repo dogfood its own task-tracking tooling (`b3526bb`).
+
+### No updates
+- second-brain-test (for 1 days)
+- second-brain-devkit (for 1 days)
+- customer-req-responder (for 4 days)
+
+
 ## 2026-07-21
 
 ### second-brain-test
