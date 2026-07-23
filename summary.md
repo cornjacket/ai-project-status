@@ -4,6 +4,21 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-23
+
+### second-brain-devkit
+
+- No development work landed today — both commits (`23ef6b0e..d4db823c`) are daily-plan bookkeeping only, touching `daily-plan.md` in the captain-log/planning file.
+- Plan shifted focus: rather than continuing the "Agent Quality" reading (an internal reading track on evaluating AI agent behavior, `29f0084`), tomorrow now starts the Kaggle "5-Day Agents" course, beginning with its Day 1 introduction to agent concepts (`d4db823`).
+- The deferred reading had reached the "Automated Metrics" section (about automated evaluation methods) before being paused in favor of the course.
+- A queued task to build an "embed-excluded" block (logic to exclude certain content from embedding/indexing, tracked as issue #39) remains unbuilt and stays in the backlog; the plan now calls for mapping the course's agent concepts onto the repo's brain retrieval / MCP (Model Context Protocol) path once Day 1 is done.
+
+### No updates
+- second-brain-test (for 2 days)
+- customer-req-responder (for 5 days)
+- captains-log (for 1 days)
+
+
 ## 2026-07-22
 
 ### captains-log
