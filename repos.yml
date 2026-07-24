@@ -23,8 +23,8 @@ repos:
     enabled: true 
   - name: customer-req-responder
     remote: https://github.com/cornjacket/customer-req-responder.git
-  - name: ai-builder
-    remote: https://github.com/cornjacket/ai-builder.git
+  - name: create-ai-builder
+    remote: https://github.com/cornjacket/create-ai-builder.git
     enabled: false
   - name: captains-log
     remote: https://github.com/cornjacket/captains-log.git
