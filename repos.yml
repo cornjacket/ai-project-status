@@ -28,3 +28,5 @@ repos:
     enabled: false
   - name: captains-log
     remote: https://github.com/cornjacket/captains-log.git
+  - name: create-project-system
+    remote: https://github.com/cornjacket/create-project-system.git
