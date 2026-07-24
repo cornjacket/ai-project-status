@@ -4,6 +4,30 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-24
+
+### captains-log
+
+- Daily plan pivoted to a single focused study track: Google/Kaggle's 5-Day AI Agents Intensive Course replaces the prior scattered whitepaper-reading items (`1b244d7..d000523`).
+- Course marked in-progress (started 2026-07-23) with a five-day checklist to track daily progress (`765970d`).
+- Plan header bumped to 2026-07-24 (`6199197`).
+
+### create-project-system
+
+- Renamed from `create-task-system` to `create-project-system`, reflecting a broader scope (`b8565c1`).
+- Core change: extracted the task-tracking subsystem out of `ai-builder` into a standalone generator, plus a new optional "status" layer reproducing the `project/` PM workspace as an add-on (`81c7bf7`, `fd7ddb2`, task 10) — the bulk of the diff, ~180 files and ~17,800 lines across generator scripts, docs, templates, and golden test fixtures.
+- Testing hardened with a golden reproducibility test (`59fc5c3`, task 06) and verification of the regenerate/upgrade path (`2085ad2`, task 05).
+- CI added: self-tests now run on Linux and macOS, with checkout/upload-artifact actions bumped to v7 (`9685b08`, `03bda6f`).
+- Onboarded into this tracker today (`daily-plan.md` + git-automation hook setup) (`b1369a9..3f2d0e9`).
+
+Range summarized: `4b825dc6..b1369a92`.
+
+### No updates
+- second-brain-test (for 3 days)
+- second-brain-devkit (for 1 days)
+- customer-req-responder (for 6 days)
+
+
 ## 2026-07-23
 
 ### second-brain-devkit
