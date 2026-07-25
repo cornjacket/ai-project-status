@@ -5,19 +5,24 @@
     "last_synced": "2026-07-01"
   },
   "captains-log": {
-    "last_activity_date": "2026-07-24",
-    "last_commit": "6199197bb9e403a6b1fa6174f8d63f7f00bb294c",
-    "last_synced": "2026-07-24"
+    "last_activity_date": "2026-07-25",
+    "last_commit": "3c436c3b73dd10aeeb291daab13897a955b5d20b",
+    "last_synced": "2026-07-25"
+  },
+  "create-ai-builder": {
+    "last_activity_date": "2026-07-25",
+    "last_commit": "8a9fa069b77230a7d20b3e0c9d8ae6e23553ff61",
+    "last_synced": "2026-07-25"
   },
   "create-project-system": {
-    "last_activity_date": "2026-07-24",
-    "last_commit": "b1369a9247d0f8beefc137d89feb1ff506f3dd02",
-    "last_synced": "2026-07-24"
+    "last_activity_date": "2026-07-25",
+    "last_commit": "d983dd170f5c3d93fd75e56e53ec842ea1c3c2ab",
+    "last_synced": "2026-07-25"
   },
   "customer-req-responder": {
     "last_activity_date": "2026-07-18",
     "last_commit": "8928387f8d32864c1eed4614860d75c2395e6ef0",
-    "last_synced": "2026-07-24"
+    "last_synced": "2026-07-25"
   },
   "gsd-walkthru": {
     "last_activity_date": "2026-06-12",
@@ -27,11 +32,11 @@
   "second-brain-devkit": {
     "last_activity_date": "2026-07-23",
     "last_commit": "d4db823cd0fa48a4933655ac06e9b82ce84092ea",
-    "last_synced": "2026-07-24"
+    "last_synced": "2026-07-25"
   },
   "second-brain-test": {
     "last_activity_date": "2026-07-21",
     "last_commit": "83f7aebf48b3f8452dcf42e358bf32a8e8ac9e5b",
-    "last_synced": "2026-07-24"
+    "last_synced": "2026-07-25"
   }
 }
