@@ -25,7 +25,6 @@ repos:
     remote: https://github.com/cornjacket/customer-req-responder.git
   - name: create-ai-builder
     remote: https://github.com/cornjacket/create-ai-builder.git
-    enabled: false
   - name: captains-log
     remote: https://github.com/cornjacket/captains-log.git
   - name: create-project-system
