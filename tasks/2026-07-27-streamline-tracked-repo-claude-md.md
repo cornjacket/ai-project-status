@@ -1,9 +1,9 @@
 # Task: Streamline the tracked-repo CLAUDE.md block + a more robust per-repo summary
 
 - **Created:** 2026-07-27
-- **Status:** IN-PROGRESS — Part 1 (kernel/guide split) implemented 2026-07-27,
-  pending propagation to the tracked repos. Part 2 (portfolio-at-a-glance
-  summary) not started.
+- **Status:** IN-PROGRESS — Part 1 (kernel/guide split) DONE 2026-07-27,
+  propagated to all six tracked repos. Part 2 (portfolio-at-a-glance summary)
+  not started.
 - **Owner:** _unassigned_
 
 ## Goal
@@ -100,5 +100,7 @@ freshness nudge.
   replaced in place, hand-written content above and below it survives, the guide
   is added, and an existing `daily-plan.md` is left alone.
 
-Remaining for Part 1: run `./setup-new-repo.sh --update <remote>` for all six
-tracked repos (one commit + push each).
+Propagated 2026-07-27 via `./setup-new-repo.sh --update <remote>` across all six
+tracked repos (one commit + push each): `second-brain-test`,
+`second-brain-devkit`, `customer-req-responder`, `create-ai-builder`,
+`captains-log`, `create-project-system`. Part 1 is closed; Part 2 remains.
