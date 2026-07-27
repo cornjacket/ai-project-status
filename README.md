@@ -135,6 +135,7 @@ Pushes to *non-default* branches work fine, so the daily routine pushes to `auto
 - `python3 tools/diff.py <repo-name>` — print the new commit telemetry and `git --stat` since the recorded `last_commit` for one repo. Debugging aid.
 - `./migrate-target-telemetry.sh <local-checkout>` — migrate an already-tracked repo off the old `log.md` workflow onto git telemetry. Idempotent.
 - `python3 tools/new-work.py` — emit the structured per-repo report `run.py` consumes.
+- `python3 tools/gen-umbrella-claude.py [--path DIR] [--dry-run]` — (re)generate the **umbrella** `CLAUDE.md` at the workspace root, the directory above every repo checkout. That directory isn't a git repo, so the file is a build artifact: this tool owns the roster block (name · one-line purpose · local path, sourced from `repos.yml` + each repo's `daily-plan.md`) and leaves everything outside the `<!-- project-status:begin/end -->` markers hand-written. Local-only and deliberately not part of `tools/run.py` — the umbrella path doesn't exist in the routine sandbox. Re-run it when a repo is added to or removed from `repos.yml`.
 
 ## Tests
 

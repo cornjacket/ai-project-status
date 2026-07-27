@@ -8,11 +8,12 @@ You are NOT doing AI development here. You are reading other repos' git commit t
 
 ## Add a new tracked repo
 
-When the user asks to add a repo to the tracker, run the full workflow — don't stop after editing `repos.yml`. All three steps are required for the repo to actually be summarized:
+When the user asks to add a repo to the tracker, run the full workflow — don't stop after editing `repos.yml`. All four steps are required for the repo to actually be summarized:
 
 1. **Bootstrap the target repo.** Run `./setup-new-repo.sh <remote-url> [branch]`. This clones the repo to a tmp dir, ensures it has `daily-plan.md`, the git-automation + daily-plan rule block in its `CLAUDE.md`, the SessionStart hook script at `.claude/hooks/check-daily-plan.py`, and a merged `.claude/settings.json` registering the hook — then commits and pushes. Idempotent — safe to re-run. Pass `--update` to refresh the rule block and the hook script in place after editing the templates. Without this, the repo lacks the commit-message discipline that makes `new-work.py`'s git telemetry useful, and `aggregate-plans.py` has no `daily-plan.md` to read. (To migrate an already-tracked repo off the old `log.md` workflow, run `./migrate-target-telemetry.sh <local-checkout>`.)
 2. **Register in `repos.yml`.** Append an entry under `repos:` with `name` and `remote` (and `branch` if non-default). Order matters — repos appear in `summary.md` in `repos.yml` order.
-3. **Add to the daily `/schedule` routine's `sources`.** Routine ID: `trig_01BLz2BYyE95n44TCDKaFcnA`. Use the `RemoteTrigger` tool — `action: "get"` to fetch the current config, then `action: "update"` with the full `job_config` and an extra `{"git_repository": {"url": "https://github.com/cornjacket/<repo>"}}` appended to `session_context.sources`. Send back the entire `job_config` (don't rely on partial-merge semantics) to avoid clobbering other fields. Browser URL for human verification: https://claude.ai/code/routines/trig_01BLz2BYyE95n44TCDKaFcnA. Skip step 3 only if the user confirms they run the pipeline locally only — without it, the sandbox's egress proxy blocks the remote routine from cloning the new repo.
+3. **Regenerate the umbrella `CLAUDE.md`.** Run `python3 tools/gen-umbrella-claude.py` so the workspace-root roster reflects the new repo. Local-only (the umbrella path doesn't exist in the remote run), so it is deliberately not part of `tools/run.py`.
+4. **Add to the daily `/schedule` routine's `sources`.** Routine ID: `trig_01BLz2BYyE95n44TCDKaFcnA`. Use the `RemoteTrigger` tool — `action: "get"` to fetch the current config, then `action: "update"` with the full `job_config` and an extra `{"git_repository": {"url": "https://github.com/cornjacket/<repo>"}}` appended to `session_context.sources`. Send back the entire `job_config` (don't rely on partial-merge semantics) to avoid clobbering other fields. Browser URL for human verification: https://claude.ai/code/routines/trig_01BLz2BYyE95n44TCDKaFcnA. Skip this step only if the user confirms they run the pipeline locally only — without it, the sandbox's egress proxy blocks the remote routine from cloning the new repo.
 
 ## Run an update cycle
 
@@ -53,3 +54,4 @@ When the user asks to add a repo to the tracker, run the full workflow — don't
 - `tools/aggregate-plans.py` — rebuild `daily-plan-summary.md` from each repo's `daily-plan.md`, and snapshot it into `daily-plan-archive/YYYY-MM-DD.md`
 - `tools/commit-state.py` — advance `state.json`, commit `summary.md` + `daily-plan-summary.md` + `daily-plan-archive/` + `state.json`
 - `tools/run.py` — orchestrator that runs the full update cycle
+- `tools/gen-umbrella-claude.py` — regenerate the workspace-root (umbrella) `CLAUDE.md` from `repos.yml`. Local-only; NOT part of the update cycle. Re-run when a repo is added or removed.
