@@ -4,6 +4,39 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-27
+
+### create-ai-builder
+
+- Re-homed three follow-up items from `create-project-system`'s backlog into this repo's own task tracker now that it's live: relocating pipeline scripts (medium), auditing repo naming conventions (low), and reworking how target repos set up their task system (medium) — created via this repo's task-creation script, with context and design doc carried over (`afe148a`).
+- That last item was renamed for clarity (`0af67d3`): target repos should pull their task system from the `create-project-system` generator rather than copying create-ai-builder's own scripts.
+- Docs-only change — 4 files, ~147 lines (`7845243..0af67d3`), no functional/code changes.
+
+### captains-log
+
+- Migrated two trackable efforts — the Google/Kaggle 5-Day AI Agents Intensive course and the task-devkit roadmap — from free-form `log/` notes into the structured task system, which supports status, checklists, and step ordering that narrative logs can't (`bdd96ea`).
+- Ran the task lifecycle end-to-end for the first time: tracked a conference talk ("Why Agentic Systems Need Ontologies"), judged it too thin for a concrete takeaway, and closed it with only a linked NotebookLM clip attached (`2fb14c2..23240b0`).
+- Added lightweight tagging (e.g. "study, course", "study, video") for filtering study items, and logged two tooling gaps: no way to retag an existing task, and a "Category" field that's actually about worktree/branch grouping rather than topic (`62389b5`).
+- Backfilled the Kaggle course's Day 1 subtask with its podcast, whitepaper, and video links so material lives with the task itself (`9df7b3d..4f8a394`).
+- 24 files touched, mostly new per-task/subtask README files establishing the task-system structure.
+
+### create-project-system
+
+- Plan hygiene: tasks 12–14, parked here during `create-ai-builder`'s tracker migration, moved back out now that it's live, replaced with cross-references to their new task IDs there; the shared design doc for target composition stays put (`2f3d04d`, `eeec3c1`).
+- Opened task 19 to resolve a naming problem: the "Category" field actually identifies a task's worktree/branch, not its topic (that's what "Tags" is for) — an operator recently reached for the wrong field. Task weighs renaming it (and updating `classes.md`) versus keeping `--category` as a deprecated alias, since ~134 already-generated tasks in `create-ai-builder` still use it (`d8cd9c4`).
+- Opened task 20 to make task-listing tooling support both repo layouts — flat `project/tasks/` vs. nested `project/projects/<name>/` — via a config-driven `LAYOUT` setting instead of duplicated scripts (`acb3575`).
+- Net change: 3 task files removed, 2 added, `PLAN.md` updated to match (`479aa8c8..eeec3c1a`).
+
+### No updates
+- second-brain-test (for 6 days)
+- second-brain-devkit (for 4 days)
+- customer-req-responder (for 9 days)
+
+### Cross-repo
+
+- `create-ai-builder` and `create-project-system` coordinated the same task-tracker migration from both ends: items parked in `create-project-system` (tasks 12–14) moved into `create-ai-builder`'s now-live tracker (`afe148a`), while `create-project-system` opened task 19 explicitly citing `create-ai-builder`'s ~134 generated tasks as the reason to keep `--category` as a deprecated alias when renaming the "Category" field.
+
+
 ## 2026-07-26
 
 ### create-ai-builder
