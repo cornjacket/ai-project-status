@@ -2,12 +2,13 @@
 # setup-new-repo.sh — bootstrap a target repo for tracking by project-status.
 #
 # Clones the target into a temporary directory, ensures it has:
-#   - CLAUDE.md         (with the git-automation rule injected between markers)
+#   - CLAUDE.md               (kernel rules injected between markers)
+#   - project-status-guide.md (the on-demand reference half; overwritten)
 # then commits + pushes the changes back to the remote and cleans up.
 #
-# Idempotent: re-running on an already-bootstrapped repo is a no-op. Pass
-# --update to refresh the rule block in place (replaces content between the
-# project-status markers).
+# Idempotent: re-running on an already-bootstrapped repo is a no-op. The guide
+# and the hook are upstream-managed and always refreshed; pass --update to also
+# replace the CLAUDE.md rule block in place (content between the markers).
 #
 # Usage:
 #   ./setup-new-repo.sh <remote-url> [branch]
@@ -24,6 +25,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TEMPLATE_RULE="$SCRIPT_DIR/templates/claude-rule.md"
 TEMPLATE_PLAN="$SCRIPT_DIR/templates/daily-plan.md"
 TEMPLATE_HOOK="$SCRIPT_DIR/templates/check-daily-plan.py"
+TEMPLATE_GUIDE="$SCRIPT_DIR/templates/project-status-guide.md"
 BEGIN_MARKER="<!-- ai-project-status:begin -->"
 END_MARKER="<!-- ai-project-status:end -->"
 HOOK_CMD="python3 .claude/hooks/check-daily-plan.py"
@@ -43,7 +45,7 @@ remote="${1:-}"
 branch="${2:-main}"
 [[ -z "$remote" ]] && usage 1
 
-for t in "$TEMPLATE_RULE" "$TEMPLATE_PLAN" "$TEMPLATE_HOOK"; do
+for t in "$TEMPLATE_RULE" "$TEMPLATE_PLAN" "$TEMPLATE_HOOK" "$TEMPLATE_GUIDE"; do
   [[ -f "$t" ]] || {
     echo "[setup] missing template: $t" >&2
     exit 1
@@ -98,7 +100,12 @@ else
   echo "[setup] appended git-automation rule to existing CLAUDE.md"
 fi
 
-# 2. daily-plan.md (created if missing; never overwritten)
+# 2. project-status-guide.md (always overwritten — upstream-managed reference
+#    half of the CLAUDE.md block; the kernel in CLAUDE.md points at it)
+cp "$TEMPLATE_GUIDE" "$target/project-status-guide.md"
+echo "[setup] installed project-status-guide.md"
+
+# 3. daily-plan.md (created if missing; never overwritten)
 if [[ ! -f "$target/daily-plan.md" ]]; then
   cp "$TEMPLATE_PLAN" "$target/daily-plan.md"
   echo "[setup] created daily-plan.md"
@@ -106,13 +113,13 @@ else
   echo "[setup] daily-plan.md already present; left as-is"
 fi
 
-# 3. .claude/hooks/check-daily-plan.py (always overwritten — upstream-managed)
+# 4. .claude/hooks/check-daily-plan.py (always overwritten — upstream-managed)
 mkdir -p "$target/.claude/hooks"
 cp "$TEMPLATE_HOOK" "$target/.claude/hooks/check-daily-plan.py"
 chmod +x "$target/.claude/hooks/check-daily-plan.py"
 echo "[setup] installed .claude/hooks/check-daily-plan.py"
 
-# 4. .claude/settings.json — merge our SessionStart hook idempotently,
+# 5. .claude/settings.json — merge our SessionStart hook idempotently,
 #    leaving any other settings the user has untouched.
 python3 - "$target/.claude/settings.json" "$HOOK_CMD" <<'PY'
 import json
@@ -137,7 +144,7 @@ path.parent.mkdir(parents=True, exist_ok=True)
 path.write_text(json.dumps(data, indent=2) + "\n")
 PY
 
-# 5. Commit + push if anything changed
+# 6. Commit + push if anything changed
 cd "$target"
 if [[ -z "$(git status --porcelain)" ]]; then
   echo "[setup] no changes — repo already bootstrapped"
@@ -145,9 +152,9 @@ if [[ -z "$(git status --porcelain)" ]]; then
 fi
 
 # `git add -f` so a `.claude/` line in .gitignore doesn't silently skip the hook.
-git add CLAUDE.md daily-plan.md
+git add CLAUDE.md daily-plan.md project-status-guide.md
 git add -f .claude/hooks/check-daily-plan.py .claude/settings.json
-git commit --quiet -m "Bootstrap project-status tracking (daily-plan.md, git-automation rule, SessionStart hook)"
+git commit --quiet -m "Bootstrap project-status tracking (daily-plan.md, kernel rule block + project-status-guide.md, SessionStart hook)"
 git push --quiet origin "$branch"
 echo "[setup] committed and pushed to origin/$branch"
 

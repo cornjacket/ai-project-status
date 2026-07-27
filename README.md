@@ -155,5 +155,5 @@ Covers the deterministic layer (status classification, state advance, summary in
 - `tracked/` — gitignored cache of cloned repos
 - `tools/` — Python plumbing
 - `prompts/` — `claude -p` prompt templates (`per-repo.md`, `polish.md`)
-- `templates/` — files injected into tracked repos by `setup-new-repo.sh` (`daily-plan.md`, `claude-rule.md`, `check-daily-plan.py`)
+- `templates/` — files injected into tracked repos by `setup-new-repo.sh` (`daily-plan.md`, `claude-rule.md`, `project-status-guide.md`, `check-daily-plan.py`). `claude-rule.md` is the **kernel** spliced into each repo's `CLAUDE.md` — only rules that would be too late if loaded on demand; `project-status-guide.md` is the on-demand reference half, installed at the tracked repo's root and read when writing a commit message or a plan. `tests/test_templates.py` holds the kernel to a size ceiling.
 - `tests/` — pytest suite for the deterministic layer

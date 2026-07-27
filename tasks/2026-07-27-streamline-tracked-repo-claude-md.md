@@ -1,7 +1,9 @@
 # Task: Streamline the tracked-repo CLAUDE.md block + a more robust per-repo summary
 
 - **Created:** 2026-07-27
-- **Status:** OPEN — unassigned. Not yet started.
+- **Status:** IN-PROGRESS — Part 1 (kernel/guide split) implemented 2026-07-27,
+  pending propagation to the tracked repos. Part 2 (portfolio-at-a-glance
+  summary) not started.
 - **Owner:** _unassigned_
 
 ## Goal
@@ -62,3 +64,41 @@ Make each repo's cross-portfolio summary genuinely scannable.
 - The lever for plan altitude/readability is upstream in `templates/` +
   `setup-new-repo.sh --update`, not in the aggregator, which copies plans through
   verbatim.
+
+## Part 1 as built (2026-07-27)
+
+**Decision gate answered: Gemini is still in the workflow.** So the split is
+CLAUDE.md → a *repo-root file*, not CLAUDE.md → the hook: a plain Markdown file
+is cross-assistant, while a Claude Code hook is not. The hook stays a thin
+freshness nudge.
+
+- `templates/claude-rule.md` cut from 62 lines / ~6,650 chars to 41 / ~2,260 —
+  the kernel only. Each surviving rule passed the test *"if this loaded on
+  demand, would it be too late?"*: the commit schema and the
+  title-for-a-stranger rule (applied at commit time, nothing would trigger a
+  lookup first), task-granularity + commit-before-session-close (fires at end of
+  session), the plan header format and single-day/overwrite rule (Gemini's only
+  channel — the hook covers this for Claude), the forward-write rule (fires on an
+  ambiguous signoff, when *no* hook fires and nothing prompts a lookup — miss it
+  and today's plan is destroyed), the ✅ announce line (kept by explicit
+  decision), and the pointer to the guide.
+- `templates/project-status-guide.md` — new, installed at each tracked repo's
+  **root** (not `.claude/`: that directory is force-added past `.gitignore` in
+  some repos, and it's Claude-branded when the whole point is cross-assistant
+  readability). Carries the rationale, worked good/bad examples, the four-part
+  plan body structure, the no-URL-in-header reasoning, and the hook description.
+  Upstream-managed — always overwritten, like the hook.
+- Fixed a live drift found while splitting: the SessionStart hook told the
+  assistant to write "one short paragraph of intent" while the rule block
+  mandated a four-part body. The hook now points at the guide's *Body structure*
+  section instead of restating it.
+- `tests/test_templates.py` — size ceiling on the kernel (2,800 chars), marker
+  integrity, the guide pointer survives, the moved procedure actually landed in
+  the guide, and the hook doesn't restate the body structure. Size is mechanical
+  and gated in CI; whether a rule *belongs* in the kernel stays a review call.
+- Verified end-to-end against a throwaway local bare remote: the old block is
+  replaced in place, hand-written content above and below it survives, the guide
+  is added, and an existing `daily-plan.md` is left alone.
+
+Remaining for Part 1: run `./setup-new-repo.sh --update <remote>` for all six
+tracked repos (one commit + push each).
