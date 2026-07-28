@@ -4,6 +4,49 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-28
+
+### second-brain-test
+
+- Bootstrapped into project-status tracking (`613b640`): daily-plan workflow, guide, and SessionStart hook.
+- No prototype work — only automated plan re-dates (`7a16fce`, `2b3195c`), leaving the standing focus unchanged: hand-build prototype #39 (the embed-excluded block feature), confirm editing it skips re-embedding, then fold it into the shared devkit.
+
+### second-brain-devkit
+
+- Bootstrapped into project-status tracking (`532c32e`), adding `daily-plan.md`, the rule block, and a 151-line `project-status-guide.md` — most of the ~180 lines changed in this range (`d4db823c..874bf544`).
+- No feature work — plan bookkeeping re-dated the standing focus through `42e364b`/`874bf54`: strip the decorative "embed-excluded" region from both the embedding text and the content hash (issue #39).
+- `acb3478` trimmed the plan to that single focus, dropping unrelated personal-learning items.
+
+### customer-req-responder
+
+- Onboarded onto project-status tracking (`aed6d47`): `daily-plan.md`, `project-status-guide.md`, a SessionStart hook, and a trimmed `CLAUDE.md` rule block. Pure infrastructure — no application code changed.
+
+### create-ai-builder
+
+- Bootstrapped into project-status tracking (`bab89b2`): daily-plan hook, kernel rule block, and a 151-line `project-status-guide.md` — routine setup, no functional change.
+- Planning tracked real task state: the 2026-07-27 plan (`417c28a`) advanced focus to task 15d940 (make `target/setup-project.sh` delegate to a pinned `create-project-system` generator script instead of copying files) after the prior migration branch merged via PR #4; the 2026-07-28 plan (`f0f9a69`) just re-dates the same intent forward.
+
+### captains-log
+
+- Range starts from the project-status bootstrap (`a96fb5f`): `daily-plan.md`, CLAUDE.md rule block, guide, SessionStart hook.
+- Day 1 of the Kaggle 5-Day AI Agents intensive stayed open, so `2465d11`/`1eba1dc` just re-dated the plan forward with unchanged focus.
+- `f09c4f8` closed out the "task-devkit pluggable subsystems" roadmap item as superseded — it had already shipped piecemeal elsewhere (create-project-system's generator, second-brain's install, ai-builder's backfill tracker, and a "copy, not shared-lib" call in create-context-hygiene) — trimming the plan to one active item.
+- `7d5719`/`cf94ee` promoted two long-idle carry-forwards (a Raspberry Pi coding-harness task, Claude Desktop custom-instructions) into proper backlog tasks so they stop silently rolling forward.
+- `67c24e6` moved reference links off the daily plan onto their owning tasks and pointed a task-devkit handoff at the actual filed task.
+
+### create-project-system
+
+- Bootstrapped into project-status tracking (`3ee1289`): daily-plan workflow, hook, and guide docs.
+- Task 09 (extract the task-system generator so it can regenerate the original subsystem from scratch) is code-complete and validated against 134 real tasks but still unmerged; today's plan (`7042992`) retargets around closing it out, then a backlog ordered so the rename (task 19) lands before the flag that depends on it (task 15), followed by tasks 18 and 20.
+- `6f664ea` opened task 22 to give an owner and trigger to spinning the shared generator logic into its own library, now that a third consumer is imminent (task 09 plus a related create-ai-builder change) — flagging that second-brain-devkit's different generator design shouldn't count toward that threshold.
+- `7610219` added task 21 to delete two throwaway test repos (`tasks-test`, `tasks-test-wt`) left over from finished verification work, which were also spuriously triggering an unrelated setup-nudge hook.
+
+### Cross-repo
+
+- Six of six active repos spent today's cycle almost entirely on project-status onboarding — second-brain-test (`613b640`), second-brain-devkit (`532c32e`), customer-req-responder (`aed6d47`), create-ai-builder (`bab89b2`), captains-log (`a96fb5f`), and create-project-system (`3ee1289`) all picked up the same daily-plan scaffolding, guide, and SessionStart hook, so most of today's portfolio activity is tracking machinery rather than product work.
+- create-ai-builder and create-project-system are converging on the same generator: create-ai-builder's task 15d940 plans to delegate `setup-project.sh` to a pinned `create-project-system` generator script, and create-project-system's new task 22 (`6f664ea`) cites that same dependency as the third consumer justifying spinning the generator into its own library.
+
+
 ## 2026-07-27
 
 ### create-ai-builder
