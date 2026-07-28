@@ -22,7 +22,14 @@ import sys
 from datetime import date, timedelta
 from pathlib import Path
 
-from _lib import DEFAULT_PRIORITY, REPO_ROOT, TRACKED_DIR, enabled_repos, git
+from _lib import (
+    DEFAULT_PRIORITY,
+    REPO_ROOT,
+    TRACKED_DIR,
+    enabled_repos,
+    git,
+    target_drift,
+)
 
 DAILY_PLAN_SUMMARY = REPO_ROOT / "daily-plan-summary.md"
 DAILY_PLAN_ARCHIVE_DIR = REPO_ROOT / "daily-plan-archive"
@@ -216,6 +223,22 @@ def render_overview(repos, today: date) -> str:
     return "\n".join(lines) + "\n"
 
 
+def drift_notice(name: str, remote: str | None) -> str:
+    """Callout naming any project-status drift in this repo, or "".
+
+    Surfaced here — in the repo's own section of the daily summary — rather than
+    only in a checker you have to remember to run: the summary is read every
+    day, so drift gets seen the day it appears."""
+    problems = target_drift(name)
+    if not problems:
+        return ""
+    cmd = f"./setup-new-repo.sh --update {remote or '<remote>'}"
+    return (
+        f"> ⚠️ **project-status drift:** {'; '.join(problems)}. "
+        f"Re-run from project-status: `{cmd}`\n\n"
+    )
+
+
 def render_repo_section(
     name: str, plan_path: Path, today: date, remote: str | None = None
 ) -> str:
@@ -224,15 +247,17 @@ def render_repo_section(
     # a plain name when the remote is absent or unrecognized.
     url = remote_to_url(remote)
     label = f"[{name}]({url})" if url else name
+    drift = drift_notice(name, remote)
 
     state, plan_date, body = plan_state(plan_path, today)
 
     if state == "missing":
-        return f"## {label} — no plan committed\n"
+        return f"## {label} — no plan committed\n\n{drift}".rstrip("\n") + "\n"
 
     if state == "unparseable":
         return (
             f"## {label} — plan file present but unparseable\n\n"
+            f"{drift}"
             "> Could not extract `# Daily plan — YYYY-MM-DD` header. "
             "The repo's SessionStart hook will prompt for a fresh plan.\n"
         )
@@ -243,8 +268,8 @@ def render_repo_section(
         header = f"## {label} — plan for {plan_date.isoformat()}"
 
     if not body:
-        return f"{header}\n\n> Plan file has no body content.\n"
-    return f"{header}\n\n{body}\n"
+        return f"{header}\n\n{drift}> Plan file has no body content.\n"
+    return f"{header}\n\n{drift}{body}\n"
 
 
 def build_summary(today: date | None = None, repos=None) -> str:

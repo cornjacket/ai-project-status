@@ -25,6 +25,13 @@ EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 # Priority band applied to a repo with no `priority:` in repos.yml.
 DEFAULT_PRIORITY = 3
 
+TEMPLATES_DIR = REPO_ROOT / "templates"
+RULE_TEMPLATE = TEMPLATES_DIR / "claude-rule.md"
+GUIDE_TEMPLATE = TEMPLATES_DIR / "project-status-guide.md"
+GUIDE_FILENAME = "project-status-guide.md"
+RULE_BEGIN = "<!-- ai-project-status:begin -->"
+RULE_END = "<!-- ai-project-status:end -->"
+
 
 def load_repos():
     """Return list of normalized repo dicts with defaults applied."""
@@ -48,6 +55,53 @@ def load_repos():
 
 def enabled_repos():
     return [r for r in load_repos() if r["enabled"]]
+
+
+def extract_marked_block(text):
+    """The `<!-- ai-project-status:begin/end -->` block, markers included."""
+    lines = text.splitlines()
+    begin = end = None
+    for i, line in enumerate(lines):
+        if line.strip() == RULE_BEGIN and begin is None:
+            begin = i
+        elif line.strip() == RULE_END and begin is not None:
+            end = i
+            break
+    if begin is None or end is None:
+        return None
+    return "\n".join(lines[begin:end + 1])
+
+
+def target_drift(name):
+    """Ways `tracked/<name>` has fallen behind templates/, newest state wins.
+
+    Returns a list of short human-readable problems ([] means in sync). The
+    drift that matters in practice is a stale CLAUDE.md block: setup-new-repo.sh
+    always refreshes the guide and hook, but only rewrites the block when passed
+    --update, so a repo can carry a current guide beside an outdated kernel and
+    nothing would say so.
+    """
+    d = TRACKED_DIR / name
+    if not d.exists():
+        return []  # not synced; sync.py reports that separately
+
+    problems = []
+    claude = d / "CLAUDE.md"
+    if not claude.exists():
+        problems.append("no CLAUDE.md")
+    else:
+        block = extract_marked_block(claude.read_text())
+        if block is None:
+            problems.append("CLAUDE.md has no project-status block")
+        elif block.strip() != RULE_TEMPLATE.read_text().strip():
+            problems.append("CLAUDE.md rule block is out of date")
+
+    guide = d / GUIDE_FILENAME
+    if not guide.exists():
+        problems.append(f"{GUIDE_FILENAME} is missing")
+    elif guide.read_text().strip() != GUIDE_TEMPLATE.read_text().strip():
+        problems.append(f"{GUIDE_FILENAME} is out of date")
+    return problems
 
 
 def load_state():

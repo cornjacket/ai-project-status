@@ -1,9 +1,9 @@
 # Task: Streamline the tracked-repo CLAUDE.md block + a more robust per-repo summary
 
 - **Created:** 2026-07-27
-- **Status:** IN-PROGRESS — Part 1 (kernel/guide split) DONE 2026-07-27,
-  propagated to all six tracked repos. Part 2 (portfolio-at-a-glance summary)
-  not started.
+- **Status:** DONE — 2026-07-27. Part 1 (kernel/guide split) propagated to all
+  six tracked repos; Part 2 (portfolio-at-a-glance table) shipped, plus a
+  two-layer guard against repos falling out of the system.
 - **Owner:** _unassigned_
 
 ## Goal
@@ -103,4 +103,45 @@ freshness nudge.
 Propagated 2026-07-27 via `./setup-new-repo.sh --update <remote>` across all six
 tracked repos (one commit + push each): `second-brain-test`,
 `second-brain-devkit`, `customer-req-responder`, `create-ai-builder`,
-`captains-log`, `create-project-system`. Part 1 is closed; Part 2 remains.
+`captains-log`, `create-project-system`.
+
+## Part 2 as built (2026-07-27)
+
+`daily-plan-summary.md` opens with an **At a glance** table: one row per repo —
+repo (linked), priority band, plan freshness, the first bullet of today's focus,
+and days since the last commit.
+
+- **Sort: fresh plans first, then by band.** Freshness leads because the table
+  answers "what is live today" before "what matters most" — a stale P1 has
+  nothing to say about today. Ties keep `repos.yml` order (stable sort).
+- **Priority lives in `repos.yml`** (`priority: 1|2|3`, default 3), not in each
+  repo's `daily-plan.md`. It is a cross-portfolio judgment that only means
+  anything relative to the other repos, and no single repo can see them; a
+  self-reported field would give six repos each claiming P1 with no arbiter.
+  Bands, not a strict rank — ties are expected. Assigned from observed commit
+  activity, recency weighted over raw volume.
+- **Idle comes from git, not `state.json`.** Aggregation runs *before*
+  `commit-state.py` advances the state, so `last_activity_date` is always a run
+  behind and would report today's work as a day idle.
+- Cells escape `|` and truncate, or one long focus bullet breaks the table.
+
+## Keeping repos from falling out of the system (2026-07-27)
+
+Cloning a *tracked* repo was never the gap — the block, guide, and hook are
+committed into the repo and arrive with the clone. Two real gaps, two layers:
+
+1. **Never bootstrapped** — a new project, or one worked in before being
+   registered. Caught by `hooks/check-repo-bootstrap.py`, a **user-level**
+   `SessionStart` hook in `~/.claude/settings.json`. It has to be user-level:
+   a repo that was never bootstrapped has no hook of its own to fire. Narrow by
+   design (git repos under the workspace root only, never the tracker itself,
+   `.project-status-ignore` opts out) — a hook that cries wolf gets ignored.
+2. **Version skew** — the failure a clone-time hook cannot see, and the one that
+   already existed: `setup-new-repo.sh` always refreshes the guide and hook but
+   only rewrites the `CLAUDE.md` block with `--update`, so a repo can carry a
+   current guide beside a months-old kernel. `_lib.target_drift()` compares both
+   against `templates/`; `tools/check-targets.py` is the whole-portfolio view
+   (non-zero exit on drift), and the same finding is repeated as a callout in
+   that repo's section of `daily-plan-summary.md` — the copy actually read every
+   day, so drift gets seen the day it appears rather than when someone
+   remembers to run a checker.

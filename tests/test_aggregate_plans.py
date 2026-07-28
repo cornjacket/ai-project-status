@@ -314,3 +314,45 @@ def test_build_summary_includes_the_overview(tmp_path, monkeypatch):
     )
     assert "## At a glance" in out
     assert out.index("## At a glance") < out.index("## ai-foo")
+
+
+# --- drift callout in the per-repo section ---------------------------------
+
+def test_drift_notice_empty_when_in_sync(monkeypatch):
+    monkeypatch.setattr(ap, "target_drift", lambda name: [])
+    assert ap.drift_notice("ai-foo", "git@example.com:x/ai-foo.git") == ""
+
+
+def test_drift_notice_names_problems_and_the_fix(monkeypatch):
+    monkeypatch.setattr(
+        ap, "target_drift", lambda name: ["CLAUDE.md rule block is out of date"]
+    )
+    out = ap.drift_notice("ai-foo", "git@example.com:x/ai-foo.git")
+    assert "project-status drift" in out
+    assert "rule block is out of date" in out
+    assert "./setup-new-repo.sh --update git@example.com:x/ai-foo.git" in out
+
+
+def test_drift_shows_up_in_the_repo_section(tmp_path, monkeypatch):
+    monkeypatch.setattr(ap, "target_drift", lambda name: ["guide is missing"])
+    plan = tmp_path / "daily-plan.md"
+    plan.write_text("# Daily plan — 2026-05-06\n\nDo the thing.\n")
+    out = ap.render_repo_section("ai-foo", plan, date(2026, 5, 6))
+    assert "project-status drift" in out
+    # the callout sits under the header, above the plan body
+    assert out.index("drift") < out.index("Do the thing.")
+
+
+def test_drift_shows_up_even_without_a_plan(tmp_path, monkeypatch):
+    monkeypatch.setattr(ap, "target_drift", lambda name: ["guide is missing"])
+    out = ap.render_repo_section("ai-foo", tmp_path / "none.md", date(2026, 5, 6))
+    assert "no plan committed" in out
+    assert "project-status drift" in out
+
+
+def test_no_drift_callout_when_repo_is_in_sync(tmp_path, monkeypatch):
+    monkeypatch.setattr(ap, "target_drift", lambda name: [])
+    plan = tmp_path / "daily-plan.md"
+    plan.write_text("# Daily plan — 2026-05-06\n\nDo the thing.\n")
+    out = ap.render_repo_section("ai-foo", plan, date(2026, 5, 6))
+    assert "drift" not in out

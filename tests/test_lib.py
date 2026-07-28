@@ -241,3 +241,71 @@ def test_load_repos_reads_explicit_priority(project):
         "    priority: 1\n"
     )
     assert _lib.load_repos()[0]["priority"] == 1
+
+
+# --- target drift detection -----------------------------------------------
+
+def _bootstrap_target(project, name, rule=None, guide=None, claude=True):
+    """A tracked checkout carrying the injected files, by default in sync."""
+    d = project / "tracked" / name
+    d.mkdir(parents=True)
+    if claude:
+        block = _lib.RULE_TEMPLATE.read_text() if rule is None else rule
+        (d / "CLAUDE.md").write_text(f"# CLAUDE.md\n\nlocal stuff\n\n{block}\n")
+    if guide is not False:
+        text = _lib.GUIDE_TEMPLATE.read_text() if guide is None else guide
+        (d / _lib.GUIDE_FILENAME).write_text(text)
+    return d
+
+
+def test_target_drift_none_when_in_sync(project):
+    _bootstrap_target(project, "ai-foo")
+    assert _lib.target_drift("ai-foo") == []
+
+
+def test_target_drift_flags_stale_rule_block(project):
+    stale = f"{_lib.RULE_BEGIN}\nold rules\n{_lib.RULE_END}"
+    _bootstrap_target(project, "ai-foo", rule=stale)
+    assert _lib.target_drift("ai-foo") == ["CLAUDE.md rule block is out of date"]
+
+
+def test_target_drift_flags_absent_block(project):
+    d = project / "tracked" / "ai-foo"
+    d.mkdir(parents=True)
+    (d / "CLAUDE.md").write_text("# CLAUDE.md\n\nno block here\n")
+    (d / _lib.GUIDE_FILENAME).write_text(_lib.GUIDE_TEMPLATE.read_text())
+    assert _lib.target_drift("ai-foo") == [
+        "CLAUDE.md has no project-status block"
+    ]
+
+
+def test_target_drift_flags_missing_and_stale_guide(project):
+    _bootstrap_target(project, "ai-gone", guide=False)
+    assert _lib.target_drift("ai-gone") == [
+        f"{_lib.GUIDE_FILENAME} is missing"
+    ]
+    _bootstrap_target(project, "ai-old", guide="an older guide\n")
+    assert _lib.target_drift("ai-old") == [
+        f"{_lib.GUIDE_FILENAME} is out of date"
+    ]
+
+
+def test_target_drift_reports_both_problems(project):
+    stale = f"{_lib.RULE_BEGIN}\nold rules\n{_lib.RULE_END}"
+    _bootstrap_target(project, "ai-foo", rule=stale, guide="old\n")
+    assert len(_lib.target_drift("ai-foo")) == 2
+
+
+def test_target_drift_silent_when_repo_not_synced(project):
+    """sync.py reports an unsynced repo; drift shouldn't double-report it."""
+    assert _lib.target_drift("never-cloned") == []
+
+
+def test_extract_marked_block_roundtrip():
+    text = f"intro\n{_lib.RULE_BEGIN}\nrules\n{_lib.RULE_END}\noutro\n"
+    assert _lib.extract_marked_block(text) == \
+        f"{_lib.RULE_BEGIN}\nrules\n{_lib.RULE_END}"
+
+
+def test_extract_marked_block_absent():
+    assert _lib.extract_marked_block("no markers\n") is None
