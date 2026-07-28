@@ -80,14 +80,18 @@ def main() -> int:
 
     print(
         f"`{root.name}` is not bootstrapped for project-status: its CLAUDE.md "
-        "carries no commit-telemetry rules, so its work will not appear in the "
-        "cross-repo rollup. Mention this to the user once, and if they want it "
-        "tracked, run from "
-        f"{tracker}:\n\n"
-        f"    ./setup-new-repo.sh {remote}\n\n"
-        f"then add it to repos.yml. If this repo should stay untracked, "
-        f"`touch {IGNORE_FILE}` in it to silence this permanently. Do not let "
-        "this block the user's actual request."
+        "carries no commit-telemetry rules, so its commits will not appear in "
+        "the cross-repo rollup.\n\n"
+        "Tell the user this once, briefly, and give them BOTH options — the "
+        "opt-out matters as much as the fix, because otherwise they get this "
+        "reminder every session in a repo they have already decided about:\n\n"
+        f"  - Track it: run `./setup-new-repo.sh {remote}` from {tracker}, "
+        "then add it to repos.yml.\n"
+        f"  - Leave it untracked and stop being asked: `touch {IGNORE_FILE}` "
+        "in this repo (commit it so the opt-out travels with the repo).\n\n"
+        "Doing nothing is also fine — this reminder is the only consequence. "
+        "Then get on with whatever the user actually asked for; this must not "
+        "block or delay it."
     )
     return 0
 

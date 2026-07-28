@@ -52,6 +52,16 @@ def test_nudges_an_unbootstrapped_repo_in_the_workspace(workspace):
     assert "setup-new-repo.sh" in out
 
 
+def test_nudge_offers_the_opt_out_not_just_the_fix(workspace):
+    """Without the opt-out the user gets nagged every session in a repo they
+    have already decided about, which is how a hook earns being ignored."""
+    repo = workspace / "ai-new"
+    init_git_repo(repo)
+    out = run_hook(repo, workspace).stdout
+    assert ".project-status-ignore" in out
+    assert "Doing nothing is also fine" in out
+
+
 def test_silent_when_the_marker_is_present(workspace):
     repo = workspace / "ai-tracked"
     init_git_repo(repo)
