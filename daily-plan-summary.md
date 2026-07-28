@@ -137,32 +137,30 @@ PR #4 merged ─▶ follow-ups re-homed ─▶ [15d940] target composition (toda
 notes, design decisions, and roadmap thinking captured as dated entries, tracked by project-status so
 the reasoning behind the portfolio is recorded alongside the code.
 
-**Last implemented:** logged Google/Kaggle's **5-Day AI Agents Intensive Course** as a tracked
-umbrella study task (2026-07-23) — [task](project/tasks/main/in-progress/5c0d5b-kaggle-5-day-ai-agents-intensive/).
+**Last implemented:** closed the **task-devkit** roadmap task as superseded — `create-project-system`
+shipped the generator, and every remaining strand re-homed to the repo that owns it (2026-07-27) —
+[task](project/tasks/main/complete/bb5b51-task-devkit-pluggable-subsystems/).
 
 **Focus / plan:**
 - **Day 1 of the Kaggle intensive — *Introduction to Agents*:** read the whitepaper front to back and
   work the day's material. Task: [`project/tasks/main/in-progress/5c0d5b-kaggle-5-day-ai-agents-intensive/`](project/tasks/main/in-progress/5c0d5b-kaggle-5-day-ai-agents-intensive/).
-- Carry forward: **Agent Quality** whitepaper — evaluation + observability (trajectory-as-truth, the
-  logging/tracing/metrics pillars, LLM-as-a-judge).
-- Carry forward: reach for the **Pi** AI coding harness — install and drive it end-to-end on a small task.
-- Carry forward: **Claude Desktop without per-prompt reminders** — global custom instructions plus
-  Projects to partition/scope chats.
-- Carry forward: sketch **task-devkit** and dogfood it by wiring a task system into this repo.
-- Carry forward (last): **re-read The New SDLC With Vibe Coding**, second pass, consolidate takeaways.
 
-### References
-- 5-Day AI Agents Intensive — https://www.kaggle.com/learn-guide/5-day-agents (video: https://www.youtube.com/watch?v=BPQDZLPtgDc)
-- Introduction to Agents — https://www.kaggle.com/whitepaper-introduction-to-agents
-- Agent Quality — https://www.kaggle.com/whitepaper-agent-quality
-- The New SDLC With Vibe Coding — https://www.kaggle.com/whitepaper-the-new-SDLC-with-vibe-coding (mirror: https://addyosmani.com/blog/new-sdlc-vibe-coding/)
-- Pi coding-agent harness — https://github.com/earendil-works/pi (docs: https://pi.dev/)
+Carry-forwards cleared off this plan today: the **Pi harness** and **Claude Desktop custom
+instructions** items became backlog tasks
+([`7d5719`](project/tasks/main/backlog/7d5719-pi-coding-harness-end-to-end/),
+[`cf94ee`](project/tasks/main/backlog/cf94ee-claude-desktop-without-per-prompt-reminders/)) rather
+than rolling forward invisibly; **Agent Quality** and **The New SDLC With Vibe Coding** moved onto
+the Kaggle task that owns them; **task-devkit** closed as superseded, with its one unowned strand
+filed in `create-project-system` as task 22.
+
+Reference links now live on the task that addresses each item, not here — a link on a daily plan is
+gone tomorrow.
 
 ```
 morning ──────────── midday ──────────── afternoon ────────── evening
- [Kaggle Day 1:      [Day 1 cont. —      [Agent Quality      [Pi harness /
-  Introduction to     finish the day's    whitepaper]         task-devkit
-  Agents] read        material]                               sketch]
+ [Kaggle Day 1:      [Day 1 cont. —      [Day 1 material     [wrap up /
+  Introduction to     finish the day's    cont.]              capture notes]
+  Agents] read        material]
 ```
 
 ## [customer-req-responder](https://github.com/cornjacket/customer-req-responder) — STALE (last plan: 2026-05-29)
