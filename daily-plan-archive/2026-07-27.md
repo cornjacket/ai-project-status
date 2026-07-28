@@ -8,14 +8,14 @@
 
 | Repo | Pri | Plan | Focus | Idle |
 | --- | --- | --- | --- | --- |
-| [second-brain-devkit](https://github.com/cornjacket/second-brain-devkit) | P1 | **STALE** 2026-07-23 | **Course — Kaggle 5-Day Agents, Day 1 (intro to agents):**… | today |
-| [create-project-system](https://github.com/cornjacket/create-project-system) | P1 | **STALE** 2026-07-24 | **Task 07 — first real rollout: generate into… | today |
-| [second-brain-test](https://github.com/cornjacket/second-brain-test) | P2 | **STALE** 2026-07-21 | **Prototype #39 — the embed-excluded block — HERE by hand:** a… | today |
-| [create-ai-builder](https://github.com/cornjacket/create-ai-builder) | P2 | **STALE** 2026-07-24 | **Review + merge** the `task-system-generator-migration` branch… | today |
-| [captains-log](https://github.com/cornjacket/captains-log) | P2 | **STALE** 2026-07-24 | **Day 1 of the Kaggle intensive — *Introduction to Agents*:**… | today |
+| [second-brain-devkit](https://github.com/cornjacket/second-brain-devkit) | P1 | 2026-07-27 | **Build #39 — embed-excluded block:** marker (reuse… | today |
+| [create-project-system](https://github.com/cornjacket/create-project-system) | P1 | 2026-07-27 | **Task 07 — first real rollout: generate into… | today |
+| [second-brain-test](https://github.com/cornjacket/second-brain-test) | P2 | 2026-07-27 | **Prototype #39 — the embed-excluded block — HERE by hand:** a… | today |
+| [create-ai-builder](https://github.com/cornjacket/create-ai-builder) | P2 | 2026-07-27 | **Begin target composition… | today |
+| [captains-log](https://github.com/cornjacket/captains-log) | P2 | 2026-07-27 | **Day 1 of the Kaggle intensive — *Introduction to Agents*:**… | today |
 | [customer-req-responder](https://github.com/cornjacket/customer-req-responder) | P3 | **STALE** 2026-05-29 | — | today |
 
-## [second-brain-test](https://github.com/cornjacket/second-brain-test) — STALE (last plan: 2026-07-21)
+## [second-brain-test](https://github.com/cornjacket/second-brain-test) — plan for 2026-07-27
 
 **What this repo is (for a newcomer):** `second-brain-test` is the *golden reference* for the devkit
 next door — a hand-built, known-good copy of a generated brain. Features are prototyped **here by
@@ -38,7 +38,7 @@ with no mid-prototype work parked.
    guardrail: backend = test; prototype → vendor → devkit CI stays green
 ```
 
-## [second-brain-devkit](https://github.com/cornjacket/second-brain-devkit) — STALE (last plan: 2026-07-23)
+## [second-brain-devkit](https://github.com/cornjacket/second-brain-devkit) — plan for 2026-07-27
 
 **What this repo is (for a newcomer):** `second-brain-devkit` is a *generator*. It builds a personal
 "second brain" — a plain-Markdown notes vault a human edits in Obsidian, plus a local SQLite
@@ -47,29 +47,18 @@ prototype → vendor → one command, `python3 tools/ci.py` (14 automated gates)
 
 **Last implemented:** #38 (a permission-denied source folder is no longer reported as empty) shipped
 2026-07-20. #39 — the *embed-excluded block* (strip decorative ASCII from a note's embedding + content
-hash) — is filed but not yet built; it stays queued behind today's learning.
+hash) — is filed but not yet built; it is the next build.
 
 **Focus / plan:**
-- **Course — Kaggle 5-Day Agents, Day 1 (intro to agents):** start the guided course
-  (https://www.kaggle.com/learn-guide/5-day-agents). Work Day 1 end-to-end and capture the
-  transferable agent lessons for the second-brain's own AI-read path.
-- **Tie-back:** map Day 1's agent concepts onto the brain — where the retrieval/MCP path is
-  already agent-shaped and where a cleaner agent loop would help.
-- **Queued build — #39 embed-excluded block:** marker (reuse `scripts/marked_block.py`) strips a
+- **Build #39 — embed-excluded block:** marker (reuse `scripts/marked_block.py`) strips a
   decorative region from `canonical_body()` before embedding **and** from the content hash; prototype
   in golden → `vendor_golden.py` → `build_template.py` → `tools/ci.py` green + a new strip/hash gate.
-- **Later (not today):** Agent Quality white-paper reading (Automated Metrics section) — resumes after
-  the course.
 - Parked (human): `add_pdf_guided` CLI form pass; Suite A Desktop; glossary Obsidian hand-test.
 
 ```
- course ▶ Kaggle 5-Day Agents — Day 1: intro to agents
-            │
-            ▼
- 7/23 ▶ work Day 1 end-to-end → note agent lessons → map onto brain retrieval/MCP path
-            │
-            ▼
- then ▶ #39 embed-excluded block (queued) · Agent Quality reading (later)
+ build ▶ #39 embed-excluded block
+   golden prototype ──▶ vendor_golden.py ──▶ build_template.py ──▶ tools/ci.py (+ strip/hash gate)
+   guardrail: strip the decorative region from BOTH the embedding and the content hash
 ```
 
 ## [customer-req-responder](https://github.com/cornjacket/customer-req-responder) — STALE (last plan: 2026-05-29)
@@ -95,7 +84,7 @@ Superpowers and start brainstorm on the 6 blocking open questions toward SPEC.md
    replace GSD, keep ai-builder log     own the eval loop separately
 ```
 
-## [create-ai-builder](https://github.com/cornjacket/create-ai-builder) — STALE (last plan: 2026-07-24)
+## [create-ai-builder](https://github.com/cornjacket/create-ai-builder) — plan for 2026-07-27
 
 **What this repo is (for a newcomer):** `create-ai-builder` is a generator that
 installs an AI-agent **build pipeline** (an orchestrator plus ARCHITECT /
@@ -103,31 +92,36 @@ IMPLEMENTOR / TESTER role agents) into a target platform repo. The pipeline is
 driven by a Markdown task system, so an installed ai-builder turns tracked tasks
 into shipped code.
 
-**Last implemented:** Renamed `ai-builder` → `create-ai-builder` (it's a
-generator, joins the `create-*` family) and **re-homed its task subsystem onto
-the `create-project-system` generator** — stripped the 25 hand-built core scripts
-to a task-free checkpoint, regenerated the decoupled machinery, and verified
-parity against the 134 real tasks (writes, category grouping, worktree root, 175
-`X-` subtasks all preserved).
+**Last implemented:** the `task-system-generator-migration` branch **merged to
+main** (PR #4) — the task subsystem now rides on the `create-project-system`
+generator instead of the 25 hand-built scripts. The three create-ai-builder-owned
+follow-ups were then **re-homed into this repo's own tracker** (dogfooding the
+migrated tooling): `29297c-relocate-pipeline-scripts` (task-tooling, MED),
+`59ea60-repo-name-rename-audit` (workspace-mgmt, LOW), and
+`15d940-target-setup-uses-generator-for-tasks` (workspace-mgmt, MED — renamed from
+the old `target-composition-delegate-to-generate`).
 
 **Focus / plan:**
 
-- **Review + merge** the `task-system-generator-migration` branch on GitHub
-  (pushed; machinery-swap-only diff, 28 files). Today's gate.
-- After merge, **re-home** the create-ai-builder-owned follow-ups into this
-  repo's now-working tracker (dogfooding): pipeline-script relocation, the
-  repo-name rename audit, and target composition.
-- Begin **target composition** — make `target/setup-project.sh` delegate the task
-  layer to a pinned `create-project-system` `generate.sh` instead of copying.
+- **Begin target composition — `15d940-target-setup-uses-generator-for-tasks`.**
+  Make `target/setup-project.sh` **delegate** the task layer to a pinned
+  `create-project-system` `generate.sh` instead of copying create-ai-builder's own
+  scripts. Start the task (move to `in-progress`, worktree class `workspace-mgmt`),
+  describe subtasks, and align before implementing.
+- Design the pin: which `create-project-system` ref to pin to, and how the target
+  setup invokes `generate.sh` (`--tasks-dir` / `--epic` / `--with-status`).
+- Next in the re-homed queue (not today): `29297c-relocate-pipeline-scripts`
+  (MED), then `59ea60-repo-name-rename-audit` (LOW).
 
 ```
-task-system-generator-migration (pushed) ──review──▶ merge to main
-                                                        │
-                                                        ▼
-              re-home 12/13/14 ──▶ target composition (pinned generate.sh)
+PR #4 merged ─▶ follow-ups re-homed ─▶ [15d940] target composition (today)
+                                          │  setup-project.sh delegates to
+                                          │  a pinned create-project-system generate.sh
+                                          ▼
+                            then ▶ 29297c relocate pipeline scripts ▶ 59ea60 rename audit
 ```
 
-## [captains-log](https://github.com/cornjacket/captains-log) — STALE (last plan: 2026-07-24)
+## [captains-log](https://github.com/cornjacket/captains-log) — plan for 2026-07-27
 
 **What this repo is (for a newcomer):** `captains-log` is a personal engineering log — learning
 notes, design decisions, and roadmap thinking captured as dated entries, tracked by project-status so
@@ -161,7 +155,7 @@ morning ──────────── midday ─────────�
   Agents] read        material]                               sketch]
 ```
 
-## [create-project-system](https://github.com/cornjacket/create-project-system) — STALE (last plan: 2026-07-24)
+## [create-project-system](https://github.com/cornjacket/create-project-system) — plan for 2026-07-27
 
 **What this repo is (for a newcomer):** A Cookiecutter-style *generator* that
 installs a Markdown-based project-management workspace — a task tracker
