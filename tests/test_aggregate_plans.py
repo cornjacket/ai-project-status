@@ -187,3 +187,130 @@ def test_archive_summary_is_idempotent_per_day(tmp_path, monkeypatch):
     files = list((tmp_path / "daily-plan-archive").iterdir())
     assert [f.name for f in files] == ["2026-05-06.md"]
     assert files[0].read_text() == "second\n"
+
+
+# --- at-a-glance overview table -------------------------------------------
+
+def test_extract_focus_takes_first_bullet_of_focus_section():
+    body = (
+        "**What this repo is (for a newcomer):** A thing.\n\n"
+        "**Focus / plan:**\n\n"
+        "- Ship the widget\n"
+        "- Then the other widget\n"
+    )
+    assert ap.extract_focus(body) == "Ship the widget"
+
+
+def test_extract_focus_falls_back_to_first_bullet_anywhere():
+    """Older plans predate the fixed body structure."""
+    assert ap.extract_focus("Some prose.\n\n- Do the thing\n") == "Do the thing"
+
+
+def test_extract_focus_none_without_bullets():
+    assert ap.extract_focus("Just prose, no bullets.\n") is None
+
+
+def test_plan_state_fresh_stale_missing_unparseable(tmp_path):
+    today = date(2026, 5, 6)  # Wednesday
+    missing = tmp_path / "nope.md"
+    assert ap.plan_state(missing, today)[0] == "missing"
+
+    bad = tmp_path / "bad.md"
+    bad.write_text("no header here\n")
+    assert ap.plan_state(bad, today)[0] == "unparseable"
+
+    stale = tmp_path / "stale.md"
+    stale.write_text("# Daily plan — 2026-04-30\n\nold\n")
+    assert ap.plan_state(stale, today)[0] == "stale"
+
+    fresh = tmp_path / "fresh.md"
+    fresh.write_text("# Daily plan — 2026-05-06\n\nnew\n")
+    state, plan_date, body = ap.plan_state(fresh, today)
+    assert (state, plan_date, body) == ("fresh", date(2026, 5, 6), "new")
+
+
+def _row(name, state, priority):
+    return {"name": name, "state": state, "priority": priority}
+
+
+def test_sort_rows_puts_fresh_before_stale_regardless_of_priority():
+    rows = [_row("stale-p1", "stale", 1), _row("fresh-p3", "fresh", 3)]
+    assert [r["name"] for _, r in ap.sort_rows(rows)] == ["fresh-p3", "stale-p1"]
+
+
+def test_sort_rows_orders_by_priority_within_a_group():
+    rows = [_row("b", "fresh", 3), _row("a", "fresh", 1), _row("c", "fresh", 2)]
+    assert [r["name"] for _, r in ap.sort_rows(rows)] == ["a", "c", "b"]
+
+
+def test_sort_rows_keeps_repos_yml_order_on_ties():
+    rows = [_row("first", "fresh", 2), _row("second", "fresh", 2)]
+    assert [r["name"] for _, r in ap.sort_rows(rows)] == ["first", "second"]
+
+
+def test_sort_rows_treats_missing_plan_as_not_fresh():
+    rows = [_row("missing-p1", "missing", 1), _row("fresh-p2", "fresh", 2)]
+    assert [r["name"] for _, r in ap.sort_rows(rows)] == ["fresh-p2", "missing-p1"]
+
+
+def test_cell_escapes_pipes_so_the_table_survives():
+    assert ap._cell("a | b") == "a \\| b"
+
+
+def test_cell_collapses_newlines_and_truncates():
+    assert ap._cell("one\ntwo") == "one two"
+    out = ap._cell("word " * 40)
+    assert len(out) <= ap.MAX_FOCUS_CHARS + 1 and out.endswith("…")
+
+
+def test_render_overview_renders_a_row_per_repo(tmp_path, monkeypatch):
+    monkeypatch.setattr(ap, "TRACKED_DIR", tmp_path)
+    (tmp_path / "ai-foo").mkdir()
+    (tmp_path / "ai-foo" / "daily-plan.md").write_text(
+        "# Daily plan — 2026-05-06\n\n**Focus / plan:**\n\n- Ship it\n"
+    )
+    out = ap.render_overview(
+        [{"name": "ai-foo", "remote": "https://github.com/x/ai-foo.git",
+          "priority": 2}],
+        date(2026, 5, 6),
+    )
+    assert "## At a glance" in out
+    assert "| Repo | Pri | Plan | Focus | Idle |" in out
+    assert "[ai-foo](https://github.com/x/ai-foo)" in out
+    assert "| P2 |" in out
+    assert "2026-05-06" in out
+    assert "Ship it" in out
+
+
+def test_render_overview_flags_stale_and_missing(tmp_path, monkeypatch):
+    monkeypatch.setattr(ap, "TRACKED_DIR", tmp_path)
+    (tmp_path / "ai-stale").mkdir()
+    (tmp_path / "ai-stale" / "daily-plan.md").write_text(
+        "# Daily plan — 2026-04-30\n\nold\n"
+    )
+    out = ap.render_overview(
+        [{"name": "ai-stale"}, {"name": "ai-gone"}], date(2026, 5, 6)
+    )
+    assert "**STALE** 2026-04-30" in out
+    assert "**none**" in out
+    # Neither repo is a git checkout here, so idle is unknown, not zero.
+    assert "| — |" in out
+
+
+def test_render_overview_defaults_unranked_repos_to_last_band(tmp_path, monkeypatch):
+    monkeypatch.setattr(ap, "TRACKED_DIR", tmp_path)
+    out = ap.render_overview([{"name": "ai-foo"}], date(2026, 5, 6))
+    assert f"| P{ap.DEFAULT_PRIORITY} |" in out
+
+
+def test_render_overview_empty_without_repos():
+    assert ap.render_overview([], date(2026, 5, 6)) == ""
+
+
+def test_build_summary_includes_the_overview(tmp_path, monkeypatch):
+    monkeypatch.setattr(ap, "TRACKED_DIR", tmp_path)
+    out = ap.build_summary(
+        today=date(2026, 5, 6), repos=[{"name": "ai-foo", "enabled": True}]
+    )
+    assert "## At a glance" in out
+    assert out.index("## At a glance") < out.index("## ai-foo")

@@ -22,6 +22,9 @@ PREBUILT_SOURCE_ROOT = Path("/home/user")
 # Well-known SHA-1 of git's empty tree, used as a baseline diff target on first run.
 EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"
 
+# Priority band applied to a repo with no `priority:` in repos.yml.
+DEFAULT_PRIORITY = 3
+
 
 def load_repos():
     """Return list of normalized repo dicts with defaults applied."""
@@ -35,6 +38,10 @@ def load_repos():
             "branch": r.get("branch", "main"),
             "enabled": r.get("enabled", True),
             "report_inactivity": r.get("report_inactivity", True),
+            # Band, not a rank: ties are expected and sort by repos.yml order.
+            # Lower = more important. Unset means "not ranked yet", which sorts
+            # last rather than silently claiming the top band.
+            "priority": int(r.get("priority", DEFAULT_PRIORITY)),
         })
     return out
 

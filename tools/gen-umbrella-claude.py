@@ -93,18 +93,45 @@ def extract_purpose(text: str) -> str | None:
     return _summarize(blob)
 
 
-def plan_sources(name: str, umbrella: Path):
+def local_checkout(umbrella: Path, name: str, branch: str = "main") -> Path | None:
+    """Working tree for `name` under the umbrella, or None if absent.
+
+    Handles the **bare + worktree** layout as well as an ordinary clone: there,
+    `<repo>/` is a container whose `.git` is a *file* (or which holds a `.bare/`
+    dir), and the actual checkouts are immediate subdirectories — so the files
+    live at `<repo>/main/`, not `<repo>/`. Pointing the roster at the container
+    would name a path with no source in it."""
+    base = umbrella / name
+    if not base.is_dir():
+        return None
+    if (base / ".git").is_dir():
+        return base
+    if (base / ".git").is_file() or (base / ".bare").is_dir():
+        worktrees = [
+            d for d in sorted(base.iterdir()) if d.is_dir() and (d / ".git").exists()
+        ]
+        for d in worktrees:
+            if d.name == branch:
+                return d
+        if worktrees:
+            return worktrees[0]
+    return base
+
+
+def plan_sources(name: str, umbrella: Path, branch: str = "main"):
     """Candidate daily-plan.md paths for `name`, best first.
 
-    The local sibling checkout wins over project-status's `tracked/` cache: it
-    is the working copy the umbrella session actually sees (and may hold an
-    uncommitted plan), and it is the path the roster points at. `tracked/` is
-    the fallback for repos not checked out locally."""
-    return [umbrella / name / "daily-plan.md", TRACKED_DIR / name / "daily-plan.md"]
+    The local checkout wins over project-status's `tracked/` cache: it is the
+    working copy the umbrella session actually sees (and may hold an uncommitted
+    plan), and it is the path the roster points at. `tracked/` is the fallback
+    for repos not checked out locally."""
+    checkout = local_checkout(umbrella, name, branch)
+    paths = [checkout / "daily-plan.md"] if checkout else []
+    return paths + [TRACKED_DIR / name / "daily-plan.md"]
 
 
-def repo_purpose(name: str, umbrella: Path) -> str | None:
-    for path in plan_sources(name, umbrella):
+def repo_purpose(name: str, umbrella: Path, branch: str = "main") -> str | None:
+    for path in plan_sources(name, umbrella, branch):
         if path.exists():
             purpose = extract_purpose(path.read_text())
             if purpose:
@@ -123,9 +150,14 @@ def render_block(repos, umbrella: Path) -> str:
     ]
     for r in repos:
         name = r["name"]
-        purpose = repo_purpose(name, umbrella) or "_(no daily-plan.md yet)_"
-        present = "" if (umbrella / name).is_dir() else " — **not checked out locally**"
-        lines.append(f"- **{name}** (`./{name}`{present}) — {purpose}")
+        branch = r.get("branch", "main")
+        purpose = repo_purpose(name, umbrella, branch) or "_(no daily-plan.md yet)_"
+        checkout = local_checkout(umbrella, name, branch)
+        if checkout is None:
+            path, present = name, " — **not checked out locally**"
+        else:
+            path, present = checkout.relative_to(umbrella).as_posix(), ""
+        lines.append(f"- **{name}** (`./{path}`{present}) — {purpose}")
     if not repos:
         lines.append("- _(no enabled repos in repos.yml)_")
     lines += ["", END_MARKER]

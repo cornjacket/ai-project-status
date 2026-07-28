@@ -5,6 +5,10 @@
 #   enabled: optional, default true. If false, the repo is skipped entirely.
 #   report_inactivity: optional, default true. If false, no inactivity line is
 #     written to summary.md when the repo has no new work.
+#   priority: optional, default 3. Band, not a rank — ties are fine and sort by
+#     the order below. Lower is more important (1 = top). Used only to sort the
+#     "At a glance" table in daily-plan-summary.md, which lists repos with a
+#     fresh plan first and orders each group by band.
 #
 # Example:
 #   repos:
@@ -18,14 +22,20 @@
 repos:
   - name: second-brain-test
     remote: https://github.com/cornjacket/second-brain-test.git
+    priority: 2
   - name: second-brain-devkit
     remote: https://github.com/cornjacket/second-brain-devkit.git
+    priority: 1
     enabled: true 
   - name: customer-req-responder
     remote: https://github.com/cornjacket/customer-req-responder.git
+    priority: 3
   - name: create-ai-builder
     remote: https://github.com/cornjacket/create-ai-builder.git
+    priority: 2
   - name: captains-log
     remote: https://github.com/cornjacket/captains-log.git
+    priority: 2
   - name: create-project-system
     remote: https://github.com/cornjacket/create-project-system.git
+    priority: 1

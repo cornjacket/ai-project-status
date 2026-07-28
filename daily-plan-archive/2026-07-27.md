@@ -2,6 +2,19 @@
 
 <!-- Auto-aggregated by tools/aggregate-plans.py from each tracked repo's daily-plan.md. Overwritten on every run. -->
 
+## At a glance
+
+<!-- Fresh plans first, then by priority band (P1 = highest, set in repos.yml). Idle = days since the newest commit. -->
+
+| Repo | Pri | Plan | Focus | Idle |
+| --- | --- | --- | --- | --- |
+| [second-brain-devkit](https://github.com/cornjacket/second-brain-devkit) | P1 | **STALE** 2026-07-23 | **Course — Kaggle 5-Day Agents, Day 1 (intro to agents):**… | today |
+| [create-project-system](https://github.com/cornjacket/create-project-system) | P1 | **STALE** 2026-07-24 | **Task 07 — first real rollout: generate into… | today |
+| [second-brain-test](https://github.com/cornjacket/second-brain-test) | P2 | **STALE** 2026-07-21 | **Prototype #39 — the embed-excluded block — HERE by hand:** a… | today |
+| [create-ai-builder](https://github.com/cornjacket/create-ai-builder) | P2 | **STALE** 2026-07-24 | **Review + merge** the `task-system-generator-migration` branch… | today |
+| [captains-log](https://github.com/cornjacket/captains-log) | P2 | **STALE** 2026-07-24 | **Day 1 of the Kaggle intensive — *Introduction to Agents*:**… | today |
+| [customer-req-responder](https://github.com/cornjacket/customer-req-responder) | P3 | **STALE** 2026-05-29 | — | today |
+
 ## [second-brain-test](https://github.com/cornjacket/second-brain-test) — STALE (last plan: 2026-07-21)
 
 **What this repo is (for a newcomer):** `second-brain-test` is the *golden reference* for the devkit

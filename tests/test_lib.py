@@ -226,3 +226,18 @@ def test_advance_state_preserves_activity_date_when_idle(project):
     assert s["last_commit"] == head
     assert s["last_synced"] == "2026-04-30"
     assert s["last_activity_date"] == "2026-04-22"
+
+
+def test_load_repos_defaults_priority_to_last_band(project):
+    (project / "repos.yml").write_text(
+        "repos:\n  - name: ai-foo\n    remote: git@example.com:x/ai-foo.git\n"
+    )
+    assert _lib.load_repos()[0]["priority"] == _lib.DEFAULT_PRIORITY
+
+
+def test_load_repos_reads_explicit_priority(project):
+    (project / "repos.yml").write_text(
+        "repos:\n  - name: ai-foo\n    remote: git@example.com:x/ai-foo.git\n"
+        "    priority: 1\n"
+    )
+    assert _lib.load_repos()[0]["priority"] == 1

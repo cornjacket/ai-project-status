@@ -24,7 +24,7 @@ When the user asks to add a repo to the tracker, run the full workflow — don't
    - All `INACTIVE` repos collapse into a single `### No updates` subsection at the END of the day section, one bullet per repo: `- <repo-name> (for N days)` (or `- <repo-name> (no activity recorded yet)`). Repos appear in `repos.yml` order. Omit the section entirely when no repos are inactive.
    - For each repo marked `INACTIVE_SUPPRESSED`: omit it entirely.
    - For each repo marked `NOT_SYNCED`: omit it (sync should have fixed this; if it didn't, the prior step printed the error).
-4. `python3 tools/aggregate-plans.py` — overwrite `daily-plan-summary.md` with each tracked repo's current `daily-plan.md`, weekend-tolerant staleness check, missing/stale plans visibly flagged. Also snapshots the aggregated summary into `daily-plan-archive/YYYY-MM-DD.md` (keyed by the summary's own date) so each day's plan is preserved for later review; the canonical `daily-plan-summary.md` stays overwrite-only.
+4. `python3 tools/aggregate-plans.py` — overwrite `daily-plan-summary.md` with an "At a glance" table (one row per repo: priority band, plan freshness, today's focus, days idle — fresh plans first, then by band) followed by each tracked repo's current `daily-plan.md`, weekend-tolerant staleness check, missing/stale plans visibly flagged. Also snapshots the aggregated summary into `daily-plan-archive/YYYY-MM-DD.md` (keyed by the summary's own date) so each day's plan is preserved for later review; the canonical `daily-plan-summary.md` stays overwrite-only.
 5. `python3 tools/commit-state.py` — advances `state.json` and commits `summary.md`, `daily-plan-summary.md`, `daily-plan-archive/`, and `state.json` together.
 
 `tools/run.py` is the orchestrator that runs all five steps; the manual flow above is for understanding or for hand-running individual steps.
@@ -41,7 +41,7 @@ When the user asks to add a repo to the tracker, run the full workflow — don't
 
 ## Config and state
 
-- `repos.yml` — tracked repo registry. Per-repo flags: `enabled` (default true), `report_inactivity` (default true), `branch` (default `main`).
+- `repos.yml` — tracked repo registry. Per-repo flags: `enabled` (default true), `report_inactivity` (default true), `branch` (default `main`), `priority` (default 3 — a band, lower = more important; sorts the "At a glance" table only, never `summary.md`).
 - `state.json` — `last_commit`, `last_synced`, `last_activity_date` per repo. Committed.
 - `daily-plan-archive/` — dated snapshots of `daily-plan-summary.md`, one per run (`YYYY-MM-DD.md`). Committed; append-only history of the aggregated plan. Per-repo `daily-plan.md` files are NOT archived here — they stay overwrite-only, with history in each repo's git log.
 - `tracked/` — gitignored cache of cloned repos.

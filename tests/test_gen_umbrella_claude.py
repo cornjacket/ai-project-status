@@ -256,3 +256,65 @@ def test_main_writes_file(tmp_path, monkeypatch):
     monkeypatch.setattr(gu, "enabled_repos", lambda: [{"name": "ai-foo"}])
     assert gu.main(["--path", str(umbrella)]) == 0
     assert "**ai-foo**" in (umbrella / "CLAUDE.md").read_text()
+
+
+# --- bare + worktree layouts ----------------------------------------------
+
+def _worktree_repo(umbrella: Path, name: str, branch: str = "main",
+                   plan: str | None = PLAN) -> None:
+    """A container whose .git is a FILE and whose checkout is a subdirectory —
+    the `git clone --bare` + `git worktree add` layout."""
+    base = umbrella / name
+    (base / ".bare").mkdir(parents=True)
+    (base / ".git").write_text("gitdir: ./.bare\n")
+    wt = base / branch
+    wt.mkdir()
+    (wt / ".git").write_text(f"gitdir: ../.bare/worktrees/{branch}\n")
+    if plan is not None:
+        (wt / "daily-plan.md").write_text(plan)
+
+
+def test_local_checkout_normal_clone(tmp_path):
+    umbrella = tmp_path / "workspace"
+    _repo(umbrella, "ai-foo")
+    (umbrella / "ai-foo" / ".git").mkdir()
+    assert gu.local_checkout(umbrella, "ai-foo") == umbrella / "ai-foo"
+
+
+def test_local_checkout_finds_the_worktree(tmp_path):
+    umbrella = tmp_path / "workspace"
+    _worktree_repo(umbrella, "ai-foo")
+    assert gu.local_checkout(umbrella, "ai-foo") == umbrella / "ai-foo" / "main"
+
+
+def test_local_checkout_prefers_the_tracked_branch(tmp_path):
+    umbrella = tmp_path / "workspace"
+    _worktree_repo(umbrella, "ai-foo", branch="develop")
+    _worktree_repo_extra = umbrella / "ai-foo" / "feature-x"
+    _worktree_repo_extra.mkdir()
+    (_worktree_repo_extra / ".git").write_text("gitdir: ../.bare/worktrees/x\n")
+    assert gu.local_checkout(umbrella, "ai-foo", "develop") == \
+        umbrella / "ai-foo" / "develop"
+
+
+def test_local_checkout_absent(tmp_path):
+    umbrella = tmp_path / "workspace"
+    umbrella.mkdir()
+    assert gu.local_checkout(umbrella, "ai-foo") is None
+
+
+def test_purpose_read_from_worktree_checkout(tmp_path, monkeypatch):
+    umbrella = tmp_path / "workspace"
+    monkeypatch.setattr(gu, "TRACKED_DIR", tmp_path / "tracked")
+    _worktree_repo(umbrella, "ai-foo")
+    assert gu.repo_purpose("ai-foo", umbrella) == \
+        "`ai-foo` builds widgets for the downstream factory pipeline every day."
+
+
+def test_roster_points_at_the_worktree_not_the_container(tmp_path, monkeypatch):
+    umbrella = tmp_path / "workspace"
+    monkeypatch.setattr(gu, "TRACKED_DIR", tmp_path / "tracked")
+    _worktree_repo(umbrella, "ai-foo")
+    block = gu.render_block([{"name": "ai-foo"}], umbrella)
+    assert "`./ai-foo/main`" in block
+    assert "not checked out locally" not in block
