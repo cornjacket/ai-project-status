@@ -1,7 +1,7 @@
 # Task: Draft next-day daily-plans from each repo's task state (human-reviewed, never auto-pushed)
 
 - **Created:** 2026-07-27
-- **Status:** PLANNED — not yet started. Design captured here for a later build pass.
+- **Status:** PLANNED — **next up (PLAN #1 of 3).** Not yet started; design captured here for the build pass.
 - **Owner:** David Taylor
 - **Scope decision:** DRAFT-ONLY. The tool **generates candidate `daily-plan.md`
   files for human review and never pushes** — approval and pushing are always the

@@ -1,7 +1,7 @@
 # Task: Missing-daily-plan reminder notifications
 
 - **Created:** 2026-06-29
-- **Status:** PLANNED — not yet started. Proposed feature; design captured here for a later build pass.
+- **Status:** PLANNED — **queued (PLAN #2 of 3).** Not yet started; proposed feature, design captured here for a later build pass.
 - **Owner:** David Taylor
 - **Scope decision:** TBD at build time. Default assumption: a new deterministic
   pipeline step (no `claude -p` call) that rides the existing daily run.
