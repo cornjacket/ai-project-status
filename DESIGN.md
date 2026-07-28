@@ -104,6 +104,8 @@ Two enforcement points keep `daily-plan.md` current:
 
 The aggregator is deterministic — no `claude -p` call. Per-repo plans are concatenated as written, with a visible `STALE` flag in the section header for any repo whose plan failed the freshness check, and a `no plan committed` line for repos that don't have one yet. Repos with `enabled: false` are skipped entirely, matching `summary.md` behavior.
 
+**Ordering.** The summary opens with an "At a glance" table sorted *fresh plans first, then priority band, then `repos.yml` order* — freshness leads because the table answers "what is live today" before "what matters most". The per-repo sections that follow are emitted in that **same** order, from the same `sort_rows` call over the same rows, so the table and the body cannot disagree and reading down the page follows the ranking you just scanned. `repos.yml` order survives only as the tie-breaker. This is deliberately *unlike* `summary.md`, which stays in `repos.yml` order: the retrospective rollup is a log, while the plan summary is a ranked worklist.
+
 If the daily routine is missed for a day or more (e.g., the user was offline and `tools/run.py` didn't run), the cure is to re-run it manually — `tools/run.py` will rebuild today's `daily-plan-summary.md` from whatever each repo's current `daily-plan.md` contains, and append a normal retrospective day section if there's been any activity.
 
 ## Bootstrapping a tracked repo

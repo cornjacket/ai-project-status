@@ -188,9 +188,12 @@ def sort_rows(rows):
     )
 
 
-def render_overview(repos, today: date) -> str:
-    """One-line-per-repo table above the full sections."""
-    rows = [overview_row(r, today) for r in repos]
+def render_overview(repos, today: date, rows=None) -> str:
+    """One-line-per-repo table above the full sections.
+
+    `rows` lets the caller pass in rows it already computed (build_summary needs
+    them to order the sections identically) instead of re-reading every plan."""
+    rows = rows if rows is not None else [overview_row(r, today) for r in repos]
     if not rows:
         return ""
     lines = [
@@ -275,19 +278,22 @@ def render_repo_section(
 def build_summary(today: date | None = None, repos=None) -> str:
     today = today or date.today()
     repos = repos if repos is not None else enabled_repos()
+    active = [r for r in repos if r.get("enabled", True)]
+    # One pass over the plans feeds both the table and the section order, so the
+    # two can never disagree: scanning the table and reading down the page are
+    # the same motion.
+    rows = [overview_row(r, today) for r in active]
+    overview = render_overview(active, today, rows=rows)
     sections = [
         render_repo_section(
-            r["name"],
-            TRACKED_DIR / r["name"] / "daily-plan.md",
+            active[i]["name"],
+            TRACKED_DIR / active[i]["name"] / "daily-plan.md",
             today,
-            r.get("remote"),
+            active[i].get("remote"),
         )
-        for r in repos
-        if r.get("enabled", True)
+        for i, _ in sort_rows(rows)
     ]
     body = "\n".join(sections)
-    active = [r for r in repos if r.get("enabled", True)]
-    overview = render_overview(active, today)
     return (
         f"# Daily plan summary — {today.isoformat()}\n\n"
         "<!-- Auto-aggregated by tools/aggregate-plans.py from each tracked "

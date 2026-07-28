@@ -15,29 +15,6 @@
 | [captains-log](https://github.com/cornjacket/captains-log) | P2 | 2026-07-27 | **Day 1 of the Kaggle intensive — *Introduction to Agents*:**… | today |
 | [customer-req-responder](https://github.com/cornjacket/customer-req-responder) | P3 | **STALE** 2026-05-29 | — | today |
 
-## [second-brain-test](https://github.com/cornjacket/second-brain-test) — plan for 2026-07-27
-
-**What this repo is (for a newcomer):** `second-brain-test` is the *golden reference* for the devkit
-next door — a hand-built, known-good copy of a generated brain. Features are prototyped **here by
-hand first**; once they behave, they are vendored into the devkit as its regression baseline. The
-workbench, not the product.
-
-**Last implemented:** #38 (permission-denied ≠ empty) prototyped and vendored; the golden is clean,
-with no mid-prototype work parked.
-
-**Focus / plan:**
-- **Prototype #39 — the embed-excluded block — HERE by hand:** a marker that keeps decorative text
-  (ASCII diagrams) out of `canonical_body()` for both embedding and the content hash.
-- Prove the invariant: editing the marked region must **not** re-embed or flag the vector stale.
-- Then hand it to the devkit loop: `vendor_golden.py` → `build_template.py` → `tools/ci.py` green.
-- Keep the search backend on `test` so the vendored snapshot stays byte-for-byte stable.
-
-```
- workbench: prototype #39 by hand → vendor into the devkit
-   7/21 ▶ marked decorative block: strip from embed + hash · prove edit-doesn't-re-embed
-   guardrail: backend = test; prototype → vendor → devkit CI stays green
-```
-
 ## [second-brain-devkit](https://github.com/cornjacket/second-brain-devkit) — plan for 2026-07-27
 
 **What this repo is (for a newcomer):** `second-brain-devkit` is a *generator*. It builds a personal
@@ -61,27 +38,60 @@ hash) — is filed but not yet built; it is the next build.
    guardrail: strip the decorative region from BOTH the embedding and the content hash
 ```
 
-## [customer-req-responder](https://github.com/cornjacket/customer-req-responder) — STALE (last plan: 2026-05-29)
+## [create-project-system](https://github.com/cornjacket/create-project-system) — plan for 2026-07-27
 
-Decide the workflow methodology for this project going forward. Researched the field
-(GSD, Superpowers, Claude Skills, chub, Everything Claude Code, paperclip, RooFlow, Open Design)
-via parallel subagents. Decision: **switch to Superpowers** for this project (single framework,
-not stacked with GSD). Rationale: small greenfield TS/Node pipeline is an ideal TDD fit, fresh
-learning ground that feeds the homegrown ai-builder framework, and low-risk to trial at this size.
-Two known gaps to own deliberately: (a) no LLM/eval phase like GSD's AI-SPEC / eval-review — will
-hand-spec the eval or author an own eval skill; (b) draft-quality is non-deterministic, so TDD
-covers the plumbing while a separate Gemini-as-judge eval loop covers generation. The log.md /
-daily-plan.md / ai-project-status discipline is framework-agnostic and stays. Next: set up
-Superpowers and start brainstorm on the 6 blocking open questions toward SPEC.md.
+**What this repo is (for a newcomer):** A Cookiecutter-style *generator* that
+installs a Markdown-based project-management workspace — a task tracker
+(`tasks/`) plus periodic status reports (`status/`) — into any target repo at a
+caller-chosen mount, non-destructively and re-runnably.
+
+**Last implemented:** Option B — added the `--with-status` layer so the
+generator reproduces the whole `project/` workspace (tasks + status), not just
+the tasks pillar; renamed the repo `create-task-system` → `create-project-system`
+to match. Self-test at 61 assertions green; new `project` golden fixture pins the
+container layout.
+
+**Focus / plan:**
+
+- **Task 07 — first real rollout: generate into `second-brain/`.** Run at repo
+  root (siblings of `vault/`, never inside it):
+  `--tasks-dir project/tasks --epic main --with-status --with-skill`.
+- Smoke-test the emitted scripts from the second-brain root; **review the diff
+  before committing** anything into that live repo.
+- Confirm no overlap with second-brain's own `install_skill.py` / `.claude/`.
+- Low-priority cleanup: update the 3 second-brain notes that still cite the old
+  `create-task-system` name.
+- If 07 lands cleanly, tee up **task 08** (captains-log).
 
 ```
-  workflow decision                    spec work (via Superpowers)
-  ┌──────────────────────────┐        ┌─────────────────────────────┐
-  │ research candidates   ok │        │ /superpowers:brainstorm  --> │
-  │ score vs project      ok │   -->  │ answer blocking Qs           │ --> plan
-  │ DECISION: Superpowers ok │        │ (2,4,5,7,9,11)               │
-  └──────────────────────────┘        └─────────────────────────────┘
-   replace GSD, keep ai-builder log     own the eval loop separately
+today ─┐
+       ▼
+   [07] second-brain  ──►  [08] captains-log  ──►  [09] task-free ai-builder
+   generate @ root         (next)                  (closes the loop)
+   project/{tasks,status}
+```
+
+## [second-brain-test](https://github.com/cornjacket/second-brain-test) — plan for 2026-07-27
+
+**What this repo is (for a newcomer):** `second-brain-test` is the *golden reference* for the devkit
+next door — a hand-built, known-good copy of a generated brain. Features are prototyped **here by
+hand first**; once they behave, they are vendored into the devkit as its regression baseline. The
+workbench, not the product.
+
+**Last implemented:** #38 (permission-denied ≠ empty) prototyped and vendored; the golden is clean,
+with no mid-prototype work parked.
+
+**Focus / plan:**
+- **Prototype #39 — the embed-excluded block — HERE by hand:** a marker that keeps decorative text
+  (ASCII diagrams) out of `canonical_body()` for both embedding and the content hash.
+- Prove the invariant: editing the marked region must **not** re-embed or flag the vector stale.
+- Then hand it to the devkit loop: `vendor_golden.py` → `build_template.py` → `tools/ci.py` green.
+- Keep the search backend on `test` so the vendored snapshot stays byte-for-byte stable.
+
+```
+ workbench: prototype #39 by hand → vendor into the devkit
+   7/21 ▶ marked decorative block: strip from embed + hash · prove edit-doesn't-re-embed
+   guardrail: backend = test; prototype → vendor → devkit CI stays green
 ```
 
 ## [create-ai-builder](https://github.com/cornjacket/create-ai-builder) — plan for 2026-07-27
@@ -155,35 +165,25 @@ morning ──────────── midday ─────────�
   Agents] read        material]                               sketch]
 ```
 
-## [create-project-system](https://github.com/cornjacket/create-project-system) — plan for 2026-07-27
+## [customer-req-responder](https://github.com/cornjacket/customer-req-responder) — STALE (last plan: 2026-05-29)
 
-**What this repo is (for a newcomer):** A Cookiecutter-style *generator* that
-installs a Markdown-based project-management workspace — a task tracker
-(`tasks/`) plus periodic status reports (`status/`) — into any target repo at a
-caller-chosen mount, non-destructively and re-runnably.
-
-**Last implemented:** Option B — added the `--with-status` layer so the
-generator reproduces the whole `project/` workspace (tasks + status), not just
-the tasks pillar; renamed the repo `create-task-system` → `create-project-system`
-to match. Self-test at 61 assertions green; new `project` golden fixture pins the
-container layout.
-
-**Focus / plan:**
-
-- **Task 07 — first real rollout: generate into `second-brain/`.** Run at repo
-  root (siblings of `vault/`, never inside it):
-  `--tasks-dir project/tasks --epic main --with-status --with-skill`.
-- Smoke-test the emitted scripts from the second-brain root; **review the diff
-  before committing** anything into that live repo.
-- Confirm no overlap with second-brain's own `install_skill.py` / `.claude/`.
-- Low-priority cleanup: update the 3 second-brain notes that still cite the old
-  `create-task-system` name.
-- If 07 lands cleanly, tee up **task 08** (captains-log).
+Decide the workflow methodology for this project going forward. Researched the field
+(GSD, Superpowers, Claude Skills, chub, Everything Claude Code, paperclip, RooFlow, Open Design)
+via parallel subagents. Decision: **switch to Superpowers** for this project (single framework,
+not stacked with GSD). Rationale: small greenfield TS/Node pipeline is an ideal TDD fit, fresh
+learning ground that feeds the homegrown ai-builder framework, and low-risk to trial at this size.
+Two known gaps to own deliberately: (a) no LLM/eval phase like GSD's AI-SPEC / eval-review — will
+hand-spec the eval or author an own eval skill; (b) draft-quality is non-deterministic, so TDD
+covers the plumbing while a separate Gemini-as-judge eval loop covers generation. The log.md /
+daily-plan.md / ai-project-status discipline is framework-agnostic and stays. Next: set up
+Superpowers and start brainstorm on the 6 blocking open questions toward SPEC.md.
 
 ```
-today ─┐
-       ▼
-   [07] second-brain  ──►  [08] captains-log  ──►  [09] task-free ai-builder
-   generate @ root         (next)                  (closes the loop)
-   project/{tasks,status}
+  workflow decision                    spec work (via Superpowers)
+  ┌──────────────────────────┐        ┌─────────────────────────────┐
+  │ research candidates   ok │        │ /superpowers:brainstorm  --> │
+  │ score vs project      ok │   -->  │ answer blocking Qs           │ --> plan
+  │ DECISION: Superpowers ok │        │ (2,4,5,7,9,11)               │
+  └──────────────────────────┘        └─────────────────────────────┘
+   replace GSD, keep ai-builder log     own the eval loop separately
 ```

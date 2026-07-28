@@ -316,6 +316,56 @@ def test_build_summary_includes_the_overview(tmp_path, monkeypatch):
     assert out.index("## At a glance") < out.index("## ai-foo")
 
 
+def _write_plan(root, name, plan_date):
+    (root / name).mkdir()
+    (root / name / "daily-plan.md").write_text(
+        f"# Daily plan — {plan_date}\n\n**Focus / plan:**\n\n- Ship {name}\n"
+    )
+
+
+def test_build_summary_sections_follow_the_overview_order(tmp_path, monkeypatch):
+    """Sections are ordered by sort_rows, not repos.yml — same as the table."""
+    monkeypatch.setattr(ap, "TRACKED_DIR", tmp_path)
+    monkeypatch.setattr(ap, "target_drift", lambda name: [])
+    _write_plan(tmp_path, "ai-stale-p1", "2026-04-30")
+    _write_plan(tmp_path, "ai-fresh-p3", "2026-05-06")
+    out = ap.build_summary(
+        today=date(2026, 5, 6),
+        repos=[
+            {"name": "ai-stale-p1", "priority": 1},
+            {"name": "ai-fresh-p3", "priority": 3},
+        ],
+    )
+    assert out.index("## ai-fresh-p3") < out.index("## ai-stale-p1")
+    # The table and the body agree row-for-row.
+    table, body = out.split("## ai-", 1)
+    assert table.index("ai-fresh-p3") < table.index("ai-stale-p1")
+
+
+def test_build_summary_sections_order_by_band_within_a_group(tmp_path, monkeypatch):
+    monkeypatch.setattr(ap, "TRACKED_DIR", tmp_path)
+    monkeypatch.setattr(ap, "target_drift", lambda name: [])
+    for name in ("ai-b", "ai-a"):
+        _write_plan(tmp_path, name, "2026-05-06")
+    out = ap.build_summary(
+        today=date(2026, 5, 6),
+        repos=[{"name": "ai-b", "priority": 3}, {"name": "ai-a", "priority": 1}],
+    )
+    assert out.index("## ai-a") < out.index("## ai-b")
+
+
+def test_build_summary_sections_keep_repos_yml_order_on_ties(tmp_path, monkeypatch):
+    monkeypatch.setattr(ap, "TRACKED_DIR", tmp_path)
+    monkeypatch.setattr(ap, "target_drift", lambda name: [])
+    for name in ("ai-second", "ai-first"):
+        _write_plan(tmp_path, name, "2026-05-06")
+    out = ap.build_summary(
+        today=date(2026, 5, 6),
+        repos=[{"name": "ai-second"}, {"name": "ai-first"}],
+    )
+    assert out.index("## ai-second") < out.index("## ai-first")
+
+
 # --- drift callout in the per-repo section ---------------------------------
 
 def test_drift_notice_empty_when_in_sync(monkeypatch):

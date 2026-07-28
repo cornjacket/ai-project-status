@@ -79,7 +79,7 @@ Internally:
 3. For each `ACTIVE` repo, one `claude -p` call produces a per-repo summary; all reportable `INACTIVE` repos collapse into a single `### No updates` block at the bottom of the day section.
 4. If two or more repos are active, a final `claude -p` polish pass merges cross-repo themes.
 5. The polished day section is prepended to `summary.md`.
-6. `tools/aggregate-plans.py` overwrites `daily-plan-summary.md` with each tracked repo's current `daily-plan.md`, applying a weekend-tolerant staleness check (missing or stale plans are visibly flagged), and snapshots the result into `daily-plan-archive/YYYY-MM-DD.md`. The file opens with an **At a glance** table — one row per repo (priority band, plan freshness, today's focus, days since the last commit), repos with a fresh plan first and each group ordered by band, so the portfolio is scannable before you read any section.
+6. `tools/aggregate-plans.py` overwrites `daily-plan-summary.md` with each tracked repo's current `daily-plan.md`, applying a weekend-tolerant staleness check (missing or stale plans are visibly flagged), and snapshots the result into `daily-plan-archive/YYYY-MM-DD.md`. The file opens with an **At a glance** table — one row per repo (priority band, plan freshness, today's focus, days since the last commit), repos with a fresh plan first and each group ordered by band, so the portfolio is scannable before you read any section. The per-repo sections below follow that same order, so scanning the table and reading down the page are the same motion.
 7. `tools/commit-state.py` advances `state.json` and commits `summary.md`, `daily-plan-summary.md`, `daily-plan-archive/`, and `state.json` together.
 
 ### Useful flags

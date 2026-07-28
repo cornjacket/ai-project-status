@@ -24,7 +24,7 @@ When the user asks to add a repo to the tracker, run the full workflow — don't
    - All `INACTIVE` repos collapse into a single `### No updates` subsection at the END of the day section, one bullet per repo: `- <repo-name> (for N days)` (or `- <repo-name> (no activity recorded yet)`). Repos appear in `repos.yml` order. Omit the section entirely when no repos are inactive.
    - For each repo marked `INACTIVE_SUPPRESSED`: omit it entirely.
    - For each repo marked `NOT_SYNCED`: omit it (sync should have fixed this; if it didn't, the prior step printed the error).
-4. `python3 tools/aggregate-plans.py` — overwrite `daily-plan-summary.md` with an "At a glance" table (one row per repo: priority band, plan freshness, today's focus, days idle — fresh plans first, then by band) followed by each tracked repo's current `daily-plan.md`, weekend-tolerant staleness check, missing/stale plans visibly flagged. Also snapshots the aggregated summary into `daily-plan-archive/YYYY-MM-DD.md` (keyed by the summary's own date) so each day's plan is preserved for later review; the canonical `daily-plan-summary.md` stays overwrite-only.
+4. `python3 tools/aggregate-plans.py` — overwrite `daily-plan-summary.md` with an "At a glance" table (one row per repo: priority band, plan freshness, today's focus, days idle — fresh plans first, then by band) followed by each tracked repo's current `daily-plan.md` **in that same order**, weekend-tolerant staleness check, missing/stale plans visibly flagged. Also snapshots the aggregated summary into `daily-plan-archive/YYYY-MM-DD.md` (keyed by the summary's own date) so each day's plan is preserved for later review; the canonical `daily-plan-summary.md` stays overwrite-only.
 5. `python3 tools/commit-state.py` — advances `state.json` and commits `summary.md`, `daily-plan-summary.md`, `daily-plan-archive/`, and `state.json` together.
 
 `tools/run.py` is the orchestrator that runs all five steps; the manual flow above is for understanding or for hand-running individual steps.
@@ -51,7 +51,7 @@ When the user asks to add a repo to the tracker, run the full workflow — don't
 - `tools/sync.py` — clone/pull every enabled repo
 - `tools/diff.py <repo-name>` — diff for one repo since its `last_commit` (debugging aid)
 - `tools/new-work.py` — full structured report you consume to write `summary.md`
-- `tools/aggregate-plans.py` — rebuild `daily-plan-summary.md` from each repo's `daily-plan.md`, and snapshot it into `daily-plan-archive/YYYY-MM-DD.md`
+- `tools/aggregate-plans.py` — rebuild `daily-plan-summary.md` from each repo's `daily-plan.md` (table and sections share one sort: fresh first, then band, then `repos.yml` order), and snapshot it into `daily-plan-archive/YYYY-MM-DD.md`
 - `tools/commit-state.py` — advance `state.json`, commit `summary.md` + `daily-plan-summary.md` + `daily-plan-archive/` + `state.json`
 - `tools/run.py` — orchestrator that runs the full update cycle
 - `tools/gen-umbrella-claude.py` — regenerate the workspace-root (umbrella) `CLAUDE.md` from `repos.yml`. Local-only; NOT part of the update cycle. Re-run when a repo is added or removed.
