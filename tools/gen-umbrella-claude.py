@@ -26,10 +26,10 @@ import re
 import sys
 from pathlib import Path
 
-from _lib import REPO_ROOT, TRACKED_DIR, enabled_repos
+from _lib import REPO_ROOT, TRACKED_DIR, UMBRELLA_DIR, enabled_repos, local_checkout
 
 # The workspace root is project-status's parent: ~/src/github.com/cornjacket/
-DEFAULT_UMBRELLA_DIR = REPO_ROOT.parent
+DEFAULT_UMBRELLA_DIR = UMBRELLA_DIR
 
 BEGIN_MARKER = "<!-- project-status:begin -->"
 END_MARKER = "<!-- project-status:end -->"
@@ -93,29 +93,8 @@ def extract_purpose(text: str) -> str | None:
     return _summarize(blob)
 
 
-def local_checkout(umbrella: Path, name: str, branch: str = "main") -> Path | None:
-    """Working tree for `name` under the umbrella, or None if absent.
-
-    Handles the **bare + worktree** layout as well as an ordinary clone: there,
-    `<repo>/` is a container whose `.git` is a *file* (or which holds a `.bare/`
-    dir), and the actual checkouts are immediate subdirectories — so the files
-    live at `<repo>/main/`, not `<repo>/`. Pointing the roster at the container
-    would name a path with no source in it."""
-    base = umbrella / name
-    if not base.is_dir():
-        return None
-    if (base / ".git").is_dir():
-        return base
-    if (base / ".git").is_file() or (base / ".bare").is_dir():
-        worktrees = [
-            d for d in sorted(base.iterdir()) if d.is_dir() and (d / ".git").exists()
-        ]
-        for d in worktrees:
-            if d.name == branch:
-                return d
-        if worktrees:
-            return worktrees[0]
-    return base
+# `local_checkout` lives in _lib: replan.py resolves the same paths to decide
+# where a drafted plan would land, and a second copy would be a second answer.
 
 
 def plan_sources(name: str, umbrella: Path, branch: str = "main"):
@@ -205,6 +184,10 @@ them fresh.
   across all tracked repos, newest first.
 - `project-status/repos.yml` — the tracked-repo registry (source of the roster
   above).
+
+Draft next-day `daily-plan.md` files across every locally checked-out repo:
+`python3 project-status/tools/replan.py` — rewrites each plan in place and leaves
+it uncommitted for you to review, commit, and push. It never commits or pushes.
 
 ## Cross-repo conventions
 

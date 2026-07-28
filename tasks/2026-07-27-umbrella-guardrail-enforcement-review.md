@@ -1,8 +1,8 @@
 # Task: Review how to stop umbrella-session work on tracked repos (all mechanisms)
 
 - **Created:** 2026-07-27
-- **Status:** OPEN — unassigned. Review/design task; evaluate options, then split
-  out whichever are adopted as their own build tasks.
+- **Status:** OPEN — **queued (PLAN #3 of 3).** Unassigned. Review/design task;
+  evaluate options, then split out whichever are adopted as their own build tasks.
 - **Owner:** _unassigned_
 
 ## The issue

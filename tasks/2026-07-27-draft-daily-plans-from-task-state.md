@@ -1,7 +1,12 @@
 # Task: Draft next-day daily-plans from each repo's task state (human-reviewed, never auto-pushed)
 
 - **Created:** 2026-07-27
-- **Status:** PLANNED — **next up (PLAN #1 of 3).** Not yet started; design captured here for the build pass.
+- **Status:** DONE — 2026-07-27. `tools/replan.py` shipped with `prompts/replan.md`
+  and `tests/test_replan.py` (38 tests); plans rewritten **in place, uncommitted**,
+  with git as the review surface; `local_checkout` lifted into `_lib.py` so the
+  roster and the drafts resolve the same paths; documented in `CLAUDE.md`,
+  `README.md`, and the umbrella pointer. Smoke-tested live against `captains-log`
+  (verdict `kept`, correctly conservative).
 - **Owner:** David Taylor
 - **Scope decision:** DRAFT-ONLY. The tool **generates candidate `daily-plan.md`
   files for human review and never pushes** — approval and pushing are always the
@@ -92,19 +97,22 @@ bloat the always-on umbrella `CLAUDE.md`. So:
 
 ### Where drafts land / the review surface — resolve at build time
 
-The tool produces **multiple drafts for one batch review**, then stops. How the
-drafts are staged is the main open decision (see Decisions):
+The tool produces **multiple drafts for one batch review**, then stops.
 
-- **Option A — staging dir (leaning toward this):** write drafts to a review area
-  (e.g. `project-status/drafts/<date>/<repo>.md`, gitignored) and print a summary
-  table. Working trees stay clean until the human approves; an optional `--apply`
-  step copies approved drafts into their repos. Cleanest separation; partial
-  approval is trivial.
-- **Option B — in-place, uncommitted:** overwrite each repo's `daily-plan.md` in
-  the working tree and let the human review via `git diff` per repo, then commit &
-  push what they approve. Uses git as the review surface but leaves N dirty working
-  trees; rejecting some means reverting those.
-- **Never:** commit-and-push, or commit at all without explicit human direction.
+**Resolved: Option B — in-place, uncommitted.** Each repo's `daily-plan.md` is
+overwritten in its working tree and left unstaged. The human reviews the batch in
+VS Code's Source Control view (which already lists every modified
+version-controlled file across the workspace) or via `git diff` per repo, then
+commits and pushes what they approve, from inside each repo. The run's last line
+says exactly that.
+
+The staging-dir alternative (Option A: `drafts/<date>/<repo>.md` + `--apply`) was
+built first and reversed: it kept working trees clean, but at the cost of putting
+the artifact somewhere the human's review tool doesn't look, plus a copy step
+between the two. Dirty working trees are not a side effect here — they *are* the
+notification.
+
+**Never:** commit-and-push, or stage or commit at all. Approval is the human's.
 
 ### Resumability / robustness
 
@@ -150,36 +158,81 @@ clear per-repo loop with isolated failures over one all-or-nothing parallel spaw
 - **Prompt lives in `templates/replan-prompt.md`; umbrella `CLAUDE.md` gets a
   one-line pointer only.** ✅
 
-**Remaining (resolve at build time):**
+**Resolved at build time (2026-07-27):**
 
-1. **Review surface** — staging dir + optional `--apply` (Option A, leaning) vs.
-   in-place uncommitted `git diff` (Option B).
-2. **Draft target date** — default to the next business day (forward-looking,
-   reuse the weekday-skipping logic) vs. an explicit `--date` argument; confirm
-   Friday → Monday behavior.
-3. **Parallel vs. sequential fan-out** — given the login-expiry failure mode,
-   decide whether isolated-failure parallelism is worth it over a simpler
-   sequential loop with per-repo status.
-4. **Keep-vs-advance authority** — does the agent decide per repo from task state
-   (preferred), or does the tool always draft and let the human decide? Preferred:
-   agent decides, conservative default = keep.
+1. **Review surface — Option B, in place.** Built as Option A (staging dir +
+   `--apply`) first and **reversed by the operator the same day**: the review tool
+   is already open. VS Code's Source Control view lists every modified
+   version-controlled file across the workspace, so writing the plan straight into
+   each repo's working tree *is* the batch review — a staging dir just added a
+   second place to look and a copy step between them. So: rewrite `daily-plan.md`
+   in place, leave it uncommitted, and end the run with "review the daily-plans,
+   commit, and push." Never stage, never commit, never push. The clobber guard
+   survives from Option A — a `daily-plan.md` with uncommitted changes is skipped
+   (`--force` overrides), because that is work git cannot give back.
+
+   *Lesson worth keeping:* when the human's review already happens in a tool that
+   watches the working tree, a staging area is not neutral overhead — it moves the
+   artifact **out of** the surface they actually read. ✅
+2. **Target date — next business day, `--date` overrides.** Fri/Sat/Sun all point
+   at Monday, matching the aggregator's weekend tolerance: a Friday plan stays
+   fresh through Sunday, so Monday's is the one actually missing. ✅
+3. **Fan-out — sequential.** The failure mode that actually bit is *shared* (an
+   expired login kills every concurrent call at once), so parallelism would buy
+   wall-clock at the cost of legible output and re-run clarity. Resumability comes
+   from the plan files themselves: a re-run skips any repo whose plan is already
+   dated for the target (`--force` redrafts), failures are isolated per repo, and
+   writes are atomic (temp file + rename) so no repo is ever left half-written.
+   Deriving idempotency from the plan's own header rather than a sidecar ledger
+   means the tool can't disagree with what's on disk. ✅
+4. **Keep-vs-advance — the agent decides, conservatively.** It reports
+   `advanced` / `kept` / `blocked` and the tool passes that straight into the
+   status table, so the human sees *which* repos actually moved. ✅
+
+**Amended:**
+
+- **Prompt lives in `prompts/replan.md`, not `templates/replan-prompt.md`.** The
+  substance of the decision (versioned single-source file, one-line pointer in the
+  umbrella `CLAUDE.md`) is unchanged; only the directory moved. `templates/` holds
+  files *installed into* tracked repos — `check-targets.py` diffs every one of
+  them against the checkouts — while `prompts/` is already the home for `claude -p`
+  templates (`per-repo.md`, `polish.md`). A prompt in `templates/` would blur what
+  that directory means.
 
 ## To-do checklist
 
-- [ ] Add repo → local-checkout-path resolution (worktree-aware; skip
-      not-checked-out repos), reusing `gen-umbrella-claude.py`'s sibling logic.
-- [ ] Author `templates/replan-prompt.md`: read the repo's task system + git log →
-      draft a `daily-plan.md` for the target date; conservative keep-and-re-date
-      default; never edit tasks; surface "tasks too stale to derive a plan."
-- [ ] Build `tools/replan.py`: resolve roster → per-repo `claude -p` (cwd = repo)
-      → stage drafts → per-repo status report. Never pushes; never commits without
-      explicit direction.
-- [ ] Decide + implement the review surface (staging dir + `--apply`, or in-place).
-- [ ] Add the one-line pointer to the umbrella `CLAUDE.md` template in
-      `gen-umbrella-claude.py`.
-- [ ] Make the batch re-runnable / per-repo idempotent (isolated failures, clean
-      partial state) — motivated by the 2026-07-27 login-expiry mid-batch failure.
-- [ ] Document the command in `CLAUDE.md` (its own section; local-only, draft-only,
-      not part of the remote cycle) and cross-link the reminder task.
-- [ ] Resolve the remaining build-time decisions (review surface, target-date
-      math, fan-out shape, keep-vs-advance authority).
+- [x] Add repo → local-checkout-path resolution (worktree-aware; skip
+      not-checked-out repos). Rather than reuse `gen-umbrella-claude.py`'s copy,
+      `local_checkout` was lifted into `_lib.py`: the roster and the drafts must
+      resolve to the same path, and two copies would eventually be two answers.
+- [x] Author the prompt (`prompts/replan.md`): read the repo's task system + git
+      log → draft a `daily-plan.md` for the target date; conservative
+      keep-and-re-date default; never edit tasks; surface "tasks too stale to
+      derive a plan" as `blocked`.
+- [x] Build `tools/replan.py`: resolve roster → per-repo `claude -p` (cwd = repo)
+      → stage drafts → per-repo status report. Never pushes; never commits.
+- [x] Decide + implement the review surface (in-place + uncommitted; git and the
+      editor's source-control view are the review surface).
+- [x] Add the one-line pointer to the umbrella `CLAUDE.md` template in
+      `gen-umbrella-claude.py` (and to the live artifact, which sits outside the
+      generated markers).
+- [x] Make the batch re-runnable / per-repo idempotent (isolated failures,
+      atomic draft writes, status persisted after every repo).
+- [x] Document the command in `CLAUDE.md` (its own section), `README.md`, and the
+      umbrella pointer.
+- [x] Resolve the remaining build-time decisions (above).
+
+## Enforced, not merely asked
+
+The "never edits tasks" rule is a CLI flag, not a sentence in the prompt: the
+agent runs with `--disallowedTools Write,Edit,NotebookEdit,…` and an allowlist of
+read-only `Bash(git log:*)`-style commands. The prompt still states the rule (the
+agent should understand *why* it is read-only), but the guarantee doesn't depend
+on it complying. Its whole output is text on stdout; the tool owns every write.
+
+## Follow-on
+
+The *nudge* side — [`2026-06-29-daily-plan-reminder.md`](2026-06-29-daily-plan-reminder.md)
+— is now the only half of the loop still unbuilt. `replan.py --report` already
+prints the state a notifier would send, so the reminder can lean on it rather than
+re-deriving freshness.

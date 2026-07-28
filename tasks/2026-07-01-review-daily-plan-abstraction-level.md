@@ -1,7 +1,7 @@
 # Task: Review daily-plan summaries for abstraction level & readability
 
 - **Created:** 2026-07-01
-- **Status:** OPEN — **queued (PLAN #3 of 3).** Unassigned recurring review task; not yet started.
+- **Status:** OPEN — **queued (PLAN #2 of 3).** Unassigned recurring review task; not yet started.
 - **Owner:** _unassigned_
 
 ## Goal

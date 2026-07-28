@@ -1,4 +1,7 @@
 tracked/
+# tools/replan.py's last-run ledger, for `--report` only. The plans themselves
+# live (uncommitted, until you commit them) in the repos that own them.
+.replan-last-run.json
 __pycache__/
 *.pyc
 .venv/

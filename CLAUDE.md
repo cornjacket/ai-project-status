@@ -29,6 +29,38 @@ When the user asks to add a repo to the tracker, run the full workflow — don't
 
 `tools/run.py` is the orchestrator that runs all five steps; the manual flow above is for understanding or for hand-running individual steps.
 
+## Draft next-day daily-plans (local-only, human-invoked)
+
+`python3 tools/replan.py` fans out one `claude -p` per tracked repo, each rooted
+in that repo's own local checkout, and rewrites that repo's `daily-plan.md` in
+place for the next business day. Two rules define it:
+
+- **Draft-only — git is the review surface.** Plans are written to the working
+  tree and left **uncommitted**; the tool never stages, commits, or pushes. Every
+  drafted plan shows up as a modified file (VS Code's Source Control view,
+  `git diff`), and the run ends by telling the human to review, commit, and push
+  from inside each repo. It refuses to overwrite a `daily-plan.md` that already
+  has uncommitted changes — that's work git can't give back (`--force` overrides).
+- **The plan is read from task state, not invented.** The human encodes intent by
+  curating each repo's task system; the agent derives the plan from that state
+  plus the git log, and defaults to keeping the current plan re-dated whenever
+  the next step isn't unambiguous. It runs read-only (no Write/Edit tools), so it
+  cannot edit the tasks it reads and the tool owns every write. `blocked` in the
+  report means the task state is too stale to derive a plan — that's a signal to
+  curate tasks, not a bug.
+
+Local-only, like `gen-umbrella-claude.py`: it writes to working checkouts that
+don't exist in the routine sandbox, so it is deliberately **not** part of
+`tools/run.py` or the cloud `/schedule` routine. The prompt lives in
+`prompts/replan.md` (single source of truth); the umbrella `CLAUDE.md` carries
+only a one-line pointer, spliced in by `gen-umbrella-claude.py`.
+
+Re-runnable: a repo whose plan is already dated for the target is skipped
+(`--force` to redraft) and per-repo failures are isolated, so a batch that dies
+partway resumes without re-spending calls. The idempotency key is the plan's own
+header date, so the tool can never disagree with what's on disk. Other flags:
+`--date`, `--only`, `--dry-run`, `--report`, `--timeout`, `--model`.
+
 ## Summarization rules
 
 - **Daily resolution.** One `## YYYY-MM-DD` section per run.
@@ -55,5 +87,6 @@ When the user asks to add a repo to the tracker, run the full workflow — don't
 - `tools/commit-state.py` — advance `state.json`, commit `summary.md` + `daily-plan-summary.md` + `daily-plan-archive/` + `state.json`
 - `tools/run.py` — orchestrator that runs the full update cycle
 - `tools/gen-umbrella-claude.py` — regenerate the workspace-root (umbrella) `CLAUDE.md` from `repos.yml`. Local-only; NOT part of the update cycle. Re-run when a repo is added or removed.
+- `tools/replan.py` — draft next-day `daily-plan.md` files for human review, one `claude -p` per locally checked-out repo. Local-only, draft-only; NOT part of the update cycle. See the section above.
 - `tools/check-targets.py` — report tracked repos whose injected `CLAUDE.md` block or `project-status-guide.md` has drifted from `templates/`. Exits non-zero on drift. The same check is surfaced per repo in `daily-plan-summary.md`, so this is the one-shot whole-portfolio view. Fix with `./setup-new-repo.sh --update <remote>`.
 - `hooks/check-repo-bootstrap.py` — user-level `SessionStart` hook (registered in `~/.claude/settings.json`, not in any target repo). Nudges when a git repo under the workspace root has no project-status block in its `CLAUDE.md` — i.e. it was never bootstrapped. Silent for bootstrapped repos, for project-status itself, outside the workspace root, and in any repo containing `.project-status-ignore`.

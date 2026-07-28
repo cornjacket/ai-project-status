@@ -7,6 +7,10 @@ from pathlib import Path
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+# The workspace root: the directory holding project-status and every sibling
+# repo checkout (~/src/github.com/cornjacket/). Local-only — it does not exist
+# in the remote routine sandbox, so only local-only tools may rely on it.
+UMBRELLA_DIR = REPO_ROOT.parent
 REPOS_YML = REPO_ROOT / "repos.yml"
 STATE_JSON = REPO_ROOT / "state.json"
 TRACKED_DIR = REPO_ROOT / "tracked"
@@ -102,6 +106,35 @@ def target_drift(name):
     elif guide.read_text().strip() != GUIDE_TEMPLATE.read_text().strip():
         problems.append(f"{GUIDE_FILENAME} is out of date")
     return problems
+
+
+def local_checkout(umbrella, name, branch="main"):
+    """Working tree for `name` under the umbrella dir, or None if absent.
+
+    Handles the **bare + worktree** layout as well as an ordinary clone: there,
+    `<repo>/` is a container whose `.git` is a *file* (or which holds a `.bare/`
+    dir), and the actual checkouts are immediate subdirectories — so the files
+    live at `<repo>/main/`, not `<repo>/`. Pointing a caller at the container
+    would name a path with no source in it.
+
+    Shared by gen-umbrella-claude.py (roster paths) and replan.py (where drafts
+    land), so the two can't disagree about where a repo actually lives.
+    """
+    base = Path(umbrella) / name
+    if not base.is_dir():
+        return None
+    if (base / ".git").is_dir():
+        return base
+    if (base / ".git").is_file() or (base / ".bare").is_dir():
+        worktrees = [
+            d for d in sorted(base.iterdir()) if d.is_dir() and (d / ".git").exists()
+        ]
+        for d in worktrees:
+            if d.name == branch:
+                return d
+        if worktrees:
+            return worktrees[0]
+    return base
 
 
 def load_state():
