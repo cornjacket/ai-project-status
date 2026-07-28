@@ -185,9 +185,14 @@ them fresh.
 - `project-status/repos.yml` — the tracked-repo registry (source of the roster
   above).
 
-Draft next-day `daily-plan.md` files across every locally checked-out repo:
-`python3 project-status/tools/replan.py` — rewrites each plan in place and leaves
-it uncommitted for you to review, commit, and push. It never commits or pushes.
+Two commands worth knowing, both run from here and both local-only:
+
+- `python3 project-status/tools/check-pending.py` — uncommitted *and* unpushed
+  work across every tracked repo (worktrees included). `--all` sweeps every git
+  repo in this directory. Exits non-zero when anything is pending.
+- `python3 project-status/tools/replan.py` — draft next-day `daily-plan.md` files
+  from each repo's task state. Rewrites each plan in place and leaves it
+  uncommitted for you to review, commit, and push. It never commits or pushes.
 
 ## Cross-repo conventions
 

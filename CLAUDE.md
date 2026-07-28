@@ -61,6 +61,27 @@ partway resumes without re-spending calls. The idempotency key is the plan's own
 header date, so the tool can never disagree with what's on disk. Other flags:
 `--date`, `--only`, `--dry-run`, `--report`, `--timeout`, `--model`.
 
+## Check for pending work across the workspace (local-only)
+
+`python3 tools/check-pending.py` reports **uncommitted and unpushed** work for
+every repo in the workspace. It exists because no single editor window can answer
+"did I commit and push everything?" — the sibling repos are separate git repos and
+aren't in scope there, which is exactly how a `replan.py` batch ends up half
+committed.
+
+- Two kinds of pending work, because tracking only the first is how work goes
+  missing: uncommitted changes (staged/unstaged/untracked) **and** commits the
+  upstream doesn't have. A branch with no upstream is reported, never assumed
+  clean.
+- **Worktrees are enumerated via `git worktree list`**, not guessed from
+  directory shape, so a worktree parked in a sibling directory or outside the
+  workspace entirely still gets checked. Every working tree can hold its own
+  uncommitted work; reporting only the primary one is the bug.
+- Roster is `repos.yml` plus project-status itself; `--all` sweeps every git repo
+  under the workspace root, honoring the `.project-status-ignore` opt-out.
+- Exits 1 when anything is pending, so it works as a gate as well as a dashboard.
+  `--dirty-only` hides clean repos.
+
 ## Summarization rules
 
 - **Daily resolution.** One `## YYYY-MM-DD` section per run.
@@ -88,5 +109,6 @@ header date, so the tool can never disagree with what's on disk. Other flags:
 - `tools/run.py` — orchestrator that runs the full update cycle
 - `tools/gen-umbrella-claude.py` — regenerate the workspace-root (umbrella) `CLAUDE.md` from `repos.yml`. Local-only; NOT part of the update cycle. Re-run when a repo is added or removed.
 - `tools/replan.py` — draft next-day `daily-plan.md` files for human review, one `claude -p` per locally checked-out repo. Local-only, draft-only; NOT part of the update cycle. See the section above.
+- `tools/check-pending.py` — report uncommitted and unpushed work across every repo in the workspace (worktrees included). Local-only; NOT part of the update cycle. Exits non-zero when anything is pending.
 - `tools/check-targets.py` — report tracked repos whose injected `CLAUDE.md` block or `project-status-guide.md` has drifted from `templates/`. Exits non-zero on drift. The same check is surfaced per repo in `daily-plan-summary.md`, so this is the one-shot whole-portfolio view. Fix with `./setup-new-repo.sh --update <remote>`.
 - `hooks/check-repo-bootstrap.py` — user-level `SessionStart` hook (registered in `~/.claude/settings.json`, not in any target repo). Nudges when a git repo under the workspace root has no project-status block in its `CLAUDE.md` — i.e. it was never bootstrapped. Silent for bootstrapped repos, for project-status itself, outside the workspace root, and in any repo containing `.project-status-ignore`.
