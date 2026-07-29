@@ -4,6 +4,41 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-29
+
+### second-brain-test
+
+- Diagrams and ASCII art can now be fenced off so they render in Obsidian but are excluded from a note's search vector — box-drawing characters cost ~1 token/char (vs ~4 chars/token for prose), so decorative art was diluting embeddings and sometimes pushing notes past the embedding model's 2048-token limit (490f18c).
+- Mechanism: paired HTML comments mark the region; a "canonical view" strips it before embedding, content hashing, and lexical search, so redrawing a diagram no longer triggers a re-embed or a stale flag.
+- Added two non-blocking pre-commit warnings: unpaired markers, and notes nearing the token budget.
+- Large single commit — 11 files, ~460 lines, including a 78-line view-extraction script, a 167-line test file, and a dev-only self-check suite.
+
+### second-brain-devkit
+
+- Same diagram-exclusion feature landed here: fenced regions hidden from search/embedding/hashing but still visible in Obsidian, fixing notes that were well under the 300-line guideline yet still blew past the 2048-token embedding limit due to token-expensive box-drawing art (`9d2f255`). Pre-commit now warns on malformed markers or near-budget notes; existing brains are unaffected since unmarked notes hash identically to before. CI grew to 15 gates.
+- Closed out the auto-linking rollout task: re-running the linker over a vault that grew by 17 notes confirmed correct behavior at scale (candidate links stay under the distance threshold, topic clusters stay separate, editing doesn't reshuffle vectors) (`75ba23b`). Surfaced a related edge case — a link disappearing as the vault grows — now handed off as a follow-up task.
+- New bug filed: brain upgrades don't refresh documentation the way fresh generation does, since the upgrade path preserves `CLAUDE.md` and skips the README without certain markers — so shipped features can go undocumented in older brains (`a23ab2b`).
+- Broad supporting change — 31 files, including a ~160-line doc and a ~167-line test file for the diagram feature (`874bf544..75ba23b7`).
+
+### create-ai-builder
+
+- Housekeeping only: task `15d940` (generator-based target setup) moved from backlog to in-progress (26840b8); no code changes.
+
+### create-project-system
+
+- Tagged first release `v0.1.0` (`7442b72`), locking `generate.sh` and its ten flags as the stable "layer-1" contract for consumers like create-ai-builder to pin against instead of vendoring a raw SHA. Documents two known upcoming breaking changes: renaming `Category` to `Worktree` and adding `--require-category`.
+- Closed the final rollout task in `c003956`, confirming create-ai-builder had already merged the generator via its own squashed PR #4 (2026-07-26) — plan tracking just hadn't caught up.
+- All rollout tasks now closed and the generator confirmed to reproduce its source subsystem; `PLAN.md`/`daily-plan.md` rewritten to drop completed work and refocus on the backlog, sequencing the `Category`→`Worktree` rename ahead of `--require-category` so the flag doesn't bake in the old field name.
+
+### No updates
+- customer-req-responder (for 1 days)
+- captains-log (for 1 days)
+
+### Cross-repo
+
+- second-brain-test and second-brain-devkit shipped the same diagram-exclusion feature today (490f18c / 9d2f255) — fencing ASCII art/diagrams out of the embedding, hashing, and search path to stop token-expensive box-drawing characters from blowing the 2048-token embedding budget.
+
+
 ## 2026-07-28
 
 ### second-brain-test
