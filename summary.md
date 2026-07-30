@@ -4,6 +4,23 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-07-30
+
+### captains-log
+
+- Promoted a new backlog item — surveying existing Claude session managers (tools for tracking multiple parallel Claude Code sessions) — to the top of the priority list and onto today's plan, ahead of a previously scheduled Kaggle work block (`ed82956`).
+- Scoped that survey around one gating question first: when is it defensible to run Claude sessions with permission checks bypassed, and what safeguards (sandboxing, disposable git worktrees, restricting network egress and credentials) would need to be in place to contain that risk (`b6b0d01`).
+- Reasoning: running several Claude sessions in parallel is already normal practice, but nothing currently tracks them as a group, and that gap shouldn't be addressed by tooling until the bypass question is answered.
+- Updated `daily-plan.md` and cross-linked task files accordingly (range `1eba1dc..b6b0d01`).
+
+### No updates
+- second-brain-test (for 1 days)
+- second-brain-devkit (for 1 days)
+- customer-req-responder (for 2 days)
+- create-ai-builder (for 1 days)
+- create-project-system (for 1 days)
+
+
 ## 2026-07-29
 
 ### second-brain-test
