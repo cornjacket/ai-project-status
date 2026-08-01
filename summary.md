@@ -4,6 +4,17 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-08-01
+
+### No updates
+- second-brain-test (for 3 days)
+- second-brain-devkit (for 3 days)
+- customer-req-responder (for 4 days)
+- create-ai-builder (for 3 days)
+- captains-log (for 2 days)
+- create-project-system (for 3 days)
+
+
 ## 2026-07-31
 
 ### No updates
