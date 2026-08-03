@@ -66,6 +66,45 @@ Per-repo flags:
 | `enabled` | `true` | when `false`, repo is skipped entirely |
 | `report_inactivity` | `true` | when `false`, repo is omitted from `summary.md` on days it has no new work |
 
+## Removing a tracked repo
+
+Two levels. **Soft removal** stops the rollup from including the repo but leaves it bootstrapped. **Hard removal** also un-bootstraps the target so it no longer carries any project-status machinery. Hard removal builds on soft — do those steps first.
+
+### Soft removal — stop tracking
+
+1. **`repos.yml`** — set `enabled: false` on the entry, or delete it. `enabled: false` keeps a record of what was once tracked; deleting is cleaner when the repo is gone for good.
+2. **Regenerate the umbrella `CLAUDE.md`** — `python3 tools/gen-umbrella-claude.py`, so the workspace-root roster drops the repo. Local-only, deliberately not part of `tools/run.py`.
+3. **Remove it from the daily routine's `sources`** — see below. Skipping this leaves the platform pre-cloning a repo that nothing reads.
+
+Optional housekeeping, cosmetic and safe to skip:
+
+- Prune the repo's key from `state.json`. Nothing prunes it automatically, so stale keys accumulate.
+- `rm -rf tracked/<name>` — `sync.py` clones and pulls but never prunes. It's a cache; re-created on demand.
+
+Leave `summary.md` and `daily-plan-archive/` alone. They are the historical record and should keep showing the repo for the period it was actually tracked.
+
+### Hard removal — un-bootstrap the target
+
+Reverses `setup-new-repo.sh`. There is no `--remove` flag, so this is done by hand in a session rooted at the target repo, on a clean tree. Remove exactly these five artifacts:
+
+| artifact | action |
+|---|---|
+| `CLAUDE.md` | delete the block between `<!-- ai-project-status:begin -->` and `<!-- ai-project-status:end -->`, markers included |
+| `project-status-guide.md` | `git rm` |
+| `daily-plan.md` | `git rm` |
+| `.claude/hooks/check-daily-plan.py` | `git rm` |
+| `.claude/settings.json` | remove the `SessionStart` entry running `check-daily-plan.py`; `git rm` the file only if it holds nothing else |
+
+Then **add a `.project-status-ignore` file at the repo root.** Without it, the user-level `hooks/check-repo-bootstrap.py` hook sees a workspace repo whose `CLAUDE.md` has no project-status block and nudges you to bootstrap it at every session start — an un-bootstrapped repo is indistinguishable from a never-bootstrapped one except by that file.
+
+**Do not touch other generators' blocks.** A target may also carry a `<!-- task-system:begin -->` block and `.claude/skills/` from `create-project-system`. Those are unrelated machinery and must survive.
+
+### Removing it from the daily routine's `sources`
+
+The mirror of step 3 in "Adding a tracked repo". Routine ID `trig_01BLz2BYyE95n44TCDKaFcnA`. Use the `RemoteTrigger` tool: `action: "get"` to fetch the current config, drop the `{"git_repository": {"url": "https://github.com/cornjacket/<repo>"}}` entry from `session_context.sources`, then `action: "update"` with the **entire** `job_config` — send the whole thing rather than relying on partial-merge semantics, which clobbers other fields. Verify at https://claude.ai/code/routines/trig_01BLz2BYyE95n44TCDKaFcnA.
+
+`repos.yml` and the routine's `sources` are two separate registries and neither one implies the other: `repos.yml` decides what the code iterates, `sources` decides what the platform pre-clones into the sandbox. Removing only the first leaves a repo being cloned daily for nothing; removing only the second breaks the run for a repo still listed in `repos.yml`.
+
 ## Running an update cycle
 
 ```bash

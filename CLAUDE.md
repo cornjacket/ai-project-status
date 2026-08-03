@@ -15,6 +15,17 @@ When the user asks to add a repo to the tracker, run the full workflow — don't
 3. **Regenerate the umbrella `CLAUDE.md`.** Run `python3 tools/gen-umbrella-claude.py` so the workspace-root roster reflects the new repo. Local-only (the umbrella path doesn't exist in the remote run), so it is deliberately not part of `tools/run.py`.
 4. **Add to the daily `/schedule` routine's `sources`.** Routine ID: `trig_01BLz2BYyE95n44TCDKaFcnA`. Use the `RemoteTrigger` tool — `action: "get"` to fetch the current config, then `action: "update"` with the full `job_config` and an extra `{"git_repository": {"url": "https://github.com/cornjacket/<repo>"}}` appended to `session_context.sources`. Send back the entire `job_config` (don't rely on partial-merge semantics) to avoid clobbering other fields. Browser URL for human verification: https://claude.ai/code/routines/trig_01BLz2BYyE95n44TCDKaFcnA. Skip this step only if the user confirms they run the pipeline locally only — without it, the sandbox's egress proxy blocks the remote routine from cloning the new repo.
 
+## Remove a tracked repo
+
+The mirror of the above. Ask first whether the user wants a **soft** removal (stop tracking; the repo keeps its project-status machinery) or a **hard** one (also un-bootstrap the target). Steps 1–3 are soft removal and always apply; step 4 is hard removal. Full detail — including the exact artifact list — is in `README.md` → "Removing a tracked repo"; don't restate it here.
+
+1. **Deregister from `repos.yml`.** Set `enabled: false` to keep a record of what was once tracked, or delete the entry when the repo is gone for good.
+2. **Regenerate the umbrella `CLAUDE.md`.** `python3 tools/gen-umbrella-claude.py`, same as step 3 of adding. Local-only.
+3. **Remove from the daily routine's `sources`.** Same `RemoteTrigger` get-then-update-with-full-`job_config` flow as step 4 of adding, dropping the repo's `git_repository` entry. `repos.yml` and `sources` are independent registries — neither removal implies the other. Leaving a stale source just wastes a daily clone; removing a source for a repo still in `repos.yml` breaks the run for it.
+4. **(Hard removal only) Un-bootstrap the target.** There is no `--remove` flag on `setup-new-repo.sh` — do it by hand in the target repo, then add a `.project-status-ignore` at its root or the user-level `check-repo-bootstrap.py` hook will nudge to re-bootstrap it every session. Other generators' blocks (e.g. `<!-- task-system:begin -->`) are unrelated and must survive.
+
+Housekeeping, optional: prune the repo's key from `state.json` (nothing prunes it automatically) and `rm -rf tracked/<name>` (a cache; `sync.py` never prunes). Never edit `summary.md` or `daily-plan-archive/` — they are the historical record for the period the repo was tracked.
+
 ## Run an update cycle
 
 1. `python3 tools/sync.py` — clone or fast-forward-pull every enabled repo into `tracked/`.

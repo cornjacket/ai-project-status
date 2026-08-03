@@ -33,9 +33,6 @@ repos:
   - name: create-ai-builder
     remote: https://github.com/cornjacket/create-ai-builder.git
     priority: 2
-  - name: captains-log
-    remote: https://github.com/cornjacket/captains-log.git
-    priority: 2
   - name: create-project-system
     remote: https://github.com/cornjacket/create-project-system.git
     priority: 1
