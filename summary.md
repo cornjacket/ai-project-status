@@ -4,6 +4,36 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-08-03
+
+### second-brain-test
+
+- `f403db2` wraps the devkit-owned section of the agent's memory file (`CLAUDE.md`) in BEGIN/END marker comments, matching the pattern already used in the README, so future upgrades can refresh just that region while leaving a user's own notes untouched. Fixes a gap where upgrades preserved `CLAUDE.md` wholesale, shipping new tooling without the directives explaining how to use it. Purely markup — inert HTML comments, no functional change (`CLAUDE.md`, 7 lines added).
+
+### second-brain-devkit
+
+- `CLAUDE.md` now merges as a managed, mergeable block during brain upgrades, so a brain created before a feature actually gets the doc explaining it, not just the code (`744b99b`). The same marker-based splice was extended to `README.md` after dogfooding on the real brain found it 142 lines out of date and missing a whole documented feature within the hour (`5cf7af2`). Both files preserve anything the user wrote outside the managed block byte-for-byte; if a user deliberately removed the markers to opt out, the tool now names the file and explains updates have stopped rather than silently skipping it.
+- Fallout fixes bundled in: the upgrade run no longer claims "up to date" while failing to deliver directives, the emitted template is now stable under its own merge logic (a stray blank line previously made a freshly generated brain look permanently "changed"), and drift in the note template is now reported instead of silently breaking a downstream check.
+- Test coverage grew accordingly: a new ~239-line checker (`tools/check_claude_block.py`) plus additional CI gates so README and CLAUDE.md can't silently drift apart again; CI is now at 16 gates total (`75ba23b7..5cf7af25`).
+
+### create-project-system
+
+- Renamed the generator's `Category` field to `Worktree` (`aa757cf`) — the old name misled operators into using it for topical grouping when its real purpose is marking which files a task touches so the tool can tell what's safe to run in parallel branches. Tags (the actual grouping mechanism) can now be edited after task creation, not just at creation time.
+- Breaking change to the generator's contract, slated for v0.2.0 rather than shipping silently; v0.1.0 stays available for consumers not ready to move. Old field/flag names (`--category`, `--group-by-category`) still work but warn; `--with-classes` now errors, pointing users to `--with-worktrees`.
+- Self-test suite expanded from 71 to 91 assertions, all passing.
+- Filed a follow-up (task 24, `c23c3eb`) noting two generated docs mis-describe the boundary between this repo (owns the task subsystem) and the downstream `create-ai-builder` pipeline layer — scoped for a future doc fix, no functional change yet.
+- Rolled the daily plan forward (`c23c3eb..322924c4`) to sequence Monday: ship v0.2.0 first (a sibling repo, `create-ai-builder`, is blocked waiting to pin against it), then the doc fix, then the next flag-rename task.
+
+### No updates
+- customer-req-responder (for 6 days)
+- create-ai-builder (for 5 days)
+- captains-log (for 4 days)
+
+### Cross-repo
+
+- Both `second-brain-devkit` and `second-brain-test` landed the same marker-based `CLAUDE.md` merge pattern today — the devkit shipped it (`744b99b`, `5cf7af2`) and `second-brain-test` immediately consumed it (`f403db2`), closing the loop between the tooling change and the downstream project it manages.
+
+
 ## 2026-08-02
 
 ### No updates
