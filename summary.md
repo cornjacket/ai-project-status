@@ -4,6 +4,38 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-08-04
+
+### second-brain-devkit
+
+- Closed task #8b (speculative fix for link "churn" during related-note refresh) by actually running the gate it was blocked on: 200 test notes across 10 domains showed the distance cutoff never triggers in practice, so tightening it would have wrecked 60% of links and isolated 94 notes (`bc008ef`). The remaining idea (hysteresis to stop links flapping) was reclassified as targeting the wrong cause and shelved pending real-world complaints.
+- Rewrote the auto-linking docs to explain the distance cutoff and correct a prior assumption — a larger vault makes it fire *less* often, not more (`da2d09e`).
+- Fixed a lifecycle gap where the new-note template, the one file the devkit is allowed to write inside the user's Obsidian vault, wasn't refreshed on upgrade, risking silent drift from the build-time format; upgrades now overwrite it like any other tool-managed file, with a new test guarding that adjacent user notes stay untouched (`63dfe62`).
+- Documented task #8 as fully closed and drafted tomorrow's plan: no code work remains queued, next steps require a human in Obsidian or Claude Desktop (`3a51849`).
+- 7 files touched overall (`5cf7af2..3a51849`), concentrated in docs and update/lifecycle tooling.
+
+### create-ai-builder
+
+- Joined the shared multi-repo "git-workspace" tracker: stripped this repo's own project-status setup (per-repo daily plan, commit-discipline hook, guide/settings — ~250 lines) in favor of a single lighter marker block in CLAUDE.md (`cdd3104`, `56c68d5`). Plan tracking now lives at the workspace level.
+- Filed a high-priority infrastructure bug, now in progress: regression test targets are plain folders inside this repo, but tooling locates "repo root" via git, which resolves to *this* repo instead of the target — so target scripts were silently reading/writing this repo's own task backlog (`84c13bc`, `185e313`). Fix requires every test harness to initialize its target as a real git repo and reject non-self-rooted targets.
+- Queued (not executed) a rename cleanup: upstream `create-project-system` renamed a task field from "Category" to "Worktree" to better reflect its meaning (which files a task touches, enabling parallel branches, vs. topical tagging). Tooling already tolerates both spellings, but 62 live task READMEs and docs (notably CLAUDE.md) still need updating to avoid lingering confusion (`93b219c`).
+
+### create-project-system
+
+- Migrated commit-discipline tracking off the old project-status hook system and onto a git-workspace model that reconstructs activity purely from `git log` instead of installed hooks (`322924c..a3e02be`).
+- `701f502` adds a workspace-agnostic "commit-discipline kernel" block to CLAUDE.md — a standardized commit schema so any number of developers can independently track this repo from their own workspace without stepping on each other's instrumentation.
+- `a3e02be` rips out the old tracker's four artifacts (SessionStart nag hook, its settings.json registration, daily-plan-guide.md, shared daily-plan.md), trimming CLAUDE.md from 94 to 52 lines and net-removing ~316 lines across 5 files.
+- In-flight plan content wasn't lost — it moved to a per-developer slot in the tracking workspace, since a plan file committed directly to a shared repo kept getting overwritten by concurrent developers. Plan staleness now surfaces in the workspace's daily rollup instead of blocking a session at startup.
+
+### No updates
+- second-brain-test (for 1 days)
+- customer-req-responder (for 7 days)
+
+### Cross-repo
+
+`create-project-system` shipped the git-workspace commit-discipline model today (`322924c..a3e02be`), and `create-ai-builder` adopted it same-day (`cdd3104`, `56c68d5`) — both retiring their local project-status hooks (SessionStart nag hook, per-repo daily-plan, guide/settings) in favor of workspace-level tracking reconstructed from `git log`.
+
+
 ## 2026-08-03
 
 ### second-brain-test
