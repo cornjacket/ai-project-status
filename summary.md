@@ -4,6 +4,32 @@ Auto-maintained by project-status. Newest activity at the top.
 
 <!-- new sections inserted below -->
 
+## 2026-08-05
+
+### second-brain-devkit
+
+- Left project-status for a shared git-workspace: the standalone daily plan, guide, and SessionStart hook are gone, with per-developer plans now living in the workspace instead (`f48f073`).
+- Before that, added the workspace's commit-discipline "kernel" — a required `[Context]`/`[Impact]` note format so cross-repo tooling can reconstruct history from `git log` alone (`7db6a8c`).
+- The migration also fixed stale tracker references in `CLAUDE.md` (including a bug filed against a repo slated for archival) and reworded the "disjointness" rule to describe a role rather than name a specific tool, so future tracker swaps won't go stale the same way (`f48f073`).
+- Follow-up plan entry: the leak-detection guard blocks by exact name rather than shape, so it missed a new CLAUDE.md-injecting block post-swap — proposed fix is a shape-based rule (`0160c80`).
+- Net: six files touched, ~325 lines removed vs. 75 added, mostly deleting old tracking scaffolding (`3a51849..0160c80`).
+
+### customer-req-responder
+
+- Joined the same multi-repo dev-workspace setup, migrating off standalone `project-status` instrumentation in favor of shared workspace tracking (`a551156`, `62b9cfb`).
+- `a551156` added the workspace's `[Context]`/`[Impact]` commit-discipline convention so rollups can read this repo's history directly from `git log`.
+- `62b9cfba` then stripped the now-redundant tracking machinery — daily-plan freshness hook, guide doc, and settings — since plans now live per-developer in the workspace; `CLAUDE.md` shrank from 94 to 52 lines and `.claude/` was removed entirely (`aed6d470..62b9cfba`, 5 files changed, ~297 lines removed).
+
+### Cross-repo
+
+- second-brain-devkit and customer-req-responder both migrated today from standalone project-status tracking to the shared git-workspace model — adding the `[Context]`/`[Impact]` commit-discipline kernel first, then removing their daily-plan hooks, guides, and settings in a follow-up commit.
+
+### No updates
+- second-brain-test (for 2 days)
+- create-ai-builder (for 1 days)
+- create-project-system (for 1 days)
+
+
 ## 2026-08-04
 
 ### second-brain-devkit
