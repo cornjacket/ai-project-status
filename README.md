@@ -1,5 +1,20 @@
 # project-status
 
+> ## ⚠️ Mothballed — 2026-08-06
+>
+> This repo is retired and no longer runs. It has been **superseded by
+> [`create-git-workspace`](https://github.com/cornjacket/create-git-workspace)**,
+> which generates git-workspace wrapper repos that manage their child repos and
+> produce the same rollups locally, with no scheduled cloud routine.
+>
+> The daily routine is disabled, every tracked repo has been un-bootstrapped, and
+> the GitHub remote is archived read-only. It is kept for the **historical
+> record** — [`summary.md`](summary.md) and
+> [`daily-plan-archive/`](daily-plan-archive/) hold months of cross-repo activity
+> that exists nowhere else.
+>
+> Nothing below this line is live. Read it as history.
+
 Tracks development activity across a portfolio of `ai-*` repos and produces two cross-repo rollups: a retrospective `summary.md` (newest activity at the top, daily resolution) and a forward-looking `daily-plan-summary.md` (today's plan from each repo, overwritten daily). Backward-looking activity is read directly from each repo's git commit telemetry (structured commit messages — title + `[Context]`/`[Impact]`); forward-looking intent comes from each repo's `daily-plan.md` (one day's intent). This tool reads those, summarizes activity per repo via `claude -p`, runs a cross-repo polish pass when more than one repo has new work, and aggregates the per-repo plans deterministically.
 
 **Current rollup: [`summary.md`](summary.md).** &nbsp; **Today's plan: [`daily-plan-summary.md`](daily-plan-summary.md).**
